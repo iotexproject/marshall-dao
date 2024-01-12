@@ -1,5 +1,4 @@
 import { ethers } from 'hardhat';
-import { Forwarder, VotingEscrow } from '../src/types';
 
 async function main() {
   const balanceLogicLibraryFactory = await ethers.getContractFactory('BalanceLogicLibrary');
@@ -40,6 +39,8 @@ async function main() {
     }
   });
   console.log(`VeArtProxy deployed to ${veArtProxy.target}`);
+
+  await escrow.setArtProxy(veArtProxy.target);
 }
 
 main().catch(err => {
