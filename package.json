@@ -6,7 +6,7 @@
   "author": "ququzone <xueping.yang@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf ./artifacts ./cache ./foundry-out ./types ./dist",
+    "clean": "rimraf ./artifacts ./cache ./foundry-out ./src/types ./dist",
     "compile": "hardhat compile",
     "test": "hardhat test",
     "snapshots": "UPDATE_SNAPSHOT=1 hardhat test",

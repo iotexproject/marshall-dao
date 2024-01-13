@@ -7,6 +7,5 @@ export * as interfaces from "./interfaces";
 export * as libraries from "./libraries";
 export { DAOForwarder__factory } from "./DAOForwarder__factory";
 export { MarshallGovernor__factory } from "./MarshallGovernor__factory";
-export { RewardsDistributor__factory } from "./RewardsDistributor__factory";
 export { VeArtProxy__factory } from "./VeArtProxy__factory";
 export { VotingEscrow__factory } from "./VotingEscrow__factory";
