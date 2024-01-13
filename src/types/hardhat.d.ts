@@ -26,6 +26,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC4906__factory>;
     getContractFactory(
+      name: "IERC5267",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC5267__factory>;
+    getContractFactory(
       name: "IERC6372",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC6372__factory>;
@@ -33,6 +37,10 @@ declare module "hardhat/types/runtime" {
       name: "ERC2771Context",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC2771Context__factory>;
+    getContractFactory(
+      name: "IERC1155Receiver",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC1155Receiver__factory>;
     getContractFactory(
       name: "IERC20Permit",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -54,6 +62,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Receiver__factory>;
     getContractFactory(
+      name: "EIP712",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.EIP712__factory>;
+    getContractFactory(
       name: "ERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC165__factory>;
@@ -61,6 +73,14 @@ declare module "hardhat/types/runtime" {
       name: "IERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
+    getContractFactory(
+      name: "ShortStrings",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ShortStrings__factory>;
+    getContractFactory(
+      name: "DoubleEndedQueue",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.DoubleEndedQueue__factory>;
     getContractFactory(
       name: "PerlinNoise",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -74,9 +94,29 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DAOForwarder__factory>;
     getContractFactory(
+      name: "IVetoGovernor",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVetoGovernor__factory>;
+    getContractFactory(
       name: "IVotes",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVotes__factory>;
+    getContractFactory(
+      name: "VetoGovernor",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VetoGovernor__factory>;
+    getContractFactory(
+      name: "VetoGovernorCountingSimple",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VetoGovernorCountingSimple__factory>;
+    getContractFactory(
+      name: "VetoGovernorVotes",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VetoGovernorVotes__factory>;
+    getContractFactory(
+      name: "VetoGovernorVotesQuorumFraction",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VetoGovernorVotesQuorumFraction__factory>;
     getContractFactory(
       name: "IVeArtProxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -102,6 +142,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SafeCastLibrary__factory>;
     getContractFactory(
+      name: "MarshallGovernor",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MarshallGovernor__factory>;
+    getContractFactory(
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.VeArtProxy__factory>;
@@ -126,6 +170,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC4906>;
     getContractAt(
+      name: "IERC5267",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC5267>;
+    getContractAt(
       name: "IERC6372",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -135,6 +184,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC2771Context>;
+    getContractAt(
+      name: "IERC1155Receiver",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC1155Receiver>;
     getContractAt(
       name: "IERC20Permit",
       address: string | ethers.Addressable,
@@ -161,6 +215,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721Receiver>;
     getContractAt(
+      name: "EIP712",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.EIP712>;
+    getContractAt(
       name: "ERC165",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -170,6 +229,16 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
+    getContractAt(
+      name: "ShortStrings",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ShortStrings>;
+    getContractAt(
+      name: "DoubleEndedQueue",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.DoubleEndedQueue>;
     getContractAt(
       name: "PerlinNoise",
       address: string | ethers.Addressable,
@@ -186,10 +255,35 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.DAOForwarder>;
     getContractAt(
+      name: "IVetoGovernor",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVetoGovernor>;
+    getContractAt(
       name: "IVotes",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IVotes>;
+    getContractAt(
+      name: "VetoGovernor",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VetoGovernor>;
+    getContractAt(
+      name: "VetoGovernorCountingSimple",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VetoGovernorCountingSimple>;
+    getContractAt(
+      name: "VetoGovernorVotes",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VetoGovernorVotes>;
+    getContractAt(
+      name: "VetoGovernorVotesQuorumFraction",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VetoGovernorVotesQuorumFraction>;
     getContractAt(
       name: "IVeArtProxy",
       address: string | ethers.Addressable,
@@ -220,6 +314,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.SafeCastLibrary>;
+    getContractAt(
+      name: "MarshallGovernor",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MarshallGovernor>;
     getContractAt(
       name: "VeArtProxy",
       address: string | ethers.Addressable,
@@ -244,6 +343,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC4906>;
     deployContract(
+      name: "IERC5267",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC5267>;
+    deployContract(
       name: "IERC6372",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC6372>;
@@ -251,6 +354,10 @@ declare module "hardhat/types/runtime" {
       name: "ERC2771Context",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC2771Context>;
+    deployContract(
+      name: "IERC1155Receiver",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC1155Receiver>;
     deployContract(
       name: "IERC20Permit",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -272,6 +379,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721Receiver>;
     deployContract(
+      name: "EIP712",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EIP712>;
+    deployContract(
       name: "ERC165",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC165>;
@@ -279,6 +390,14 @@ declare module "hardhat/types/runtime" {
       name: "IERC165",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC165>;
+    deployContract(
+      name: "ShortStrings",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ShortStrings>;
+    deployContract(
+      name: "DoubleEndedQueue",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.DoubleEndedQueue>;
     deployContract(
       name: "PerlinNoise",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -292,9 +411,29 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DAOForwarder>;
     deployContract(
+      name: "IVetoGovernor",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVetoGovernor>;
+    deployContract(
       name: "IVotes",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVotes>;
+    deployContract(
+      name: "VetoGovernor",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernor>;
+    deployContract(
+      name: "VetoGovernorCountingSimple",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernorCountingSimple>;
+    deployContract(
+      name: "VetoGovernorVotes",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernorVotes>;
+    deployContract(
+      name: "VetoGovernorVotesQuorumFraction",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernorVotesQuorumFraction>;
     deployContract(
       name: "IVeArtProxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -319,6 +458,10 @@ declare module "hardhat/types/runtime" {
       name: "SafeCastLibrary",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.SafeCastLibrary>;
+    deployContract(
+      name: "MarshallGovernor",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MarshallGovernor>;
     deployContract(
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -344,6 +487,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC4906>;
     deployContract(
+      name: "IERC5267",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC5267>;
+    deployContract(
       name: "IERC6372",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -353,6 +501,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC2771Context>;
+    deployContract(
+      name: "IERC1155Receiver",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC1155Receiver>;
     deployContract(
       name: "IERC20Permit",
       args: any[],
@@ -379,6 +532,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC721Receiver>;
     deployContract(
+      name: "EIP712",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.EIP712>;
+    deployContract(
       name: "ERC165",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -388,6 +546,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC165>;
+    deployContract(
+      name: "ShortStrings",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ShortStrings>;
+    deployContract(
+      name: "DoubleEndedQueue",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.DoubleEndedQueue>;
     deployContract(
       name: "PerlinNoise",
       args: any[],
@@ -404,10 +572,35 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DAOForwarder>;
     deployContract(
+      name: "IVetoGovernor",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVetoGovernor>;
+    deployContract(
       name: "IVotes",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVotes>;
+    deployContract(
+      name: "VetoGovernor",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernor>;
+    deployContract(
+      name: "VetoGovernorCountingSimple",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernorCountingSimple>;
+    deployContract(
+      name: "VetoGovernorVotes",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernorVotes>;
+    deployContract(
+      name: "VetoGovernorVotesQuorumFraction",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VetoGovernorVotesQuorumFraction>;
     deployContract(
       name: "IVeArtProxy",
       args: any[],
@@ -438,6 +631,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.SafeCastLibrary>;
+    deployContract(
+      name: "MarshallGovernor",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MarshallGovernor>;
     deployContract(
       name: "VeArtProxy",
       args: any[],

@@ -2,4 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export { IERC4906__factory } from "./IERC4906__factory";
+export { IERC5267__factory } from "./IERC5267__factory";
 export { IERC6372__factory } from "./IERC6372__factory";
