@@ -11,5 +11,6 @@ import type * as libraries from "./libraries";
 export type { libraries };
 export type { DAOForwarder } from "./DAOForwarder";
 export type { MarshallGovernor } from "./MarshallGovernor";
+export type { RewardsDistributor } from "./RewardsDistributor";
 export type { VeArtProxy } from "./VeArtProxy";
 export type { VotingEscrow } from "./VotingEscrow";
