@@ -22,6 +22,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IForwarder__factory>;
     getContractFactory(
+      name: "Ownable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Ownable__factory>;
+    getContractFactory(
       name: "IERC4906",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC4906__factory>;
@@ -93,6 +97,10 @@ declare module "hardhat/types/runtime" {
       name: "DAOForwarder",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DAOForwarder__factory>;
+    getContractFactory(
+      name: "FactoryRegistry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FactoryRegistry__factory>;
     getContractFactory(
       name: "GaugeFactory",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -213,6 +221,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IForwarder>;
     getContractAt(
+      name: "Ownable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Ownable>;
+    getContractAt(
       name: "IERC4906",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -302,6 +315,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.DAOForwarder>;
+    getContractAt(
+      name: "FactoryRegistry",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FactoryRegistry>;
     getContractAt(
       name: "GaugeFactory",
       address: string | ethers.Addressable,
@@ -447,6 +465,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IForwarder>;
     deployContract(
+      name: "Ownable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Ownable>;
+    deployContract(
       name: "IERC4906",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC4906>;
@@ -518,6 +540,10 @@ declare module "hardhat/types/runtime" {
       name: "DAOForwarder",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DAOForwarder>;
+    deployContract(
+      name: "FactoryRegistry",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FactoryRegistry>;
     deployContract(
       name: "GaugeFactory",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -638,6 +664,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IForwarder>;
     deployContract(
+      name: "Ownable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Ownable>;
+    deployContract(
       name: "IERC4906",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -727,6 +758,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DAOForwarder>;
+    deployContract(
+      name: "FactoryRegistry",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.FactoryRegistry>;
     deployContract(
       name: "GaugeFactory",
       args: any[],
