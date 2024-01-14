@@ -18,9 +18,9 @@ import type {
   TypedEventLog,
   TypedListener,
   TypedContractMethod,
-} from "../../../common";
+} from "../../common";
 
-export interface IGaugeFactoryInterface extends Interface {
+export interface GaugeFactoryInterface extends Interface {
   getFunction(nameOrSignature: "createGauge"): FunctionFragment;
 
   encodeFunctionData(
@@ -34,11 +34,11 @@ export interface IGaugeFactoryInterface extends Interface {
   ): Result;
 }
 
-export interface IGaugeFactory extends BaseContract {
-  connect(runner?: ContractRunner | null): IGaugeFactory;
+export interface GaugeFactory extends BaseContract {
+  connect(runner?: ContractRunner | null): GaugeFactory;
   waitForDeployment(): Promise<this>;
 
-  interface: IGaugeFactoryInterface;
+  interface: GaugeFactoryInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,

@@ -21,11 +21,6 @@ const _abi = [
         name: "_pool",
         type: "address",
       },
-      {
-        internalType: "address",
-        name: "_ve",
-        type: "address",
-      },
     ],
     name: "createGauge",
     outputs: [

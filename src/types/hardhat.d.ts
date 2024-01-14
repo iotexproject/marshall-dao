@@ -94,6 +94,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DAOForwarder__factory>;
     getContractFactory(
+      name: "GaugeFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GaugeFactory__factory>;
+    getContractFactory(
+      name: "Gauge",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Gauge__factory>;
+    getContractFactory(
       name: "IVetoGovernor",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVetoGovernor__factory>;
@@ -295,6 +303,16 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.DAOForwarder>;
     getContractAt(
+      name: "GaugeFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GaugeFactory>;
+    getContractAt(
+      name: "Gauge",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Gauge>;
+    getContractAt(
       name: "IVetoGovernor",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -501,6 +519,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DAOForwarder>;
     deployContract(
+      name: "GaugeFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.GaugeFactory>;
+    deployContract(
+      name: "Gauge",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Gauge>;
+    deployContract(
       name: "IVetoGovernor",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVetoGovernor>;
@@ -701,6 +727,16 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.DAOForwarder>;
+    deployContract(
+      name: "GaugeFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.GaugeFactory>;
+    deployContract(
+      name: "Gauge",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Gauge>;
     deployContract(
       name: "IVetoGovernor",
       args: any[],

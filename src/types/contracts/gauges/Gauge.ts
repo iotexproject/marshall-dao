@@ -23,7 +23,7 @@ import type {
   TypedContractMethod,
 } from "../../common";
 
-export interface IGaugeInterface extends Interface {
+export interface GaugeInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "balanceOf"
@@ -31,6 +31,7 @@ export interface IGaugeInterface extends Interface {
       | "deposit(uint256)"
       | "earned"
       | "getReward"
+      | "isTrustedForwarder"
       | "lastTimeRewardApplicable"
       | "lastUpdateTime"
       | "left"
@@ -73,6 +74,10 @@ export interface IGaugeInterface extends Interface {
   encodeFunctionData(functionFragment: "earned", values: [AddressLike]): string;
   encodeFunctionData(
     functionFragment: "getReward",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isTrustedForwarder",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -146,6 +151,10 @@ export interface IGaugeInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "earned", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getReward", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isTrustedForwarder",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "lastTimeRewardApplicable",
     data: BytesLike
@@ -255,11 +264,11 @@ export namespace WithdrawEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface IGauge extends BaseContract {
-  connect(runner?: ContractRunner | null): IGauge;
+export interface Gauge extends BaseContract {
+  connect(runner?: ContractRunner | null): Gauge;
   waitForDeployment(): Promise<this>;
 
-  interface: IGaugeInterface;
+  interface: GaugeInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -315,6 +324,12 @@ export interface IGauge extends BaseContract {
   earned: TypedContractMethod<[_account: AddressLike], [bigint], "view">;
 
   getReward: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+
+  isTrustedForwarder: TypedContractMethod<
+    [forwarder: AddressLike],
+    [boolean],
+    "view"
+  >;
 
   lastTimeRewardApplicable: TypedContractMethod<[], [bigint], "view">;
 
@@ -381,6 +396,9 @@ export interface IGauge extends BaseContract {
   getFunction(
     nameOrSignature: "getReward"
   ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "isTrustedForwarder"
+  ): TypedContractMethod<[forwarder: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "lastTimeRewardApplicable"
   ): TypedContractMethod<[], [bigint], "view">;

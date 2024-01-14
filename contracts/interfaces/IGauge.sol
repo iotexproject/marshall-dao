@@ -13,26 +13,16 @@ interface IGauge {
   event Deposit(address indexed from, address indexed to, uint256 amount);
   event Withdraw(address indexed from, uint256 amount);
   event NotifyReward(address indexed from, uint256 amount);
-  event ClaimFees(address indexed from, uint256 claimed0, uint256 claimed1);
   event ClaimRewards(address indexed from, uint256 amount);
 
   /// @notice Address of the pool LP token which is deposited (staked) for rewards
   function stakingToken() external view returns (address);
-
-  /// @notice Address of the token (AERO) rewarded to stakers
-  function rewardToken() external view returns (address);
-
-  /// @notice Address of the FeesVotingReward contract linked to the gauge
-  function feesVotingReward() external view returns (address);
 
   /// @notice Address of Protocol Voter
   function voter() external view returns (address);
 
   /// @notice Address of Protocol Voting Escrow
   function ve() external view returns (address);
-
-  /// @notice Returns if gauge is linked to a legitimate Protocol pool
-  function isPool() external view returns (bool);
 
   /// @notice Timestamp end of current rewards period
   function periodFinish() external view returns (uint256);
@@ -60,12 +50,6 @@ interface IGauge {
 
   /// @notice View to see the rewardRate given the timestamp of the start of the epoch
   function rewardRateByEpoch(uint256) external view returns (uint256);
-
-  /// @notice Cached amount of fees generated from the Pool linked to the Gauge of token0
-  function fees0() external view returns (uint256);
-
-  /// @notice Cached amount of fees generated from the Pool linked to the Gauge of token1
-  function fees1() external view returns (uint256);
 
   /// @notice Get the current reward rate per unit of stakingToken deposited
   function rewardPerToken() external view returns (uint256 _rewardPerToken);
@@ -104,5 +88,5 @@ interface IGauge {
   /// @dev Notifies gauge of gauge rewards without distributing its fees.
   ///      Assumes gauge reward tokens is 18 decimals.
   ///      If not 18 decimals, rewardRate may have rounding issues.
-  function notifyRewardWithoutClaim(uint256 amount) external;
+  function notifyRewardWithoutClaim() external payable;
 }

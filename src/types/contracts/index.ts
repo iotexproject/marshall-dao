@@ -3,6 +3,10 @@
 /* eslint-disable */
 import type * as art from "./art";
 export type { art };
+import type * as factories from "./factories";
+export type { factories };
+import type * as gauges from "./gauges";
+export type { gauges };
 import type * as governance from "./governance";
 export type { governance };
 import type * as interfaces from "./interfaces";

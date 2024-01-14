@@ -276,7 +276,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
     address _bribeVotingReward = IVotingRewardsFactory(votingRewardsFactory).createRewards(forwarder, _pool);
 
-    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, ve);
+    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
 
     gaugeToBribe[_gauge] = _bribeVotingReward;
     gauges[_pool] = _gauge;

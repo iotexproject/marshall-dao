@@ -2,6 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as art from "./art";
+export * as factories from "./factories";
+export * as gauges from "./gauges";
 export * as governance from "./governance";
 export * as interfaces from "./interfaces";
 export * as libraries from "./libraries";
