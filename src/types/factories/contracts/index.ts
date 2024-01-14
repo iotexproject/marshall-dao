@@ -7,6 +7,7 @@ export * as gauges from "./gauges";
 export * as governance from "./governance";
 export * as interfaces from "./interfaces";
 export * as libraries from "./libraries";
+export * as rewards from "./rewards";
 export { DAOForwarder__factory } from "./DAOForwarder__factory";
 export { MarshallGovernor__factory } from "./MarshallGovernor__factory";
 export { Minter__factory } from "./Minter__factory";

@@ -106,6 +106,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.GaugeFactory__factory>;
     getContractFactory(
+      name: "VotingRewardsFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VotingRewardsFactory__factory>;
+    getContractFactory(
       name: "Gauge",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Gauge__factory>;
@@ -193,6 +197,18 @@ declare module "hardhat/types/runtime" {
       name: "Minter",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Minter__factory>;
+    getContractFactory(
+      name: "BribeVotingReward",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BribeVotingReward__factory>;
+    getContractFactory(
+      name: "Reward",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Reward__factory>;
+    getContractFactory(
+      name: "VotingReward",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VotingReward__factory>;
     getContractFactory(
       name: "RewardsDistributor",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -326,6 +342,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.GaugeFactory>;
     getContractAt(
+      name: "VotingRewardsFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VotingRewardsFactory>;
+    getContractAt(
       name: "Gauge",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -435,6 +456,21 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.Minter>;
+    getContractAt(
+      name: "BribeVotingReward",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BribeVotingReward>;
+    getContractAt(
+      name: "Reward",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Reward>;
+    getContractAt(
+      name: "VotingReward",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VotingReward>;
     getContractAt(
       name: "RewardsDistributor",
       address: string | ethers.Addressable,
@@ -549,6 +585,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.GaugeFactory>;
     deployContract(
+      name: "VotingRewardsFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VotingRewardsFactory>;
+    deployContract(
       name: "Gauge",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Gauge>;
@@ -636,6 +676,18 @@ declare module "hardhat/types/runtime" {
       name: "Minter",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Minter>;
+    deployContract(
+      name: "BribeVotingReward",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.BribeVotingReward>;
+    deployContract(
+      name: "Reward",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Reward>;
+    deployContract(
+      name: "VotingReward",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VotingReward>;
     deployContract(
       name: "RewardsDistributor",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -769,6 +821,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.GaugeFactory>;
     deployContract(
+      name: "VotingRewardsFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VotingRewardsFactory>;
+    deployContract(
       name: "Gauge",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -878,6 +935,21 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Minter>;
+    deployContract(
+      name: "BribeVotingReward",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.BribeVotingReward>;
+    deployContract(
+      name: "Reward",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Reward>;
+    deployContract(
+      name: "VotingReward",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VotingReward>;
     deployContract(
       name: "RewardsDistributor",
       args: any[],

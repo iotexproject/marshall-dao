@@ -13,6 +13,8 @@ import type * as interfaces from "./interfaces";
 export type { interfaces };
 import type * as libraries from "./libraries";
 export type { libraries };
+import type * as rewards from "./rewards";
+export type { rewards };
 export type { DAOForwarder } from "./DAOForwarder";
 export type { MarshallGovernor } from "./MarshallGovernor";
 export type { Minter } from "./Minter";
