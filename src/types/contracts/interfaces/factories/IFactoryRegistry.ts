@@ -28,10 +28,8 @@ export interface IFactoryRegistryInterface extends Interface {
       | "approve"
       | "factoriesToPoolFactory"
       | "isPoolFactoryApproved"
-      | "managedRewardsFactory"
       | "poolFactories"
       | "poolFactoriesLength"
-      | "setManagedRewardsFactory"
       | "unapprove"
   ): FunctionFragment;
 
@@ -52,20 +50,12 @@ export interface IFactoryRegistryInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "managedRewardsFactory",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "poolFactories",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "poolFactoriesLength",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setManagedRewardsFactory",
-    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "unapprove",
@@ -82,19 +72,11 @@ export interface IFactoryRegistryInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "managedRewardsFactory",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "poolFactories",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "poolFactoriesLength",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setManagedRewardsFactory",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unapprove", data: BytesLike): Result;
@@ -221,17 +203,9 @@ export interface IFactoryRegistry extends BaseContract {
     "view"
   >;
 
-  managedRewardsFactory: TypedContractMethod<[], [string], "view">;
-
   poolFactories: TypedContractMethod<[], [string[]], "view">;
 
   poolFactoriesLength: TypedContractMethod<[], [bigint], "view">;
-
-  setManagedRewardsFactory: TypedContractMethod<
-    [_newManagedRewardsFactory: AddressLike],
-    [void],
-    "nonpayable"
-  >;
 
   unapprove: TypedContractMethod<
     [poolFactory: AddressLike],
@@ -265,21 +239,11 @@ export interface IFactoryRegistry extends BaseContract {
     nameOrSignature: "isPoolFactoryApproved"
   ): TypedContractMethod<[poolFactory: AddressLike], [boolean], "view">;
   getFunction(
-    nameOrSignature: "managedRewardsFactory"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "poolFactories"
   ): TypedContractMethod<[], [string[]], "view">;
   getFunction(
     nameOrSignature: "poolFactoriesLength"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "setManagedRewardsFactory"
-  ): TypedContractMethod<
-    [_newManagedRewardsFactory: AddressLike],
-    [void],
-    "nonpayable"
-  >;
   getFunction(
     nameOrSignature: "unapprove"
   ): TypedContractMethod<[poolFactory: AddressLike], [void], "nonpayable">;

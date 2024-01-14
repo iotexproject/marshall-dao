@@ -14,7 +14,6 @@ interface IFactoryRegistry {
   event SetManagedRewardsFactory(address indexed _newRewardsFactory);
 
   /// @notice Approve a set of factories used in the Protocol.
-  ///         Router.sol is able to swap any poolFactories currently approved.
   ///         Cannot approve address(0) factories.
   ///         Cannot aprove path that is already approved.
   ///         Each poolFactory has one unique set and maintains state.  In the case a poolFactory is unapproved
@@ -34,14 +33,6 @@ interface IFactoryRegistry {
   /// @dev Callable by onlyOwner
   /// @param poolFactory .
   function unapprove(address poolFactory) external;
-
-  /// @notice Factory to create free and locked rewards for a managed veNFT
-  function managedRewardsFactory() external view returns (address);
-
-  /// @notice Set the rewards factory address
-  /// @dev Callable by onlyOwner
-  /// @param _newManagedRewardsFactory address of new managedRewardsFactory
-  function setManagedRewardsFactory(address _newManagedRewardsFactory) external;
 
   /// @notice Get the factories correlated to a poolFactory.
   ///         Once set, this can never be modified.

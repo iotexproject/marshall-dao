@@ -99,7 +99,7 @@ interface IGauge {
 
   /// @dev Notifies gauge of gauge rewards. Assumes gauge reward tokens is 18 decimals.
   ///      If not 18 decimals, rewardRate may have rounding issues.
-  function notifyRewardAmount(uint256 amount) external;
+  function notifyRewardAmount() external payable;
 
   /// @dev Notifies gauge of gauge rewards without distributing its fees.
   ///      Assumes gauge reward tokens is 18 decimals.

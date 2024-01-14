@@ -170,19 +170,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "managedRewardsFactory",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "poolFactories",
     outputs: [
       {
@@ -205,19 +192,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_newManagedRewardsFactory",
-        type: "address",
-      },
-    ],
-    name: "setManagedRewardsFactory",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {

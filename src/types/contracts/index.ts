@@ -14,4 +14,5 @@ export type { MarshallGovernor } from "./MarshallGovernor";
 export type { Minter } from "./Minter";
 export type { RewardsDistributor } from "./RewardsDistributor";
 export type { VeArtProxy } from "./VeArtProxy";
+export type { Voter } from "./Voter";
 export type { VotingEscrow } from "./VotingEscrow";

@@ -2,3 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export { IFactoryRegistry__factory } from "./IFactoryRegistry__factory";
+export { IGaugeFactory__factory } from "./IGaugeFactory__factory";
+export { IVotingRewardsFactory__factory } from "./IVotingRewardsFactory__factory";

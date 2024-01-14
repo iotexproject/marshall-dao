@@ -10,4 +10,5 @@ export { MarshallGovernor__factory } from "./MarshallGovernor__factory";
 export { Minter__factory } from "./Minter__factory";
 export { RewardsDistributor__factory } from "./RewardsDistributor__factory";
 export { VeArtProxy__factory } from "./VeArtProxy__factory";
+export { Voter__factory } from "./Voter__factory";
 export { VotingEscrow__factory } from "./VotingEscrow__factory";

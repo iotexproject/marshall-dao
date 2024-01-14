@@ -2,3 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { IFactoryRegistry } from "./IFactoryRegistry";
+export type { IGaugeFactory } from "./IGaugeFactory";
+export type { IVotingRewardsFactory } from "./IVotingRewardsFactory";

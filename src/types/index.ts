@@ -62,6 +62,10 @@ export type { VetoGovernorVotesQuorumFraction } from "./contracts/governance/Vet
 export { VetoGovernorVotesQuorumFraction__factory } from "./factories/contracts/governance/VetoGovernorVotesQuorumFraction__factory";
 export type { IFactoryRegistry } from "./contracts/interfaces/factories/IFactoryRegistry";
 export { IFactoryRegistry__factory } from "./factories/contracts/interfaces/factories/IFactoryRegistry__factory";
+export type { IGaugeFactory } from "./contracts/interfaces/factories/IGaugeFactory";
+export { IGaugeFactory__factory } from "./factories/contracts/interfaces/factories/IGaugeFactory__factory";
+export type { IVotingRewardsFactory } from "./contracts/interfaces/factories/IVotingRewardsFactory";
+export { IVotingRewardsFactory__factory } from "./factories/contracts/interfaces/factories/IVotingRewardsFactory__factory";
 export type { IGauge } from "./contracts/interfaces/IGauge";
 export { IGauge__factory } from "./factories/contracts/interfaces/IGauge__factory";
 export type { IMinter } from "./contracts/interfaces/IMinter";
@@ -90,5 +94,7 @@ export type { RewardsDistributor } from "./contracts/RewardsDistributor";
 export { RewardsDistributor__factory } from "./factories/contracts/RewardsDistributor__factory";
 export type { VeArtProxy } from "./contracts/VeArtProxy";
 export { VeArtProxy__factory } from "./factories/contracts/VeArtProxy__factory";
+export type { Voter } from "./contracts/Voter";
+export { Voter__factory } from "./factories/contracts/Voter__factory";
 export type { VotingEscrow } from "./contracts/VotingEscrow";
 export { VotingEscrow__factory } from "./factories/contracts/VotingEscrow__factory";

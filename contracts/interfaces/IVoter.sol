@@ -33,7 +33,6 @@ interface IVoter {
     address indexed gaugeFactory,
     address pool,
     address bribeVotingReward,
-    address feeVotingReward,
     address gauge,
     address creator
   );
@@ -55,7 +54,7 @@ interface IVoter {
     uint256 totalWeight,
     uint256 timestamp
   );
-  event NotifyReward(address indexed sender, address indexed reward, uint256 amount);
+  event NotifyReward(address indexed sender, uint256 amount);
   event DistributeReward(address indexed sender, address indexed gauge, uint256 amount);
   event WhitelistToken(address indexed whitelister, address indexed token, bool indexed _bool);
   event WhitelistNFT(address indexed whitelister, uint256 indexed tokenId, bool indexed _bool);
@@ -66,20 +65,14 @@ interface IVoter {
   /// @notice The ve token that governs these contracts
   function ve() external view returns (address);
 
-  /// @notice Factory registry for valid pool / gauge / rewards factories
+  /// @notice Factory registry for valid gauge / rewards factories
   function factoryRegistry() external view returns (address);
-
-  /// @notice V1 factory
-  function v1Factory() external view returns (address);
 
   /// @notice Address of Minter.sol
   function minter() external view returns (address);
 
   /// @notice Standard OZ IGovernor using ve for vote weights.
   function governor() external view returns (address);
-
-  /// @notice Custom Epoch Governor using ve for vote weights.
-  function epochGovernor() external view returns (address);
 
   /// @notice credibly neutral party similar to Curve's Emergency DAO
   function emergencyCouncil() external view returns (address);
@@ -96,9 +89,6 @@ interface IVoter {
 
   /// @dev Gauge => Pool
   function poolForGauge(address gauge) external view returns (address);
-
-  /// @dev Gauge => Fees Voting Reward
-  function gaugeToFees(address gauge) external view returns (address);
 
   /// @dev Gauge => Bribes Voting Reward
   function gaugeToBribe(address gauge) external view returns (address);
@@ -168,21 +158,6 @@ interface IVoter {
   /// @param _tokenId Id of veNFT you are reseting.
   function reset(uint256 _tokenId) external;
 
-  /// @notice Called by users to deposit into a managed NFT.
-  ///         Can only vote or deposit into a managed NFT once per epoch.
-  ///         Note that NFTs deposited into a managed NFT will be re-locked
-  ///         to the maximum lock time on withdrawal.
-  /// @dev Throws if not approved or owner.
-  ///      Throws if managed NFT is inactive.
-  ///      Throws if depositing within privileged window (one hour prior to epoch flip).
-  function depositManaged(uint256 _tokenId, uint256 _mTokenId) external;
-
-  /// @notice Called by users to withdraw from a managed NFT.
-  ///         Cannot do it in the same epoch that you deposited into a managed NFT.
-  ///         Can vote or deposit into a managed NFT again after withdrawing.
-  ///         Note that the NFT withdrawn is re-locked to the maximum lock time.
-  function withdrawManaged(uint256 _tokenId) external;
-
   /// @notice Claim emissions from gauges.
   /// @param _gauges Array of gauges to collect emissions from.
   function claimRewards(address[] memory _gauges) external;
@@ -194,22 +169,10 @@ interface IVoter {
   /// @param _tokenId Id of veNFT that you wish to claim bribes for.
   function claimBribes(address[] memory _bribes, address[][] memory _tokens, uint256 _tokenId) external;
 
-  /// @notice Claim fees for a given NFT.
-  /// @dev Utility to help batch fee claims.
-  /// @param _fees    Array of FeesVotingReward contracts to collect from.
-  /// @param _tokens  Array of tokens that are used as fees.
-  /// @param _tokenId Id of veNFT that you wish to claim fees for.
-  function claimFees(address[] memory _fees, address[][] memory _tokens, uint256 _tokenId) external;
-
   /// @notice Set new governor.
   /// @dev Throws if not called by governor.
   /// @param _governor .
   function setGovernor(address _governor) external;
-
-  /// @notice Set new epoch based governor.
-  /// @dev Throws if not called by governor.
-  /// @param _epochGovernor .
-  function setEpochGovernor(address _epochGovernor) external;
 
   /// @notice Set new emergency council.
   /// @dev Throws if not called by emergency council.

@@ -122,6 +122,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IFactoryRegistry__factory>;
     getContractFactory(
+      name: "IGaugeFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IGaugeFactory__factory>;
+    getContractFactory(
+      name: "IVotingRewardsFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVotingRewardsFactory__factory>;
+    getContractFactory(
       name: "IGauge",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IGauge__factory>;
@@ -177,6 +185,10 @@ declare module "hardhat/types/runtime" {
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.VeArtProxy__factory>;
+    getContractFactory(
+      name: "Voter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Voter__factory>;
     getContractFactory(
       name: "VotingEscrow",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -318,6 +330,16 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IFactoryRegistry>;
     getContractAt(
+      name: "IGaugeFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IGaugeFactory>;
+    getContractAt(
+      name: "IVotingRewardsFactory",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVotingRewardsFactory>;
+    getContractAt(
       name: "IGauge",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -387,6 +409,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.VeArtProxy>;
+    getContractAt(
+      name: "Voter",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Voter>;
     getContractAt(
       name: "VotingEscrow",
       address: string | ethers.Addressable,
@@ -502,6 +529,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IFactoryRegistry>;
     deployContract(
+      name: "IGaugeFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IGaugeFactory>;
+    deployContract(
+      name: "IVotingRewardsFactory",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVotingRewardsFactory>;
+    deployContract(
       name: "IGauge",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IGauge>;
@@ -557,6 +592,10 @@ declare module "hardhat/types/runtime" {
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.VeArtProxy>;
+    deployContract(
+      name: "Voter",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Voter>;
     deployContract(
       name: "VotingEscrow",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -698,6 +737,16 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IFactoryRegistry>;
     deployContract(
+      name: "IGaugeFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IGaugeFactory>;
+    deployContract(
+      name: "IVotingRewardsFactory",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVotingRewardsFactory>;
+    deployContract(
       name: "IGauge",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -767,6 +816,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.VeArtProxy>;
+    deployContract(
+      name: "Voter",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Voter>;
     deployContract(
       name: "VotingEscrow",
       args: any[],

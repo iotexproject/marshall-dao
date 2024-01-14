@@ -99,7 +99,7 @@ export interface IGaugeInterface extends Interface {
   encodeFunctionData(functionFragment: "left", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "notifyRewardAmount",
-    values: [BigNumberish]
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "notifyRewardWithoutClaim",
@@ -376,11 +376,7 @@ export interface IGauge extends BaseContract {
 
   left: TypedContractMethod<[], [bigint], "view">;
 
-  notifyRewardAmount: TypedContractMethod<
-    [amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
 
   notifyRewardWithoutClaim: TypedContractMethod<
     [amount: BigNumberish],
@@ -468,7 +464,7 @@ export interface IGauge extends BaseContract {
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "notifyRewardAmount"
-  ): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;
+  ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "notifyRewardWithoutClaim"
   ): TypedContractMethod<[amount: BigNumberish], [void], "nonpayable">;

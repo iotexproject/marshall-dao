@@ -245,12 +245,6 @@ const _abi = [
       {
         indexed: false,
         internalType: "address",
-        name: "feeVotingReward",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
         name: "gauge",
         type: "address",
       },
@@ -297,12 +291,6 @@ const _abi = [
         indexed: true,
         internalType: "address",
         name: "sender",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "reward",
         type: "address",
       },
       {
@@ -435,29 +423,6 @@ const _abi = [
     inputs: [
       {
         internalType: "address[]",
-        name: "_fees",
-        type: "address[]",
-      },
-      {
-        internalType: "address[][]",
-        name: "_tokens",
-        type: "address[][]",
-      },
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "claimFees",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address[]",
         name: "_gauges",
         type: "address[]",
       },
@@ -513,24 +478,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "_mTokenId",
-        type: "uint256",
-      },
-    ],
-    name: "depositManaged",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "address[]",
         name: "_gauges",
         type: "address[]",
@@ -562,19 +509,6 @@ const _abi = [
   {
     inputs: [],
     name: "emergencyCouncil",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "epochGovernor",
     outputs: [
       {
         internalType: "address",
@@ -620,25 +554,6 @@ const _abi = [
       },
     ],
     name: "gaugeToBribe",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "gauge",
-        type: "address",
-      },
-    ],
-    name: "gaugeToFees",
     outputs: [
       {
         internalType: "address",
@@ -910,19 +825,6 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_epochGovernor",
-        type: "address",
-      },
-    ],
-    name: "setEpochGovernor",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
         name: "_governor",
         type: "address",
       },
@@ -1016,19 +918,6 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "v1Factory",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
       },
     ],
     stateMutability: "view",
@@ -1145,19 +1034,6 @@ const _abi = [
       },
     ],
     name: "whitelistToken",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "withdrawManaged",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
