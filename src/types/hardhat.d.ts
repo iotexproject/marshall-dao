@@ -118,6 +118,26 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.VetoGovernorVotesQuorumFraction__factory>;
     getContractFactory(
+      name: "IFactoryRegistry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IFactoryRegistry__factory>;
+    getContractFactory(
+      name: "IGauge",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IGauge__factory>;
+    getContractFactory(
+      name: "IMinter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IMinter__factory>;
+    getContractFactory(
+      name: "IReward",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IReward__factory>;
+    getContractFactory(
+      name: "IRewardsDistributor",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IRewardsDistributor__factory>;
+    getContractFactory(
       name: "IVeArtProxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IVeArtProxy__factory>;
@@ -145,6 +165,10 @@ declare module "hardhat/types/runtime" {
       name: "MarshallGovernor",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MarshallGovernor__factory>;
+    getContractFactory(
+      name: "Minter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Minter__factory>;
     getContractFactory(
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -285,6 +309,31 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.VetoGovernorVotesQuorumFraction>;
     getContractAt(
+      name: "IFactoryRegistry",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IFactoryRegistry>;
+    getContractAt(
+      name: "IGauge",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IGauge>;
+    getContractAt(
+      name: "IMinter",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IMinter>;
+    getContractAt(
+      name: "IReward",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IReward>;
+    getContractAt(
+      name: "IRewardsDistributor",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IRewardsDistributor>;
+    getContractAt(
       name: "IVeArtProxy",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -319,6 +368,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.MarshallGovernor>;
+    getContractAt(
+      name: "Minter",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Minter>;
     getContractAt(
       name: "VeArtProxy",
       address: string | ethers.Addressable,
@@ -435,6 +489,26 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.VetoGovernorVotesQuorumFraction>;
     deployContract(
+      name: "IFactoryRegistry",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFactoryRegistry>;
+    deployContract(
+      name: "IGauge",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IGauge>;
+    deployContract(
+      name: "IMinter",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IMinter>;
+    deployContract(
+      name: "IReward",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IReward>;
+    deployContract(
+      name: "IRewardsDistributor",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRewardsDistributor>;
+    deployContract(
       name: "IVeArtProxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IVeArtProxy>;
@@ -462,6 +536,10 @@ declare module "hardhat/types/runtime" {
       name: "MarshallGovernor",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MarshallGovernor>;
+    deployContract(
+      name: "Minter",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Minter>;
     deployContract(
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -602,6 +680,31 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.VetoGovernorVotesQuorumFraction>;
     deployContract(
+      name: "IFactoryRegistry",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFactoryRegistry>;
+    deployContract(
+      name: "IGauge",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IGauge>;
+    deployContract(
+      name: "IMinter",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IMinter>;
+    deployContract(
+      name: "IReward",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IReward>;
+    deployContract(
+      name: "IRewardsDistributor",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IRewardsDistributor>;
+    deployContract(
       name: "IVeArtProxy",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -636,6 +739,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.MarshallGovernor>;
+    deployContract(
+      name: "Minter",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Minter>;
     deployContract(
       name: "VeArtProxy",
       args: any[],

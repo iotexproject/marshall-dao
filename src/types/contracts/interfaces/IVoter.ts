@@ -175,7 +175,7 @@ export interface IVoterInterface extends Interface {
   encodeFunctionData(functionFragment: "minter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "notifyRewardAmount",
-    values: [BigNumberish]
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "poke", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -718,11 +718,7 @@ export interface IVoter extends BaseContract {
 
   minter: TypedContractMethod<[], [string], "view">;
 
-  notifyRewardAmount: TypedContractMethod<
-    [_amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
 
   poke: TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;
 
@@ -919,7 +915,7 @@ export interface IVoter extends BaseContract {
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "notifyRewardAmount"
-  ): TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
+  ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "poke"
   ): TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;

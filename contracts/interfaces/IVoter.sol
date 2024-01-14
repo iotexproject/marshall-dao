@@ -136,8 +136,7 @@ interface IVoter {
   /// @notice Called by Minter to distribute weekly emissions rewards for disbursement amongst gauges.
   /// @dev Assumes totalWeight != 0 (Will never be zero as long as users are voting).
   ///      Throws if not called by minter.
-  /// @param _amount Amount of rewards to distribute.
-  function notifyRewardAmount(uint256 _amount) external;
+  function notifyRewardAmount() external payable;
 
   /// @dev Utility to distribute to gauges of pools in range _start to _finish.
   /// @param _start   Starting index of gauges to distribute to.
