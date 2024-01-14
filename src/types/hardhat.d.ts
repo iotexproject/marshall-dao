@@ -170,6 +170,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Minter__factory>;
     getContractFactory(
+      name: "RewardsDistributor",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RewardsDistributor__factory>;
+    getContractFactory(
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.VeArtProxy__factory>;
@@ -374,6 +378,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Minter>;
     getContractAt(
+      name: "RewardsDistributor",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RewardsDistributor>;
+    getContractAt(
       name: "VeArtProxy",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -541,6 +550,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Minter>;
     deployContract(
+      name: "RewardsDistributor",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RewardsDistributor>;
+    deployContract(
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.VeArtProxy>;
@@ -744,6 +757,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Minter>;
+    deployContract(
+      name: "RewardsDistributor",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.RewardsDistributor>;
     deployContract(
       name: "VeArtProxy",
       args: any[],

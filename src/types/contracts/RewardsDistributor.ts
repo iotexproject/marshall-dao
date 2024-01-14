@@ -21,9 +21,9 @@ import type {
   TypedLogDescription,
   TypedListener,
   TypedContractMethod,
-} from "../../common";
+} from "../common";
 
-export interface IRewardsDistributorInterface extends Interface {
+export interface RewardsDistributorInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "WEEK"
@@ -37,6 +37,7 @@ export interface IRewardsDistributorInterface extends Interface {
       | "startTime"
       | "timeCursorOf"
       | "tokenLastBalance"
+      | "tokensPerWeek"
       | "ve"
   ): FunctionFragment;
 
@@ -76,6 +77,10 @@ export interface IRewardsDistributorInterface extends Interface {
     functionFragment: "tokenLastBalance",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "tokensPerWeek",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "ve", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "WEEK", data: BytesLike): Result;
@@ -99,6 +104,10 @@ export interface IRewardsDistributorInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "tokenLastBalance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokensPerWeek",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "ve", data: BytesLike): Result;
@@ -142,11 +151,11 @@ export namespace ClaimedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface IRewardsDistributor extends BaseContract {
-  connect(runner?: ContractRunner | null): IRewardsDistributor;
+export interface RewardsDistributor extends BaseContract {
+  connect(runner?: ContractRunner | null): RewardsDistributor;
   waitForDeployment(): Promise<this>;
 
-  interface: IRewardsDistributorInterface;
+  interface: RewardsDistributorInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -189,15 +198,15 @@ export interface IRewardsDistributor extends BaseContract {
 
   checkpointToken: TypedContractMethod<[], [void], "nonpayable">;
 
-  claim: TypedContractMethod<[tokenId: BigNumberish], [bigint], "nonpayable">;
+  claim: TypedContractMethod<[_tokenId: BigNumberish], [bigint], "nonpayable">;
 
   claimMany: TypedContractMethod<
-    [tokenIds: BigNumberish[]],
+    [_tokenIds: BigNumberish[]],
     [boolean],
     "nonpayable"
   >;
 
-  claimable: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  claimable: TypedContractMethod<[_tokenId: BigNumberish], [bigint], "view">;
 
   lastTokenTime: TypedContractMethod<[], [bigint], "view">;
 
@@ -207,9 +216,11 @@ export interface IRewardsDistributor extends BaseContract {
 
   startTime: TypedContractMethod<[], [bigint], "view">;
 
-  timeCursorOf: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  timeCursorOf: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
   tokenLastBalance: TypedContractMethod<[], [bigint], "view">;
+
+  tokensPerWeek: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
   ve: TypedContractMethod<[], [string], "view">;
 
@@ -225,13 +236,13 @@ export interface IRewardsDistributor extends BaseContract {
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "claim"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "nonpayable">;
+  ): TypedContractMethod<[_tokenId: BigNumberish], [bigint], "nonpayable">;
   getFunction(
     nameOrSignature: "claimMany"
-  ): TypedContractMethod<[tokenIds: BigNumberish[]], [boolean], "nonpayable">;
+  ): TypedContractMethod<[_tokenIds: BigNumberish[]], [boolean], "nonpayable">;
   getFunction(
     nameOrSignature: "claimable"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  ): TypedContractMethod<[_tokenId: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "lastTokenTime"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -246,10 +257,13 @@ export interface IRewardsDistributor extends BaseContract {
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "timeCursorOf"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
   getFunction(
     nameOrSignature: "tokenLastBalance"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "tokensPerWeek"
+  ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
   getFunction(nameOrSignature: "ve"): TypedContractMethod<[], [string], "view">;
 
   getEvent(

@@ -26,9 +26,6 @@ interface IRewardsDistributor {
   /// @notice Interface of VotingEscrow.sol
   function ve() external view returns (IVotingEscrow);
 
-  /// @notice Address of token used for distributions (AERO)
-  function token() external view returns (address);
-
   /// @notice Address of Minter.sol
   ///         Authorized caller of checkpointToken()
   function minter() external view returns (address);

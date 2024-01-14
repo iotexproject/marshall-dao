@@ -86,6 +86,8 @@ export type { MarshallGovernor } from "./contracts/MarshallGovernor";
 export { MarshallGovernor__factory } from "./factories/contracts/MarshallGovernor__factory";
 export type { Minter } from "./contracts/Minter";
 export { Minter__factory } from "./factories/contracts/Minter__factory";
+export type { RewardsDistributor } from "./contracts/RewardsDistributor";
+export { RewardsDistributor__factory } from "./factories/contracts/RewardsDistributor__factory";
 export type { VeArtProxy } from "./contracts/VeArtProxy";
 export { VeArtProxy__factory } from "./factories/contracts/VeArtProxy__factory";
 export type { VotingEscrow } from "./contracts/VotingEscrow";

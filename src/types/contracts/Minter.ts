@@ -41,6 +41,7 @@ export interface MinterInterface extends Interface {
       | "veRate"
       | "voter"
       | "weekly"
+      | "withdraw"
   ): FunctionFragment;
 
   getEvent(
@@ -93,6 +94,10 @@ export interface MinterInterface extends Interface {
   encodeFunctionData(functionFragment: "veRate", values?: undefined): string;
   encodeFunctionData(functionFragment: "voter", values?: undefined): string;
   encodeFunctionData(functionFragment: "weekly", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [AddressLike, BigNumberish]
+  ): string;
 
   decodeFunctionResult(functionFragment: "WEEK", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "acceptTeam", data: BytesLike): Result;
@@ -127,6 +132,7 @@ export interface MinterInterface extends Interface {
   decodeFunctionResult(functionFragment: "veRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "voter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weekly", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 }
 
 export namespace AcceptTeamEvent {
@@ -259,6 +265,12 @@ export interface Minter extends BaseContract {
 
   weekly: TypedContractMethod<[], [bigint], "view">;
 
+  withdraw: TypedContractMethod<
+    [_recipcient: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -306,6 +318,13 @@ export interface Minter extends BaseContract {
   getFunction(
     nameOrSignature: "weekly"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "withdraw"
+  ): TypedContractMethod<
+    [_recipcient: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   getEvent(
     key: "AcceptTeam"
