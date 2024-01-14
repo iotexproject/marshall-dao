@@ -76,7 +76,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   uint256 public tokenId;
 
   /// @param _forwarder address of trusted forwarder
-  constructor(address _forwarder) ERC2771Context(_forwarder) {
+  constructor(address _forwarder, address[] memory _tokens) ERC2771Context(_forwarder) {
     forwarder = _forwarder;
     token[address(0)] = block.timestamp;
     team = _msgSender();
@@ -90,6 +90,15 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     supportedInterfaces[ERC721_METADATA_INTERFACE_ID] = true;
     supportedInterfaces[ERC4906_INTERFACE_ID] = true;
     supportedInterfaces[ERC6372_INTERFACE_ID] = true;
+
+    emit TokenActived(address(0));
+    for (uint256 i = 0; i < _tokens.length; i++) {
+      address _token = _tokens[i];
+      if (_token != address(0)) {
+        token[_token] = _pendingTokens[_token];
+        emit TokenActived(_token);
+      }
+    }
 
     // mint-ish
     emit Transfer(address(0), address(this), tokenId);
