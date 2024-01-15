@@ -7,6 +7,7 @@ async function main() {
   }
 
   const governor = await ethers.deployContract('MarshallGovernor', [process.env.VE]);
+  await governor.waitForDeployment();
   console.log(`MarshallGovernor deployed to ${governor.target}`);
 }
 
