@@ -38,6 +38,10 @@ All of these operations require ownership of the underlying NFT or tokens being 
 - Can unlock a permanently locked NFT to allow its voting power to decay.
 - Can delegate votes to other `tokenId`s for use in marshall governance to other addresses based on voting power. Voting power retrieved from `getVotes` and `getPastVotes` does not reveal locked amount balances and are used only for voting. 
 
+### Minter
+
+The minting contract handles emissions for the Marshall DAO protocol. Emissions start fixed amount $IOTX per epoch (7 days). Liquidity providers and veIOTX holder will receive weekly emissions. The weekly emissions amount and the ratio of the LP and veIOTX can be adjust by DAO governor.
+
 ## RewardsDistributor
 
 Standard Curve-fee distribution contract, modified for use with rebases. Rebases
@@ -49,7 +53,7 @@ Rebase claims against expired veNFTs will be distributed as unlocked IOTX to the
 
 ### Gauge
 
-The gauge contract is a standard rewards contract in charge of distributing emissions to LP depositors. Users that deposit LP tokens can forgo their fee reward in exchange for a proportional distribution of emissions (proportional to their share of LP deposits in the gauge). The fee rewards that the LP depositors forgo are transferred to the `FeeVotingReward` contract. 
+The gauge contract is a standard rewards contract in charge of distributing emissions to LP depositors. Users that deposit LP tokens can forgo their fee reward in exchange for a proportional distribution of emissions (proportional to their share of LP deposits in the gauge).
 
 Standard Operations:
 - Can deposit LP tokens.
@@ -62,6 +66,16 @@ Standard Operations:
 
 The base reward contract for all reward contracts. Individual voting balance checkpoints and total supply checkpoints are created in a reward contract whenever a user votes for a pool. Checkpoints do not automatically update when voting power decays (requires `Voter.poke`). Rewards in these contracts are distributed proportionally to an NFT's voting power contribution to a pool. An NFT is distributed rewards in each epoch proportional to its voting power contribution in that epoch. 
 
-### VotingReward
+#### VotingReward
 
 Voting rewards are rewards that accrue to users that vote for a specific pool. They can be broken down into fees and bribes.
+
+#### BribeVotingReward
+
+Bribe voting rewards are externally deposited rewards of whitelisted tokens (see Voter) used to incentivize users to vote for a given pool.
+
+### Governance
+
+### Governor
+
+Lightly modified from OpenZeppelin's Governor contract. Enables governance by using timestamp based voting power from VotingEscrow NFTs. Includes support for vetoing of proposals as mitigation against 51% attacks. proposalHash has also been modified to include the proposer to prevent griefing attacks from proposal frontrunning. Votes are cast and counted on a per tokenId basis.
