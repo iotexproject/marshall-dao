@@ -2,6 +2,8 @@
 
 **Marshall DAO is a Decentralized Autonomous Organization (DAO) that will employ a vote-escrow on-chain governance protocol.**
 
+See [SPECIFICATION.md](./SPECIFICATION.md) for more detail.
+
 ### Deployment
 
 #### Testnet
