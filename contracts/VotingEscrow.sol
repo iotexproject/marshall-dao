@@ -95,7 +95,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     for (uint256 i = 0; i < _tokens.length; i++) {
       address _token = _tokens[i];
       if (_token != address(0)) {
-        token[_token] = _pendingTokens[_token];
+        token[_token] = block.timestamp;
         emit TokenActived(_token);
       }
     }
