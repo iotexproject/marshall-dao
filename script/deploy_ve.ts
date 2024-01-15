@@ -15,7 +15,12 @@ async function main() {
   await forwarder.waitForDeployment();
   console.log(`Forwarder deployed to ${forwarder.target}`);
 
-  const escrow = await ethers.deployContract('VotingEscrow', [forwarder, []], {
+  const tokens = [];
+  if (process.env.LST_ADDRESS) {
+    tokens.push(process.env.LST_ADDRESS);
+  }
+
+  const escrow = await ethers.deployContract('VotingEscrow', [forwarder, tokens], {
     libraries: {
       BalanceLogicLibrary: balanceLogicLibrary.target,
       DelegationLogicLibrary: delegationLogicLibrary.target,
