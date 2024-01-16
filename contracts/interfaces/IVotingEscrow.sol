@@ -125,9 +125,6 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   /// @notice Timestamp that token actived to create a veNFT
   function token(address _token) external view returns (uint);
 
-  /// @notice Address of RewardsDistributor.sol
-  function distributor() external view returns (address);
-
   /// @notice Address of Voter.sol
   function voter() external view returns (address);
 
@@ -375,9 +372,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   /// @return True if voted, else false
   function voted(uint256 _tokenId) external view returns (bool);
 
-  /// @notice Set the global state voter and distributor
+  /// @notice Set the global state voter
   /// @dev This is only called once, at setup
-  function setVoterAndDistributor(address _voter, address _distributor) external;
+  function setVoter(address _voter) external;
 
   /// @notice Set `voted` for _tokenId to true or false
   /// @dev Only callable by voter

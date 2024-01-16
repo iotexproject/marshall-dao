@@ -41,8 +41,6 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVotingEscrow
   mapping(address => uint) public token;
   /// @inheritdoc IVotingEscrow
-  address public distributor;
-  /// @inheritdoc IVotingEscrow
   address public voter;
   /// @inheritdoc IVotingEscrow
   address public team;
@@ -1022,10 +1020,9 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   mapping(uint256 => bool) public voted;
 
   /// @inheritdoc IVotingEscrow
-  function setVoterAndDistributor(address _voter, address _distributor) external {
+  function setVoter(address _voter) external {
     if (_msgSender() != voter) revert NotVoter();
     voter = _voter;
-    distributor = _distributor;
   }
 
   /// @inheritdoc IVotingEscrow
