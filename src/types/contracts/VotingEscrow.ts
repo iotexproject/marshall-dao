@@ -124,7 +124,6 @@ export interface VotingEscrowInterface extends Interface {
       | "delegateBySig"
       | "delegates"
       | "depositFor"
-      | "distributor"
       | "epoch"
       | "forwarder"
       | "getApproved"
@@ -153,7 +152,7 @@ export interface VotingEscrowInterface extends Interface {
       | "setApprovalForAll"
       | "setArtProxy"
       | "setTeam"
-      | "setVoterAndDistributor"
+      | "setVoter"
       | "slopeChanges"
       | "split"
       | "supply"
@@ -282,10 +281,6 @@ export interface VotingEscrowInterface extends Interface {
     functionFragment: "depositFor",
     values: [BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "distributor",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "epoch", values?: undefined): string;
   encodeFunctionData(functionFragment: "forwarder", values?: undefined): string;
   encodeFunctionData(
@@ -387,8 +382,8 @@ export interface VotingEscrowInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "setVoterAndDistributor",
-    values: [AddressLike, AddressLike]
+    functionFragment: "setVoter",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "slopeChanges",
@@ -499,10 +494,6 @@ export interface VotingEscrowInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositFor", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "distributor",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "epoch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "forwarder", data: BytesLike): Result;
   decodeFunctionResult(
@@ -591,10 +582,7 @@ export interface VotingEscrowInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setTeam", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setVoterAndDistributor",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "setVoter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "slopeChanges",
     data: BytesLike
@@ -1154,8 +1142,6 @@ export interface VotingEscrow extends BaseContract {
     "payable"
   >;
 
-  distributor: TypedContractMethod<[], [string], "view">;
-
   epoch: TypedContractMethod<[], [bigint], "view">;
 
   forwarder: TypedContractMethod<[], [string], "view">;
@@ -1281,11 +1267,7 @@ export interface VotingEscrow extends BaseContract {
 
   setTeam: TypedContractMethod<[_team: AddressLike], [void], "nonpayable">;
 
-  setVoterAndDistributor: TypedContractMethod<
-    [_voter: AddressLike, _distributor: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  setVoter: TypedContractMethod<[_voter: AddressLike], [void], "nonpayable">;
 
   slopeChanges: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
 
@@ -1474,9 +1456,6 @@ export interface VotingEscrow extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "distributor"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "epoch"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -1614,12 +1593,8 @@ export interface VotingEscrow extends BaseContract {
     nameOrSignature: "setTeam"
   ): TypedContractMethod<[_team: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "setVoterAndDistributor"
-  ): TypedContractMethod<
-    [_voter: AddressLike, _distributor: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+    nameOrSignature: "setVoter"
+  ): TypedContractMethod<[_voter: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "slopeChanges"
   ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;

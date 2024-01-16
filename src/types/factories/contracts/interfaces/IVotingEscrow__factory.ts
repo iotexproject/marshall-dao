@@ -998,19 +998,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "distributor",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "epoch",
     outputs: [
       {
@@ -1527,13 +1514,8 @@ const _abi = [
         name: "_voter",
         type: "address",
       },
-      {
-        internalType: "address",
-        name: "_distributor",
-        type: "address",
-      },
     ],
-    name: "setVoterAndDistributor",
+    name: "setVoter",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

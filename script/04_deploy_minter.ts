@@ -13,10 +13,6 @@ async function main() {
     console.log(`Please provide FACTORY_REGISTRY address`);
     return;
   }
-  if (!process.env.FACTORY_REGISTRY) {
-    console.log(`Please provide FACTORY_REGISTRY address`);
-    return;
-  }
   if (!process.env.GOVERNOR) {
     console.log(`Please provide GOVERNOR address`);
     return;
