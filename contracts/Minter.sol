@@ -45,8 +45,6 @@ contract Minter is IMinter {
     activePeriod = ((block.timestamp) / WEEK) * WEEK; // allow emissions this coming epoch
   }
 
-  receive() external payable {}
-
   /// @inheritdoc IMinter
   function setTeam(address _team) external {
     if (msg.sender != team) revert NotTeam();
