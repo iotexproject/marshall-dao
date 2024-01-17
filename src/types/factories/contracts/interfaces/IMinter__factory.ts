@@ -35,6 +35,11 @@ const _abi = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "ZeroDonation",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -53,13 +58,32 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_sender",
+        name: "donor",
         type: "address",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "_weekly",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Donation",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "weekly",
         type: "uint256",
       },
     ],
@@ -149,6 +173,13 @@ const _abi = [
     name: "changeWeekly",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "donate",
+    outputs: [],
+    stateMutability: "payable",
     type: "function",
   },
   {

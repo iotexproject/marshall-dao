@@ -108,4 +108,10 @@ contract Minter is IMinter {
     if (msg.sender != team) revert NotTeam();
     _recipcient.transfer(_amount);
   }
+
+  /// @inheritdoc IMinter
+  function donate() external payable {
+    if (msg.value == 0) revert ZeroDonation();
+    emit Donation(msg.sender, msg.value);
+  }
 }

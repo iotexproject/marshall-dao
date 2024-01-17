@@ -31,6 +31,7 @@ export interface IMinterInterface extends Interface {
       | "activePeriod"
       | "changeVeRate"
       | "changeWeekly"
+      | "donate"
       | "epochCount"
       | "pendingTeam"
       | "rewardsDistributor"
@@ -46,6 +47,7 @@ export interface IMinterInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "AcceptTeam"
+      | "Donation"
       | "Mint"
       | "VeRateChanged"
       | "WeeklyChanged"
@@ -68,6 +70,7 @@ export interface IMinterInterface extends Interface {
     functionFragment: "changeWeekly",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "donate", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "epochCount",
     values?: undefined
@@ -108,6 +111,7 @@ export interface IMinterInterface extends Interface {
     functionFragment: "changeWeekly",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "donate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "epochCount", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pendingTeam",
@@ -141,12 +145,25 @@ export namespace AcceptTeamEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace MintEvent {
-  export type InputTuple = [_sender: AddressLike, _weekly: BigNumberish];
-  export type OutputTuple = [_sender: string, _weekly: bigint];
+export namespace DonationEvent {
+  export type InputTuple = [donor: AddressLike, amount: BigNumberish];
+  export type OutputTuple = [donor: string, amount: bigint];
   export interface OutputObject {
-    _sender: string;
-    _weekly: bigint;
+    donor: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace MintEvent {
+  export type InputTuple = [sender: AddressLike, weekly: BigNumberish];
+  export type OutputTuple = [sender: string, weekly: bigint];
+  export interface OutputObject {
+    sender: string;
+    weekly: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -239,6 +256,8 @@ export interface IMinter extends BaseContract {
     "nonpayable"
   >;
 
+  donate: TypedContractMethod<[], [void], "payable">;
+
   epochCount: TypedContractMethod<[], [bigint], "view">;
 
   pendingTeam: TypedContractMethod<[], [string], "view">;
@@ -279,6 +298,9 @@ export interface IMinter extends BaseContract {
     nameOrSignature: "changeWeekly"
   ): TypedContractMethod<[_weekly: BigNumberish], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "donate"
+  ): TypedContractMethod<[], [void], "payable">;
+  getFunction(
     nameOrSignature: "epochCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -315,6 +337,13 @@ export interface IMinter extends BaseContract {
     AcceptTeamEvent.OutputObject
   >;
   getEvent(
+    key: "Donation"
+  ): TypedContractEvent<
+    DonationEvent.InputTuple,
+    DonationEvent.OutputTuple,
+    DonationEvent.OutputObject
+  >;
+  getEvent(
     key: "Mint"
   ): TypedContractEvent<
     MintEvent.InputTuple,
@@ -346,6 +375,17 @@ export interface IMinter extends BaseContract {
       AcceptTeamEvent.InputTuple,
       AcceptTeamEvent.OutputTuple,
       AcceptTeamEvent.OutputObject
+    >;
+
+    "Donation(address,uint256)": TypedContractEvent<
+      DonationEvent.InputTuple,
+      DonationEvent.OutputTuple,
+      DonationEvent.OutputObject
+    >;
+    Donation: TypedContractEvent<
+      DonationEvent.InputTuple,
+      DonationEvent.OutputTuple,
+      DonationEvent.OutputObject
     >;
 
     "Mint(address,uint256)": TypedContractEvent<

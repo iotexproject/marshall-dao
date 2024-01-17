@@ -8,14 +8,16 @@ import {IRewardsDistributor} from "./IRewardsDistributor.sol";
 interface IMinter {
   error NotTeam();
   error ZeroAddress();
+  error ZeroDonation();
   error InvalidRate();
   error NotPendingTeam();
   error InsufficientFund();
 
-  event Mint(address indexed _sender, uint256 _weekly);
+  event Mint(address indexed sender, uint256 weekly);
   event AcceptTeam(address indexed _newTeam);
   event WeeklyChanged(uint256 weekly);
   event VeRateChanged(uint256 rate);
+  event Donation(address indexed donor, uint256 amount);
 
   /// @notice Interface of Voter.sol
   function voter() external view returns (IVoter);
@@ -64,4 +66,7 @@ interface IMinter {
 
   /// @notice Change ve rate of emission.
   function changeVeRate(uint256 _rate) external;
+
+  /// @notice Donate fund to DAO
+  function donate() external payable;
 }
