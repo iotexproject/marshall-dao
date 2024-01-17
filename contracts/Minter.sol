@@ -107,6 +107,10 @@ contract Minter is IMinter {
     _recipcient.transfer(_amount);
   }
 
+  receive() external payable {
+    emit Donation(msg.sender, msg.value);
+  }
+
   /// @inheritdoc IMinter
   function donate() external payable {
     if (msg.value == 0) revert ZeroDonation();
