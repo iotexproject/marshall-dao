@@ -101,10 +101,11 @@ contract Minter is IMinter {
     emit VeRateChanged(_rate);
   }
 
-  /// @notice Withdraw fund
+  /// @inheritdoc IMinter
   function withdraw(address payable _recipcient, uint256 _amount) external {
     if (msg.sender != team) revert NotTeam();
     _recipcient.transfer(_amount);
+    emit Withdraw(msg.sender, _recipcient, _amount);
   }
 
   receive() external payable {

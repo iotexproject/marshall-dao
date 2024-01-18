@@ -18,6 +18,7 @@ interface IMinter {
   event WeeklyChanged(uint256 weekly);
   event VeRateChanged(uint256 rate);
   event Donation(address indexed donor, uint256 amount);
+  event Withdraw(address indexed operator, address indexed recipcient, uint256 amount);
 
   /// @notice Interface of Voter.sol
   function voter() external view returns (IVoter);
@@ -66,6 +67,9 @@ interface IMinter {
 
   /// @notice Change ve rate of emission.
   function changeVeRate(uint256 _rate) external;
+
+  /// @notice Withdraw fund from DAO
+  function withdraw(address payable _recipcient, uint256 _amount) external;
 
   /// @notice Donate fund to DAO
   function donate() external payable;
