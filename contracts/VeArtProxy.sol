@@ -105,7 +105,7 @@ contract VeArtProxy is IVeArtProxy {
             '",',
             '"background_color": "121a26",',
             '"description": "Marshall DAO is a Decentralized Autonomous Organization (DAO) that will employ a vote-escrow on-chain governance protocol.",',
-            '"image_data": "data:image/svg+xml;base64,',
+            '"image": "data:image/svg+xml;base64,',
             output,
             '",',
             '"attributes": [',

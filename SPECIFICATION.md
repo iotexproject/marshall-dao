@@ -40,7 +40,7 @@ All of these operations require ownership of the underlying NFT or tokens being 
 
 ### Vault
 
-The minting contract handles emissions for the Marshall DAO protocol. Emissions start fixed amount $IOTX per epoch (7 days). Liquidity providers and veIOTX holder will receive weekly emissions. The weekly emissions amount and the ratio of the LP and veIOTX can be adjust by DAO governor.
+The vault contract handles DAO fund and emissions for the Marshall DAO protocol. Emissions start fixed amount $IOTX per epoch (7 days). Liquidity providers and veIOTX holder will receive weekly emissions. The weekly emissions amount and the ratio of the LP and veIOTX can be adjust by DAO governor.
 
 ## RewardsDistributor
 
