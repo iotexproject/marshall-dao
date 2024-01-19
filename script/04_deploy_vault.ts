@@ -35,18 +35,18 @@ async function main() {
   await rewardsDistributor.waitForDeployment();
   console.log(`RewardsDistributor deployed to ${rewardsDistributor.target}`);
   
-  const minter = await ethers.deployContract('Minter', [
+  const vault = await ethers.deployContract('Vault', [
     voter.target,
     process.env.VE,
     rewardsDistributor.target
   ]);
-  await minter.waitForDeployment();
-  console.log(`Minter deployed to ${minter.target}`);
+  await vault.waitForDeployment();
+  console.log(`Vault deployed to ${vault.target}`);
 
-  tx = await voter.initialize([], minter.target);
+  tx = await voter.initialize([], vault.target);
   await tx.wait();
 
-  tx = await rewardsDistributor.setMinter(minter.target);
+  tx = await rewardsDistributor.setVault(vault.target);
   await tx.wait();
 }
 
