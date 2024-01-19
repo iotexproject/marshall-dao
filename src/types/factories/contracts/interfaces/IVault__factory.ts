@@ -4,9 +4,9 @@
 
 import { Contract, Interface, type ContractRunner } from "ethers";
 import type {
-  IMinter,
-  IMinterInterface,
-} from "../../../contracts/interfaces/IMinter";
+  IVault,
+  IVaultInterface,
+} from "../../../contracts/interfaces/IVault";
 
 const _abi = [
   {
@@ -87,7 +87,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "Mint",
+    name: "Emission",
     type: "event",
   },
   {
@@ -114,6 +114,31 @@ const _abi = [
       },
     ],
     name: "WeeklyChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "operator",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "recipcient",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Withdraw",
     type: "event",
   },
   {
@@ -312,14 +337,32 @@ const _abi = [
     stateMutability: "view",
     type: "function",
   },
+  {
+    inputs: [
+      {
+        internalType: "address payable",
+        name: "_recipcient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "withdraw",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ] as const;
 
-export class IMinter__factory {
+export class IVault__factory {
   static readonly abi = _abi;
-  static createInterface(): IMinterInterface {
-    return new Interface(_abi) as IMinterInterface;
+  static createInterface(): IVaultInterface {
+    return new Interface(_abi) as IVaultInterface;
   }
-  static connect(address: string, runner?: ContractRunner | null): IMinter {
-    return new Contract(address, _abi, runner) as unknown as IMinter;
+  static connect(address: string, runner?: ContractRunner | null): IVault {
+    return new Contract(address, _abi, runner) as unknown as IVault;
   }
 }

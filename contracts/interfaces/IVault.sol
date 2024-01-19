@@ -5,7 +5,7 @@ import {IVoter} from "./IVoter.sol";
 import {IVotingEscrow} from "./IVotingEscrow.sol";
 import {IRewardsDistributor} from "./IRewardsDistributor.sol";
 
-interface IMinter {
+interface IVault {
   error NotTeam();
   error ZeroAddress();
   error ZeroDonation();
@@ -13,7 +13,7 @@ interface IMinter {
   error NotPendingTeam();
   error InsufficientFund();
 
-  event Mint(address indexed sender, uint256 weekly);
+  event Emission(address indexed sender, uint256 weekly);
   event AcceptTeam(address indexed _newTeam);
   event WeeklyChanged(uint256 weekly);
   event VeRateChanged(uint256 rate);

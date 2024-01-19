@@ -32,12 +32,12 @@ export interface RewardsDistributorInterface extends Interface {
       | "claimMany"
       | "claimable"
       | "lastTokenTime"
-      | "minter"
-      | "setMinter"
+      | "setVault"
       | "startTime"
       | "timeCursorOf"
       | "tokenLastBalance"
       | "tokensPerWeek"
+      | "vault"
       | "ve"
   ): FunctionFragment;
 
@@ -63,9 +63,8 @@ export interface RewardsDistributorInterface extends Interface {
     functionFragment: "lastTokenTime",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "minter", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "setMinter",
+    functionFragment: "setVault",
     values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "startTime", values?: undefined): string;
@@ -81,6 +80,7 @@ export interface RewardsDistributorInterface extends Interface {
     functionFragment: "tokensPerWeek",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(functionFragment: "ve", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "WEEK", data: BytesLike): Result;
@@ -95,8 +95,7 @@ export interface RewardsDistributorInterface extends Interface {
     functionFragment: "lastTokenTime",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "minter", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setMinter", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setVault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "startTime", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "timeCursorOf",
@@ -110,6 +109,7 @@ export interface RewardsDistributorInterface extends Interface {
     functionFragment: "tokensPerWeek",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ve", data: BytesLike): Result;
 }
 
@@ -210,9 +210,7 @@ export interface RewardsDistributor extends BaseContract {
 
   lastTokenTime: TypedContractMethod<[], [bigint], "view">;
 
-  minter: TypedContractMethod<[], [string], "view">;
-
-  setMinter: TypedContractMethod<[_minter: AddressLike], [void], "nonpayable">;
+  setVault: TypedContractMethod<[_vault: AddressLike], [void], "nonpayable">;
 
   startTime: TypedContractMethod<[], [bigint], "view">;
 
@@ -221,6 +219,8 @@ export interface RewardsDistributor extends BaseContract {
   tokenLastBalance: TypedContractMethod<[], [bigint], "view">;
 
   tokensPerWeek: TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+
+  vault: TypedContractMethod<[], [string], "view">;
 
   ve: TypedContractMethod<[], [string], "view">;
 
@@ -247,11 +247,8 @@ export interface RewardsDistributor extends BaseContract {
     nameOrSignature: "lastTokenTime"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "minter"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "setMinter"
-  ): TypedContractMethod<[_minter: AddressLike], [void], "nonpayable">;
+    nameOrSignature: "setVault"
+  ): TypedContractMethod<[_vault: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "startTime"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -264,6 +261,9 @@ export interface RewardsDistributor extends BaseContract {
   getFunction(
     nameOrSignature: "tokensPerWeek"
   ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "vault"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(nameOrSignature: "ve"): TypedContractMethod<[], [string], "view">;
 
   getEvent(

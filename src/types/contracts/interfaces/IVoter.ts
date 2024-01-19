@@ -46,7 +46,6 @@ export interface IVoterInterface extends Interface {
       | "lastVoted"
       | "length"
       | "maxVotingNum"
-      | "minter"
       | "notifyRewardAmount"
       | "poke"
       | "poolForGauge"
@@ -60,6 +59,7 @@ export interface IVoterInterface extends Interface {
       | "updateFor(uint256,uint256)"
       | "updateFor(address[])"
       | "usedWeights"
+      | "vault"
       | "ve"
       | "vote"
       | "votes"
@@ -149,7 +149,6 @@ export interface IVoterInterface extends Interface {
     functionFragment: "maxVotingNum",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "minter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "notifyRewardAmount",
     values?: undefined
@@ -196,6 +195,7 @@ export interface IVoterInterface extends Interface {
     functionFragment: "usedWeights",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "vault", values?: undefined): string;
   encodeFunctionData(functionFragment: "ve", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "vote",
@@ -271,7 +271,6 @@ export interface IVoterInterface extends Interface {
     functionFragment: "maxVotingNum",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "minter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "notifyRewardAmount",
     data: BytesLike
@@ -318,6 +317,7 @@ export interface IVoterInterface extends Interface {
     functionFragment: "usedWeights",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "votes", data: BytesLike): Result;
@@ -638,8 +638,6 @@ export interface IVoter extends BaseContract {
 
   maxVotingNum: TypedContractMethod<[], [bigint], "view">;
 
-  minter: TypedContractMethod<[], [string], "view">;
-
   notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
 
   poke: TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;
@@ -689,6 +687,8 @@ export interface IVoter extends BaseContract {
   >;
 
   usedWeights: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+
+  vault: TypedContractMethod<[], [string], "view">;
 
   ve: TypedContractMethod<[], [string], "view">;
 
@@ -799,9 +799,6 @@ export interface IVoter extends BaseContract {
     nameOrSignature: "maxVotingNum"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "minter"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "notifyRewardAmount"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
@@ -848,6 +845,9 @@ export interface IVoter extends BaseContract {
   getFunction(
     nameOrSignature: "usedWeights"
   ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "vault"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(nameOrSignature: "ve"): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "vote"

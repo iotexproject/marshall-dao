@@ -17,7 +17,7 @@ interface IVoter {
   error NotApprovedOrOwner();
   error NotGovernor();
   error NotEmergencyCouncil();
-  error NotMinter();
+  error NotVault();
   error NotWhitelistedNFT();
   error NotWhitelistedToken();
   error SameValue();
@@ -68,8 +68,8 @@ interface IVoter {
   /// @notice Factory registry for valid gauge / rewards factories
   function factoryRegistry() external view returns (address);
 
-  /// @notice Address of Minter.sol
-  function minter() external view returns (address);
+  /// @notice Address of Vault.sol
+  function vault() external view returns (address);
 
   /// @notice Standard OZ IGovernor using ve for vote weights.
   function governor() external view returns (address);
@@ -123,9 +123,9 @@ interface IVoter {
   /// @notice Number of pools with a Gauge
   function length() external view returns (uint256);
 
-  /// @notice Called by Minter to distribute weekly emissions rewards for disbursement amongst gauges.
+  /// @notice Called by Vault to distribute weekly emissions rewards for disbursement amongst gauges.
   /// @dev Assumes totalWeight != 0 (Will never be zero as long as users are voting).
-  ///      Throws if not called by minter.
+  ///      Throws if not called by vault.
   function notifyRewardAmount() external payable;
 
   /// @dev Utility to distribute to gauges of pools in range _start to _finish.

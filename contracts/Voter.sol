@@ -5,7 +5,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IVotingRewardsFactory} from "./interfaces/factories/IVotingRewardsFactory.sol";
 import {IGauge} from "./interfaces/IGauge.sol";
 import {IGaugeFactory} from "./interfaces/factories/IGaugeFactory.sol";
-import {IMinter} from "./interfaces/IMinter.sol";
+import {IVault} from "./interfaces/IVault.sol";
 import {IReward} from "./interfaces/IReward.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
@@ -28,7 +28,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @notice Rewards are released over 7 days
   uint256 internal constant DURATION = 7 days;
   /// @inheritdoc IVoter
-  address public minter;
+  address public vault;
   /// @inheritdoc IVoter
   address public governor;
   /// @inheritdoc IVoter
@@ -78,7 +78,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     ve = _ve;
     factoryRegistry = _factoryRegistry;
     address _sender = _msgSender();
-    minter = _sender;
+    vault = _sender;
     governor = _sender;
     emergencyCouncil = _sender;
     maxVotingNum = 30;
@@ -108,13 +108,13 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @dev requires initialization with at least rewardToken
-  function initialize(address[] calldata _tokens, address _minter) external {
-    if (_msgSender() != minter) revert NotMinter();
+  function initialize(address[] calldata _tokens, address _vault) external {
+    if (_msgSender() != vault) revert NotVault();
     uint256 _length = _tokens.length;
     for (uint256 i = 0; i < _length; i++) {
       _whitelistToken(_tokens[i], true);
     }
-    minter = _minter;
+    vault = _vault;
   }
 
   /// @inheritdoc IVoter
@@ -294,10 +294,10 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function killGauge(address _gauge) external {
     if (_msgSender() != emergencyCouncil) revert NotEmergencyCouncil();
     if (!isAlive[_gauge]) revert GaugeAlreadyKilled();
-    // Return claimable back to minter
+    // Return claimable back to valut
     uint256 _claimable = claimable[_gauge];
     if (_claimable > 0) {
-      payable(minter).transfer(_claimable);
+      payable(vault).transfer(_claimable);
       delete claimable[_gauge];
     }
     isAlive[_gauge] = false;
@@ -320,7 +320,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVoter
   function notifyRewardAmount() external payable {
     address sender = _msgSender();
-    if (sender != minter) revert NotMinter();
+    if (sender != vault) revert NotVault();
     uint256 _amount = msg.value;
     uint256 _ratio = (_amount * 1e18) / Math.max(totalWeight, 1); // 1e18 adjustment is removed during claim
     if (_ratio > 0) {
@@ -362,7 +362,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
         if (isAlive[_gauge]) {
           claimable[_gauge] += _share;
         } else {
-          payable(minter).transfer(_share); // send rewards back to Minter so they're not stuck in Voter
+          payable(vault).transfer(_share); // send rewards back to Vault so they're not stuck in Voter
         }
       }
     } else {
@@ -399,7 +399,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function distribute(uint256 _start, uint256 _finish) external nonReentrant {
-    IMinter(minter).updatePeriod();
+    IVault(vault).updatePeriod();
     for (uint256 x = _start; x < _finish; x++) {
       _distribute(gauges[pools[x]]);
     }
@@ -407,7 +407,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function distribute(address[] memory _gauges) external nonReentrant {
-    IMinter(minter).updatePeriod();
+    IVault(vault).updatePeriod();
     uint256 _length = _gauges.length;
     for (uint256 x = 0; x < _length; x++) {
       _distribute(_gauges[x]);

@@ -98,7 +98,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "NotMinter",
+    name: "NotVault",
     type: "error",
   },
   {
@@ -732,19 +732,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "minter",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "notifyRewardAmount",
     outputs: [],
     stateMutability: "payable",
@@ -918,6 +905,19 @@ const _abi = [
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "vault",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",

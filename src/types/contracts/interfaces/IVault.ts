@@ -23,7 +23,7 @@ import type {
   TypedContractMethod,
 } from "../../common";
 
-export interface IMinterInterface extends Interface {
+export interface IVaultInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "WEEK"
@@ -42,15 +42,17 @@ export interface IMinterInterface extends Interface {
       | "veRate"
       | "voter"
       | "weekly"
+      | "withdraw"
   ): FunctionFragment;
 
   getEvent(
     nameOrSignatureOrTopic:
       | "AcceptTeam"
       | "Donation"
-      | "Mint"
+      | "Emission"
       | "VeRateChanged"
       | "WeeklyChanged"
+      | "Withdraw"
   ): EventFragment;
 
   encodeFunctionData(functionFragment: "WEEK", values?: undefined): string;
@@ -96,6 +98,10 @@ export interface IMinterInterface extends Interface {
   encodeFunctionData(functionFragment: "veRate", values?: undefined): string;
   encodeFunctionData(functionFragment: "voter", values?: undefined): string;
   encodeFunctionData(functionFragment: "weekly", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [AddressLike, BigNumberish]
+  ): string;
 
   decodeFunctionResult(functionFragment: "WEEK", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "acceptTeam", data: BytesLike): Result;
@@ -131,6 +137,7 @@ export interface IMinterInterface extends Interface {
   decodeFunctionResult(functionFragment: "veRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "voter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weekly", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 }
 
 export namespace AcceptTeamEvent {
@@ -158,7 +165,7 @@ export namespace DonationEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace MintEvent {
+export namespace EmissionEvent {
   export type InputTuple = [sender: AddressLike, weekly: BigNumberish];
   export type OutputTuple = [sender: string, weekly: bigint];
   export interface OutputObject {
@@ -195,11 +202,33 @@ export namespace WeeklyChangedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface IMinter extends BaseContract {
-  connect(runner?: ContractRunner | null): IMinter;
+export namespace WithdrawEvent {
+  export type InputTuple = [
+    operator: AddressLike,
+    recipcient: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [
+    operator: string,
+    recipcient: string,
+    amount: bigint
+  ];
+  export interface OutputObject {
+    operator: string;
+    recipcient: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export interface IVault extends BaseContract {
+  connect(runner?: ContractRunner | null): IVault;
   waitForDeployment(): Promise<this>;
 
-  interface: IMinterInterface;
+  interface: IVaultInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -278,6 +307,12 @@ export interface IMinter extends BaseContract {
 
   weekly: TypedContractMethod<[], [bigint], "view">;
 
+  withdraw: TypedContractMethod<
+    [_recipcient: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -328,6 +363,13 @@ export interface IMinter extends BaseContract {
   getFunction(
     nameOrSignature: "weekly"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "withdraw"
+  ): TypedContractMethod<
+    [_recipcient: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   getEvent(
     key: "AcceptTeam"
@@ -344,11 +386,11 @@ export interface IMinter extends BaseContract {
     DonationEvent.OutputObject
   >;
   getEvent(
-    key: "Mint"
+    key: "Emission"
   ): TypedContractEvent<
-    MintEvent.InputTuple,
-    MintEvent.OutputTuple,
-    MintEvent.OutputObject
+    EmissionEvent.InputTuple,
+    EmissionEvent.OutputTuple,
+    EmissionEvent.OutputObject
   >;
   getEvent(
     key: "VeRateChanged"
@@ -363,6 +405,13 @@ export interface IMinter extends BaseContract {
     WeeklyChangedEvent.InputTuple,
     WeeklyChangedEvent.OutputTuple,
     WeeklyChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Withdraw"
+  ): TypedContractEvent<
+    WithdrawEvent.InputTuple,
+    WithdrawEvent.OutputTuple,
+    WithdrawEvent.OutputObject
   >;
 
   filters: {
@@ -388,15 +437,15 @@ export interface IMinter extends BaseContract {
       DonationEvent.OutputObject
     >;
 
-    "Mint(address,uint256)": TypedContractEvent<
-      MintEvent.InputTuple,
-      MintEvent.OutputTuple,
-      MintEvent.OutputObject
+    "Emission(address,uint256)": TypedContractEvent<
+      EmissionEvent.InputTuple,
+      EmissionEvent.OutputTuple,
+      EmissionEvent.OutputObject
     >;
-    Mint: TypedContractEvent<
-      MintEvent.InputTuple,
-      MintEvent.OutputTuple,
-      MintEvent.OutputObject
+    Emission: TypedContractEvent<
+      EmissionEvent.InputTuple,
+      EmissionEvent.OutputTuple,
+      EmissionEvent.OutputObject
     >;
 
     "VeRateChanged(uint256)": TypedContractEvent<
@@ -419,6 +468,17 @@ export interface IMinter extends BaseContract {
       WeeklyChangedEvent.InputTuple,
       WeeklyChangedEvent.OutputTuple,
       WeeklyChangedEvent.OutputObject
+    >;
+
+    "Withdraw(address,address,uint256)": TypedContractEvent<
+      WithdrawEvent.InputTuple,
+      WithdrawEvent.OutputTuple,
+      WithdrawEvent.OutputObject
+    >;
+    Withdraw: TypedContractEvent<
+      WithdrawEvent.InputTuple,
+      WithdrawEvent.OutputTuple,
+      WithdrawEvent.OutputObject
     >;
   };
 }

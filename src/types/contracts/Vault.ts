@@ -23,7 +23,7 @@ import type {
   TypedContractMethod,
 } from "../common";
 
-export interface MinterInterface extends Interface {
+export interface VaultInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "WEEK"
@@ -49,9 +49,10 @@ export interface MinterInterface extends Interface {
     nameOrSignatureOrTopic:
       | "AcceptTeam"
       | "Donation"
-      | "Mint"
+      | "Emission"
       | "VeRateChanged"
       | "WeeklyChanged"
+      | "Withdraw"
   ): EventFragment;
 
   encodeFunctionData(functionFragment: "WEEK", values?: undefined): string;
@@ -164,7 +165,7 @@ export namespace DonationEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace MintEvent {
+export namespace EmissionEvent {
   export type InputTuple = [sender: AddressLike, weekly: BigNumberish];
   export type OutputTuple = [sender: string, weekly: bigint];
   export interface OutputObject {
@@ -201,11 +202,33 @@ export namespace WeeklyChangedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export interface Minter extends BaseContract {
-  connect(runner?: ContractRunner | null): Minter;
+export namespace WithdrawEvent {
+  export type InputTuple = [
+    operator: AddressLike,
+    recipcient: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [
+    operator: string,
+    recipcient: string,
+    amount: bigint
+  ];
+  export interface OutputObject {
+    operator: string;
+    recipcient: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export interface Vault extends BaseContract {
+  connect(runner?: ContractRunner | null): Vault;
   waitForDeployment(): Promise<this>;
 
-  interface: MinterInterface;
+  interface: VaultInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -363,11 +386,11 @@ export interface Minter extends BaseContract {
     DonationEvent.OutputObject
   >;
   getEvent(
-    key: "Mint"
+    key: "Emission"
   ): TypedContractEvent<
-    MintEvent.InputTuple,
-    MintEvent.OutputTuple,
-    MintEvent.OutputObject
+    EmissionEvent.InputTuple,
+    EmissionEvent.OutputTuple,
+    EmissionEvent.OutputObject
   >;
   getEvent(
     key: "VeRateChanged"
@@ -382,6 +405,13 @@ export interface Minter extends BaseContract {
     WeeklyChangedEvent.InputTuple,
     WeeklyChangedEvent.OutputTuple,
     WeeklyChangedEvent.OutputObject
+  >;
+  getEvent(
+    key: "Withdraw"
+  ): TypedContractEvent<
+    WithdrawEvent.InputTuple,
+    WithdrawEvent.OutputTuple,
+    WithdrawEvent.OutputObject
   >;
 
   filters: {
@@ -407,15 +437,15 @@ export interface Minter extends BaseContract {
       DonationEvent.OutputObject
     >;
 
-    "Mint(address,uint256)": TypedContractEvent<
-      MintEvent.InputTuple,
-      MintEvent.OutputTuple,
-      MintEvent.OutputObject
+    "Emission(address,uint256)": TypedContractEvent<
+      EmissionEvent.InputTuple,
+      EmissionEvent.OutputTuple,
+      EmissionEvent.OutputObject
     >;
-    Mint: TypedContractEvent<
-      MintEvent.InputTuple,
-      MintEvent.OutputTuple,
-      MintEvent.OutputObject
+    Emission: TypedContractEvent<
+      EmissionEvent.InputTuple,
+      EmissionEvent.OutputTuple,
+      EmissionEvent.OutputObject
     >;
 
     "VeRateChanged(uint256)": TypedContractEvent<
@@ -438,6 +468,17 @@ export interface Minter extends BaseContract {
       WeeklyChangedEvent.InputTuple,
       WeeklyChangedEvent.OutputTuple,
       WeeklyChangedEvent.OutputObject
+    >;
+
+    "Withdraw(address,address,uint256)": TypedContractEvent<
+      WithdrawEvent.InputTuple,
+      WithdrawEvent.OutputTuple,
+      WithdrawEvent.OutputObject
+    >;
+    Withdraw: TypedContractEvent<
+      WithdrawEvent.InputTuple,
+      WithdrawEvent.OutputTuple,
+      WithdrawEvent.OutputObject
     >;
   };
 }

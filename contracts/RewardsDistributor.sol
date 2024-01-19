@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IRewardsDistributor} from "./interfaces/IRewardsDistributor.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
-import {IMinter} from "./interfaces/IMinter.sol";
+import {IVault} from "./interfaces/IVault.sol";
 
 /*
  * @title Curve Fee Distribution modified for ve(3,3) emissions
@@ -28,7 +28,7 @@ contract RewardsDistributor is IRewardsDistributor {
   /// @inheritdoc IRewardsDistributor
   IVotingEscrow public immutable ve;
   /// @inheritdoc IRewardsDistributor
-  address public minter;
+  address public vault;
   /// @inheritdoc IRewardsDistributor
   uint256 public tokenLastBalance;
 
@@ -37,7 +37,7 @@ contract RewardsDistributor is IRewardsDistributor {
     startTime = _t;
     lastTokenTime = _t;
     ve = IVotingEscrow(_ve);
-    minter = msg.sender;
+    vault = msg.sender;
   }
 
   receive() external payable {}
@@ -78,7 +78,7 @@ contract RewardsDistributor is IRewardsDistributor {
 
   /// @inheritdoc IRewardsDistributor
   function checkpointToken() external {
-    if (msg.sender != minter) revert NotMinter();
+    if (msg.sender != vault) revert NotVault();
     _checkpointToken();
   }
 
@@ -131,7 +131,7 @@ contract RewardsDistributor is IRewardsDistributor {
 
   /// @inheritdoc IRewardsDistributor
   function claim(uint256 _tokenId) external returns (uint256) {
-    if (IMinter(minter).activePeriod() < ((block.timestamp / WEEK) * WEEK)) revert UpdatePeriod();
+    if (IVault(vault).activePeriod() < ((block.timestamp / WEEK) * WEEK)) revert UpdatePeriod();
     uint256 _timestamp = block.timestamp;
     uint256 _lastTokenTime = lastTokenTime;
     _lastTokenTime = (_lastTokenTime / WEEK) * WEEK;
@@ -151,7 +151,7 @@ contract RewardsDistributor is IRewardsDistributor {
 
   /// @inheritdoc IRewardsDistributor
   function claimMany(uint256[] calldata _tokenIds) external returns (bool) {
-    if (IMinter(minter).activePeriod() < ((block.timestamp / WEEK) * WEEK)) revert UpdatePeriod();
+    if (IVault(vault).activePeriod() < ((block.timestamp / WEEK) * WEEK)) revert UpdatePeriod();
     uint256 _timestamp = block.timestamp;
     uint256 _lastTokenTime = lastTokenTime;
     _lastTokenTime = (_lastTokenTime / WEEK) * WEEK;
@@ -181,8 +181,8 @@ contract RewardsDistributor is IRewardsDistributor {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function setMinter(address _minter) external {
-    if (msg.sender != minter) revert NotMinter();
-    minter = _minter;
+  function setVault(address _vault) external {
+    if (msg.sender != vault) revert NotVault();
+    vault = _vault;
   }
 }

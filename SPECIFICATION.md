@@ -38,7 +38,7 @@ All of these operations require ownership of the underlying NFT or tokens being 
 - Can unlock a permanently locked NFT to allow its voting power to decay.
 - Can delegate votes to other `tokenId`s for use in marshall governance to other addresses based on voting power. Voting power retrieved from `getVotes` and `getPastVotes` does not reveal locked amount balances and are used only for voting. 
 
-### Minter
+### Vault
 
 The minting contract handles emissions for the Marshall DAO protocol. Emissions start fixed amount $IOTX per epoch (7 days). Liquidity providers and veIOTX holder will receive weekly emissions. The weekly emissions amount and the ratio of the LP and veIOTX can be adjust by DAO governor.
 
