@@ -24,5 +24,5 @@ GaugeFactory deployed to 0x454e0Ef916fA03839D0f40de8FaC7f64641C01A6
 FactoryRegistry deployed to 0x7d8cC390e8d6B5a06a1357A5EF3059fd23E97e0f
 Voter deployed to 0xC14F28FB65A101bc89A134Ff976037E05d43Dd9E
 RewardsDistributor deployed to 0x46b359Cb147dB48c53637cCC07502118aEd0af90
-Minter deployed to 0xd4970c3210C784555cac08b0f3555DfC8a13987d
+Vault deployed to 0xd4970c3210C784555cac08b0f3555DfC8a13987d
 ```
