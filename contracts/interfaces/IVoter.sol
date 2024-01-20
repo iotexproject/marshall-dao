@@ -13,7 +13,6 @@ interface IVoter {
   error InactiveManagedNFT();
   error MaximumVotingNumberTooLow();
   error NonZeroVotes();
-  error NotAPool();
   error NotApprovedOrOwner();
   error NotGovernor();
   error NotEmergencyCouncil();

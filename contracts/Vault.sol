@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IVault} from "./interfaces/IVault.sol";
 import {IRewardsDistributor} from "./interfaces/IRewardsDistributor.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
@@ -11,8 +13,12 @@ import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 /// @author velodrome.finance, @figs999, @pegahcarter
 /// @notice Controls minting of emissions and rebases for the Protocol
 contract Vault is IVault {
+  using SafeERC20 for IERC20;
+
   /// @inheritdoc IVault
   IVoter public immutable voter;
+  /// @inheritdoc IVault
+  address public governor;
   /// @inheritdoc IVault
   IVotingEscrow public immutable ve;
   /// @inheritdoc IVault
@@ -28,10 +34,6 @@ contract Vault is IVault {
   uint256 public activePeriod;
   /// @inheritdoc IVault
   uint256 public epochCount;
-  /// @inheritdoc IVault
-  address public team;
-  /// @inheritdoc IVault
-  address public pendingTeam;
 
   constructor(
     address _voter, // the voting & distribution system
@@ -40,24 +42,16 @@ contract Vault is IVault {
   ) {
     voter = IVoter(_voter);
     ve = IVotingEscrow(_ve);
-    team = msg.sender;
+    governor = msg.sender;
     rewardsDistributor = IRewardsDistributor(_rewardsDistributor);
     activePeriod = ((block.timestamp) / WEEK) * WEEK; // allow emissions this coming epoch
   }
 
   /// @inheritdoc IVault
-  function setTeam(address _team) external {
-    if (msg.sender != team) revert NotTeam();
-    if (_team == address(0)) revert ZeroAddress();
-    pendingTeam = _team;
-  }
-
-  /// @inheritdoc IVault
-  function acceptTeam() external {
-    if (msg.sender != pendingTeam) revert NotPendingTeam();
-    team = pendingTeam;
-    delete pendingTeam;
-    emit AcceptTeam(team);
+  function setGovernor(address _governor) public {
+    if (msg.sender != governor) revert NotGovernor();
+    if (_governor == address(0)) revert ZeroAddress();
+    governor = _governor;
   }
 
   /// @inheritdoc IVault
@@ -86,7 +80,7 @@ contract Vault is IVault {
 
   /// @inheritdoc IVault
   function changeWeekly(uint256 _weekly) external {
-    if (msg.sender != team) revert NotTeam();
+    if (msg.sender != governor) revert NotGovernor();
 
     weekly = _weekly;
     emit WeeklyChanged(_weekly);
@@ -94,7 +88,7 @@ contract Vault is IVault {
 
   /// @inheritdoc IVault
   function changeVeRate(uint256 _rate) external {
-    if (msg.sender != team) revert NotTeam();
+    if (msg.sender != governor) revert NotGovernor();
     if (_rate > 5000) revert InvalidRate();
 
     veRate = _rate;
@@ -102,19 +96,30 @@ contract Vault is IVault {
   }
 
   /// @inheritdoc IVault
-  function withdraw(address payable _recipcient, uint256 _amount) external {
-    if (msg.sender != team) revert NotTeam();
-    _recipcient.transfer(_amount);
-    emit Withdraw(msg.sender, _recipcient, _amount);
+  function withdraw(address _token, address payable _recipcient, uint256 _amount) external {
+    if (msg.sender != governor) revert NotGovernor();
+
+    if (_token == address(0)) {
+      _recipcient.transfer(_amount);
+    } else {
+      IERC20(_token).safeTransfer(_recipcient, _amount);
+    }
+    emit Withdraw(msg.sender, _token, _recipcient, _amount);
   }
 
   receive() external payable {
-    emit Donation(msg.sender, msg.value);
+    emit Donation(msg.sender, address(0), msg.value);
   }
 
   /// @inheritdoc IVault
   function donate() external payable {
     if (msg.value == 0) revert ZeroDonation();
-    emit Donation(msg.sender, msg.value);
+    emit Donation(msg.sender, address(0), msg.value);
+  }
+
+  /// @inheritdoc IVault
+  function donate(address _token, uint256 _amount) external {
+    IERC20(_token).safeTransferFrom(msg.sender, address(this), _amount);
+    emit Donation(msg.sender, _token, _amount);
   }
 }
