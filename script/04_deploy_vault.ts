@@ -13,10 +13,10 @@ async function main() {
     console.log(`Please provide FACTORY_REGISTRY address`);
     return;
   }
-  if (!process.env.GOVERNOR) {
-    console.log(`Please provide GOVERNOR address`);
-    return;
-  }
+  // if (!process.env.GOVERNOR) {
+  //   console.log(`Please provide GOVERNOR address`);
+  //   return;
+  // }
 
   const voter = await ethers.deployContract('Voter', [
     process.env.FORWARDER,
@@ -26,8 +26,8 @@ async function main() {
   await voter.waitForDeployment();
   console.log(`Voter deployed to ${voter.target}`);
 
-  let tx = await voter.setGovernor(process.env.GOVERNOR);
-  await tx.wait();
+  // let tx = await voter.setGovernor(process.env.GOVERNOR);
+  // await tx.wait();
 
   const rewardsDistributor = await ethers.deployContract('RewardsDistributor', [
     process.env.VE
@@ -43,7 +43,10 @@ async function main() {
   await vault.waitForDeployment();
   console.log(`Vault deployed to ${vault.target}`);
 
-  tx = await voter.initialize([], vault.target);
+  // tx = await vault.setGovernor(process.env.GOVERNOR);
+  // await tx.wait();
+
+  let tx = await voter.initialize([], vault.target);
   await tx.wait();
 
   tx = await rewardsDistributor.setVault(vault.target);

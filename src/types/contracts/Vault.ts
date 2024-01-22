@@ -27,16 +27,15 @@ export interface VaultInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "WEEK"
-      | "acceptTeam"
       | "activePeriod"
       | "changeVeRate"
       | "changeWeekly"
-      | "donate"
+      | "donate(address,uint256)"
+      | "donate()"
       | "epochCount"
-      | "pendingTeam"
+      | "governor"
       | "rewardsDistributor"
-      | "setTeam"
-      | "team"
+      | "setGovernor"
       | "updatePeriod"
       | "ve"
       | "veRate"
@@ -47,7 +46,6 @@ export interface VaultInterface extends Interface {
 
   getEvent(
     nameOrSignatureOrTopic:
-      | "AcceptTeam"
       | "Donation"
       | "Emission"
       | "VeRateChanged"
@@ -56,10 +54,6 @@ export interface VaultInterface extends Interface {
   ): EventFragment;
 
   encodeFunctionData(functionFragment: "WEEK", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "acceptTeam",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "activePeriod",
     values?: undefined
@@ -72,24 +66,24 @@ export interface VaultInterface extends Interface {
     functionFragment: "changeWeekly",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "donate", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "donate(address,uint256)",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "donate()", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "epochCount",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "pendingTeam",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "governor", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "rewardsDistributor",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setTeam",
+    functionFragment: "setGovernor",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "team", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "updatePeriod",
     values?: undefined
@@ -100,11 +94,10 @@ export interface VaultInterface extends Interface {
   encodeFunctionData(functionFragment: "weekly", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdraw",
-    values: [AddressLike, BigNumberish]
+    values: [AddressLike, AddressLike, BigNumberish]
   ): string;
 
   decodeFunctionResult(functionFragment: "WEEK", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "acceptTeam", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "activePeriod",
     data: BytesLike
@@ -117,18 +110,21 @@ export interface VaultInterface extends Interface {
     functionFragment: "changeWeekly",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "donate", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "epochCount", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "pendingTeam",
+    functionFragment: "donate(address,uint256)",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "donate()", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "epochCount", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "governor", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "rewardsDistributor",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setTeam", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "team", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setGovernor",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "updatePeriod",
     data: BytesLike
@@ -140,23 +136,16 @@ export interface VaultInterface extends Interface {
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 }
 
-export namespace AcceptTeamEvent {
-  export type InputTuple = [_newTeam: AddressLike];
-  export type OutputTuple = [_newTeam: string];
-  export interface OutputObject {
-    _newTeam: string;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
 export namespace DonationEvent {
-  export type InputTuple = [donor: AddressLike, amount: BigNumberish];
-  export type OutputTuple = [donor: string, amount: bigint];
+  export type InputTuple = [
+    donor: AddressLike,
+    token: AddressLike,
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [donor: string, token: string, amount: bigint];
   export interface OutputObject {
     donor: string;
+    token: string;
     amount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -205,16 +194,19 @@ export namespace WeeklyChangedEvent {
 export namespace WithdrawEvent {
   export type InputTuple = [
     operator: AddressLike,
+    token: AddressLike,
     recipcient: AddressLike,
     amount: BigNumberish
   ];
   export type OutputTuple = [
     operator: string,
+    token: string,
     recipcient: string,
     amount: bigint
   ];
   export interface OutputObject {
     operator: string;
+    token: string;
     recipcient: string;
     amount: bigint;
   }
@@ -269,8 +261,6 @@ export interface Vault extends BaseContract {
 
   WEEK: TypedContractMethod<[], [bigint], "view">;
 
-  acceptTeam: TypedContractMethod<[], [void], "nonpayable">;
-
   activePeriod: TypedContractMethod<[], [bigint], "view">;
 
   changeVeRate: TypedContractMethod<
@@ -285,17 +275,25 @@ export interface Vault extends BaseContract {
     "nonpayable"
   >;
 
-  donate: TypedContractMethod<[], [void], "payable">;
+  "donate(address,uint256)": TypedContractMethod<
+    [_token: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  "donate()": TypedContractMethod<[], [void], "payable">;
 
   epochCount: TypedContractMethod<[], [bigint], "view">;
 
-  pendingTeam: TypedContractMethod<[], [string], "view">;
+  governor: TypedContractMethod<[], [string], "view">;
 
   rewardsDistributor: TypedContractMethod<[], [string], "view">;
 
-  setTeam: TypedContractMethod<[_team: AddressLike], [void], "nonpayable">;
-
-  team: TypedContractMethod<[], [string], "view">;
+  setGovernor: TypedContractMethod<
+    [_governor: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   updatePeriod: TypedContractMethod<[], [bigint], "nonpayable">;
 
@@ -308,7 +306,7 @@ export interface Vault extends BaseContract {
   weekly: TypedContractMethod<[], [bigint], "view">;
 
   withdraw: TypedContractMethod<
-    [_recipcient: AddressLike, _amount: BigNumberish],
+    [_token: AddressLike, _recipcient: AddressLike, _amount: BigNumberish],
     [void],
     "nonpayable"
   >;
@@ -321,9 +319,6 @@ export interface Vault extends BaseContract {
     nameOrSignature: "WEEK"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "acceptTeam"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
     nameOrSignature: "activePeriod"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -333,23 +328,27 @@ export interface Vault extends BaseContract {
     nameOrSignature: "changeWeekly"
   ): TypedContractMethod<[_weekly: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "donate"
+    nameOrSignature: "donate(address,uint256)"
+  ): TypedContractMethod<
+    [_token: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "donate()"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "epochCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "pendingTeam"
+    nameOrSignature: "governor"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "rewardsDistributor"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "setTeam"
-  ): TypedContractMethod<[_team: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "team"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: "setGovernor"
+  ): TypedContractMethod<[_governor: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "updatePeriod"
   ): TypedContractMethod<[], [bigint], "nonpayable">;
@@ -366,18 +365,11 @@ export interface Vault extends BaseContract {
   getFunction(
     nameOrSignature: "withdraw"
   ): TypedContractMethod<
-    [_recipcient: AddressLike, _amount: BigNumberish],
+    [_token: AddressLike, _recipcient: AddressLike, _amount: BigNumberish],
     [void],
     "nonpayable"
   >;
 
-  getEvent(
-    key: "AcceptTeam"
-  ): TypedContractEvent<
-    AcceptTeamEvent.InputTuple,
-    AcceptTeamEvent.OutputTuple,
-    AcceptTeamEvent.OutputObject
-  >;
   getEvent(
     key: "Donation"
   ): TypedContractEvent<
@@ -415,18 +407,7 @@ export interface Vault extends BaseContract {
   >;
 
   filters: {
-    "AcceptTeam(address)": TypedContractEvent<
-      AcceptTeamEvent.InputTuple,
-      AcceptTeamEvent.OutputTuple,
-      AcceptTeamEvent.OutputObject
-    >;
-    AcceptTeam: TypedContractEvent<
-      AcceptTeamEvent.InputTuple,
-      AcceptTeamEvent.OutputTuple,
-      AcceptTeamEvent.OutputObject
-    >;
-
-    "Donation(address,uint256)": TypedContractEvent<
+    "Donation(address,address,uint256)": TypedContractEvent<
       DonationEvent.InputTuple,
       DonationEvent.OutputTuple,
       DonationEvent.OutputObject
@@ -470,7 +451,7 @@ export interface Vault extends BaseContract {
       WeeklyChangedEvent.OutputObject
     >;
 
-    "Withdraw(address,address,uint256)": TypedContractEvent<
+    "Withdraw(address,address,address,uint256)": TypedContractEvent<
       WithdrawEvent.InputTuple,
       WithdrawEvent.OutputTuple,
       WithdrawEvent.OutputObject

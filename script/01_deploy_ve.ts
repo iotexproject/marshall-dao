@@ -35,8 +35,8 @@ async function main() {
   const perlinNoiseFactory = await ethers.getContractFactory('PerlinNoise');
   const perlinNoise = await perlinNoiseFactory.deploy();
   await perlinNoise.waitForDeployment();
-
   console.log(`PerlinNoise deployed to ${perlinNoise.target}`);
+
   const veArtProxy = await ethers.deployContract('VeArtProxy', [escrow.target], {
     libraries: {
       Trig: trig.target,

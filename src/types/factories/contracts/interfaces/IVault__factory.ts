@@ -21,12 +21,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "NotPendingTeam",
-    type: "error",
-  },
-  {
-    inputs: [],
-    name: "NotTeam",
+    name: "NotGovernor",
     type: "error",
   },
   {
@@ -45,20 +40,13 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "_newTeam",
+        name: "donor",
         type: "address",
       },
-    ],
-    name: "AcceptTeam",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
       {
         indexed: true,
         internalType: "address",
-        name: "donor",
+        name: "token",
         type: "address",
       },
       {
@@ -128,6 +116,12 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
+        name: "token",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
         name: "recipcient",
         type: "address",
       },
@@ -152,13 +146,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "acceptTeam",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -201,6 +188,24 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "donate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "donate",
     outputs: [],
@@ -222,7 +227,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "pendingTeam",
+    name: "governor",
     outputs: [
       {
         internalType: "address",
@@ -250,26 +255,13 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "_team",
+        name: "_governor",
         type: "address",
       },
     ],
-    name: "setTeam",
+    name: "setGovernor",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "team",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -339,6 +331,11 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "address",
+        name: "_token",
+        type: "address",
+      },
       {
         internalType: "address payable",
         name: "_recipcient",

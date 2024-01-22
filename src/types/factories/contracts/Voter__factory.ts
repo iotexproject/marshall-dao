@@ -107,11 +107,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "NotAPool",
-    type: "error",
-  },
-  {
-    inputs: [],
     name: "NotApprovedOrOwner",
     type: "error",
   },
