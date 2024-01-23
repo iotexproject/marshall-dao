@@ -51,6 +51,10 @@ async function main() {
 
   tx = await rewardsDistributor.setVault(vault.target);
   await tx.wait();
+
+  const ve = await ethers.getContractAt('VotingEscrow', process.env.VE);
+  tx = await ve.setVoter(voter.target);
+  await tx.wait();
 }
 
 main().catch(err => {

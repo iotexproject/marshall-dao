@@ -8,6 +8,7 @@ export * as governance from "./governance";
 export * as interfaces from "./interfaces";
 export * as libraries from "./libraries";
 export * as rewards from "./rewards";
+export * as test from "./test";
 export { DAOForwarder__factory } from "./DAOForwarder__factory";
 export { MarshallGovernor__factory } from "./MarshallGovernor__factory";
 export { RewardsDistributor__factory } from "./RewardsDistributor__factory";

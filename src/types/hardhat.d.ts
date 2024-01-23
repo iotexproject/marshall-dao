@@ -46,6 +46,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC1155Receiver__factory>;
     getContractFactory(
+      name: "ERC20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC20__factory>;
+    getContractFactory(
+      name: "IERC20Metadata",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC20Metadata__factory>;
+    getContractFactory(
       name: "IERC20Permit",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC20Permit__factory>;
@@ -210,6 +218,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.RewardsDistributor__factory>;
     getContractFactory(
+      name: "TestToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TestToken__factory>;
+    getContractFactory(
       name: "Vault",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Vault__factory>;
@@ -267,6 +279,16 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC1155Receiver>;
     getContractAt(
+      name: "ERC20",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC20>;
+    getContractAt(
+      name: "IERC20Metadata",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC20Metadata>;
+    getContractAt(
       name: "IERC20Permit",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -471,6 +493,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.RewardsDistributor>;
+    getContractAt(
+      name: "TestToken",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TestToken>;
     getContractAt(
       name: "Vault",
       address: string | ethers.Addressable,
@@ -525,6 +552,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC1155Receiver>;
     deployContract(
+      name: "ERC20",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ERC20>;
+    deployContract(
+      name: "IERC20Metadata",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC20Metadata>;
+    deployContract(
       name: "IERC20Permit",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC20Permit>;
@@ -688,6 +723,10 @@ declare module "hardhat/types/runtime" {
       name: "RewardsDistributor",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.RewardsDistributor>;
+    deployContract(
+      name: "TestToken",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TestToken>;
     deployContract(
       name: "Vault",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -746,6 +785,16 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IERC1155Receiver>;
     deployContract(
+      name: "ERC20",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ERC20>;
+    deployContract(
+      name: "IERC20Metadata",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IERC20Metadata>;
+    deployContract(
       name: "IERC20Permit",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -950,6 +999,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.RewardsDistributor>;
+    deployContract(
+      name: "TestToken",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TestToken>;
     deployContract(
       name: "Vault",
       args: any[],
