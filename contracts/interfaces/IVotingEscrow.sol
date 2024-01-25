@@ -66,6 +66,7 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   error NotPermanentLock();
   error NotOwner();
   error NotTeam();
+  error NotAdmin();
   error NotVoter();
   error OwnershipChange();
   error PermanentLock();
@@ -117,6 +118,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
     uint256 _locktime,
     uint256 _ts
   );
+  event NativeRootCommitted(address indexed _committer, bytes32 indexed _root);
+  event NativeRootApproved(address indexed _approver, bytes32 indexed _root);
+  event NativeRootRejected(address indexed _rejector, bytes32 indexed _root);
 
   // State variables
   /// @notice Address of Meta-tx Forwarder
@@ -130,6 +134,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
 
   /// @notice Address of team multisig
   function team() external view returns (address);
+
+  /// @notice Address of admin multisig
+  function admin() external view returns (address);
 
   /// @notice Address of art proxy used for on-chain art generation
   function artProxy() external view returns (address);
@@ -150,6 +157,8 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   function decimals() external view returns (uint8);
 
   function setTeam(address _team) external;
+
+  function setAdmin(address _admin) external;
 
   function setArtProxy(address _proxy) external;
 
@@ -244,6 +253,24 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   /// @return Address of token
   function lockedToken(uint256 _tokenId) external view returns (address);
 
+  /// @notice Native staking bucket merkle proof root
+  /// @return Merkle proof root
+  function nativeRoot() external view returns (bytes32);
+
+  /// @notice Native staking bucket pending merkle proof root
+  /// @return Merkle proof root
+  function pendingNativeRoot() external view returns (bytes32);
+
+  /// @notice Get the native bucket mappinged tokenId
+  /// @param _bucketId .
+  /// @return TokenId of veNFT
+  function nativeTokenId(uint256 _bucketId) external view returns (uint256);
+
+  /// @notice Get the veNFT tokenId by native bucket id
+  /// @param _tokenId .
+  /// @return BucketId of veNFT
+  function tokenIdNative(uint256 _tokenId) external view returns (uint256);
+
   /// @notice User -> UserPoint[userEpoch]
   function userPointHistory(uint256 _tokenId, uint256 _loc) external view returns (UserPoint memory);
 
@@ -284,6 +311,19 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   /// @notice Deposit `_value` additional tokens for `_tokenId` without modifying the unlock time
   /// @param _value Amount of tokens to deposit and add to the lock
   function increaseAmount(uint256 _tokenId, uint256 _value) external payable;
+
+  /// @notice Claim veNFT with native proof
+  /// @param _bucketId native bucket id
+  /// @param _voter native bucket voter
+  /// @param _end voter stake end time
+  /// @param _amount staked amount
+  function claimNative(
+    uint256 _bucketId,
+    address _voter,
+    uint256 _end,
+    uint256 _amount,
+    bytes32[] calldata proof
+  ) external returns (uint256);
 
   /// @notice Extend the unlock time for `_tokenId`
   ///         Cannot extend lock time of permanent locks
