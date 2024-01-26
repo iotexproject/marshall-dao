@@ -865,12 +865,33 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     uint256 _amount,
     bytes32[] calldata proof
   ) external returns (uint256) {
+    if (_end < block.timestamp) revert LockDurationNotInFuture();
     bytes32 node = keccak256(abi.encodePacked(_bucketId, _voter, _end, _amount));
     if (!MerkleProof.verify(proof, nativeRoot, node)) revert InvalidProof();
 
-    // TODO
+    uint256 _tokenId = _nativeTokenId[_bucketId];
+    if (_tokenId == 0) {
+      _tokenId = _createLock(address(0), _amount, _end - block.timestamp, _voter);
+      _nativeTokenId[_bucketId] = _tokenId;
+      _tokenIdNative[_tokenId] = _bucketId;
+      return _tokenId;
+    }
 
-    return 0;
+    LockedBalance memory oldLocked = _locked[_tokenId];
+    uint256 unlockTime = (_end / WEEK) * WEEK; // Locktime is rounded down to weeks
+
+    if (unlockTime <= oldLocked.end) revert LockDurationNotInFuture();
+    if (unlockTime > block.timestamp + MAXTIME) revert LockDurationTooLong();
+
+    uint256 oldAmount = oldLocked.amount.toUint256();
+    if (oldAmount > _amount) revert InvalidAmount();
+    if (oldAmount < _amount) {
+      _checkpointDelegatee(_delegates[_tokenId], _amount, true);
+    }
+    _depositFor(_tokenId, _amount - oldAmount, unlockTime, oldLocked, DepositType.DEPOSIT_FOR_TYPE);
+
+    emit MetadataUpdate(_tokenId);
+    return _tokenId;
   }
 
   /// @inheritdoc IVotingEscrow

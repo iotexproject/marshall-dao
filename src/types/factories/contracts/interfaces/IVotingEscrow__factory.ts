@@ -41,6 +41,16 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "InvalidProof",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "InvalidRoot",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "InvalidSignature",
     type: "error",
   },
@@ -76,12 +86,22 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "NativeNFT",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "NoLockFound",
     type: "error",
   },
   {
     inputs: [],
     name: "NonExistentToken",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "NotAdmin",
     type: "error",
   },
   {
@@ -475,6 +495,63 @@ const _abi = [
     inputs: [
       {
         indexed: true,
+        internalType: "address",
+        name: "_approver",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "_root",
+        type: "bytes32",
+      },
+    ],
+    name: "NativeRootApproved",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "_committer",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "_root",
+        type: "bytes32",
+      },
+    ],
+    name: "NativeRootCommitted",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "_rejector",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "_root",
+        type: "bytes32",
+      },
+    ],
+    name: "NativeRootRejected",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "uint256",
         name: "_from",
         type: "uint256",
@@ -645,6 +722,19 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "admin",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -658,6 +748,13 @@ const _abi = [
       },
     ],
     name: "approve",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "approveNativeRoot",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -810,6 +907,45 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_bucketId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "_voter",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_end",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes32[]",
+        name: "proof",
+        type: "bytes32[]",
+      },
+    ],
+    name: "claimNative",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "clock",
     outputs: [
@@ -820,6 +956,19 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bytes32",
+        name: "_root",
+        type: "bytes32",
+      },
+    ],
+    name: "commitNativeRoot",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -1273,6 +1422,38 @@ const _abi = [
     type: "function",
   },
   {
+    inputs: [],
+    name: "nativeRoot",
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "",
+        type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_bucketId",
+        type: "uint256",
+      },
+    ],
+    name: "nativeTokenId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -1348,6 +1529,19 @@ const _abi = [
         internalType: "uint256",
         name: "_tokenId",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "pendingNativeRoot",
+    outputs: [
+      {
+        internalType: "bytes32",
+        name: "",
+        type: "bytes32",
       },
     ],
     stateMutability: "view",
@@ -1459,6 +1653,19 @@ const _abi = [
       },
     ],
     name: "safeTransferFrom",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_admin",
+        type: "address",
+      },
+    ],
+    name: "setAdmin",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -1666,6 +1873,25 @@ const _abi = [
   {
     inputs: [],
     name: "tokenId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "tokenIdNative",
     outputs: [
       {
         internalType: "uint256",
