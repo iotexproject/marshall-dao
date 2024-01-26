@@ -10,7 +10,6 @@ import {IVoter} from "./interfaces/IVoter.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 
 /// @title Vault
-/// @author velodrome.finance, @figs999, @pegahcarter
 /// @notice Controls minting of emissions and rebases for the Protocol
 contract Vault is IVault {
   using SafeERC20 for IERC20;
