@@ -2,13 +2,14 @@
 pragma solidity ^0.8.0;
 
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
-import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC6372} from "@openzeppelin/contracts/interfaces/IERC6372.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import {IVeArtProxy} from "./interfaces/IVeArtProxy.sol";
+import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {DelegationLogicLibrary} from "./libraries/DelegationLogicLibrary.sol";
 import {BalanceLogicLibrary} from "./libraries/BalanceLogicLibrary.sol";
 import {SafeCastLibrary} from "./libraries/SafeCastLibrary.sol";
@@ -45,6 +46,8 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVotingEscrow
   address public team;
   /// @inheritdoc IVotingEscrow
+  address public admin;
+  /// @inheritdoc IVotingEscrow
   address public artProxy;
 
   mapping(address => uint) internal _pendingTokens;
@@ -78,6 +81,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     forwarder = _forwarder;
     token[address(0)] = block.timestamp;
     team = _msgSender();
+    admin = _msgSender();
     voter = _msgSender();
 
     _pointHistory[0].blk = block.number;
@@ -117,6 +121,12 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     if (_msgSender() != team) revert NotTeam();
     if (_team == address(0)) revert ZeroAddress();
     team = _team;
+  }
+
+  function setAdmin(address _admin) external {
+    if (_msgSender() != admin) revert NotAdmin();
+    if (_admin == address(0)) revert ZeroAddress();
+    admin = _admin;
   }
 
   function setArtProxy(address _proxy) external {
@@ -415,8 +425,15 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVotingEscrow
   uint256 public supply;
 
+  /// @inheritdoc IVotingEscrow
+  bytes32 public nativeRoot;
+  /// @inheritdoc IVotingEscrow
+  bytes32 public pendingNativeRoot;
+
   mapping(uint256 => LockedBalance) internal _locked;
   mapping(uint256 => address) internal _lockedToken;
+  mapping(uint256 => uint256) internal _nativeTokenId;
+  mapping(uint256 => uint256) internal _tokenIdNative;
   mapping(uint256 => UserPoint[1000000000]) internal _userPointHistory;
   mapping(uint256 => uint256) public userPointEpoch;
   /// @inheritdoc IVotingEscrow
@@ -434,6 +451,16 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVotingEscrow
   function lockedToken(uint256 _tokenId) external view returns (address) {
     return _lockedToken[_tokenId];
+  }
+
+  /// @inheritdoc IVotingEscrow
+  function nativeTokenId(uint256 _bucketId) external view returns (uint256) {
+    return _nativeTokenId[_bucketId];
+  }
+
+  /// @inheritdoc IVotingEscrow
+  function tokenIdNative(uint256 _tokenId) external view returns (uint256) {
+    return _tokenIdNative[_tokenId];
   }
 
   /// @inheritdoc IVotingEscrow
@@ -724,6 +751,8 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVotingEscrow
   function depositFor(uint256 _tokenId, uint256 _value) external payable nonReentrant {
+    if (_tokenIdNative[_tokenId] != 0) revert NativeNFT();
+
     _increaseAmountFor(_tokenId, _value, DepositType.DEPOSIT_FOR_TYPE);
   }
 
@@ -784,12 +813,16 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVotingEscrow
   function increaseAmount(uint256 _tokenId, uint256 _value) external payable nonReentrant {
+    if (_tokenIdNative[_tokenId] != 0) revert NativeNFT();
+
     if (!_isApprovedOrOwner(_msgSender(), _tokenId)) revert NotApprovedOrOwner();
     _increaseAmountFor(_tokenId, _value, DepositType.INCREASE_LOCK_AMOUNT);
   }
 
   /// @inheritdoc IVotingEscrow
   function increaseUnlockTime(uint256 _tokenId, uint256 _lockDuration) external nonReentrant {
+    if (_tokenIdNative[_tokenId] != 0) revert NativeNFT();
+
     if (!_isApprovedOrOwner(_msgSender(), _tokenId)) revert NotApprovedOrOwner();
     if (token[_lockedToken[_tokenId]] == 0) revert InvalidToken();
 
@@ -808,7 +841,42 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVotingEscrow
+  function commitNativeRoot(bytes32 _root) external {
+    if (_msgSender() != team) revert NotTeam();
+    if (bytes32(0) == _root) revert InvalidRoot();
+    pendingNativeRoot = _root;
+    emit NativeRootCommitted(team, _root);
+  }
+
+  /// @inheritdoc IVotingEscrow
+  function approveNativeRoot() external {
+    if (_msgSender() != admin) revert NotAdmin();
+    if (bytes32(0) == pendingNativeRoot) revert InvalidRoot();
+    nativeRoot = pendingNativeRoot;
+    pendingNativeRoot = bytes32(0);
+    emit NativeRootApproved(admin, nativeRoot);
+  }
+
+  /// @inheritdoc IVotingEscrow
+  function claimNative(
+    uint256 _bucketId,
+    address _voter,
+    uint256 _end,
+    uint256 _amount,
+    bytes32[] calldata proof
+  ) external returns (uint256) {
+    bytes32 node = keccak256(abi.encodePacked(_bucketId, _voter, _end, _amount));
+    if (!MerkleProof.verify(proof, nativeRoot, node)) revert InvalidProof();
+
+    // TODO
+
+    return 0;
+  }
+
+  /// @inheritdoc IVotingEscrow
   function withdraw(uint256 _tokenId) external nonReentrant {
+    if (_tokenIdNative[_tokenId] != 0) revert NativeNFT();
+
     address sender = _msgSender();
     if (!_isApprovedOrOwner(sender, _tokenId)) revert NotApprovedOrOwner();
     if (voted[_tokenId]) revert AlreadyVoted();
@@ -842,6 +910,8 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVotingEscrow
   function merge(uint256 _from, uint256 _to) external nonReentrant {
+    if (_tokenIdNative[_from] != 0 || _tokenIdNative[_to] != 0) revert NativeNFT();
+
     address sender = _msgSender();
     if (voted[_from]) revert AlreadyVoted();
     if (_from == _to) revert SameNFT();
@@ -886,6 +956,8 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVotingEscrow
   function split(uint256 _from, uint256 _amount) external nonReentrant returns (uint256 _tokenId1, uint256 _tokenId2) {
+    if (_tokenIdNative[_from] != 0) revert NativeNFT();
+
     address sender = _msgSender();
     address owner = _ownerOf(_from);
     if (owner == address(0)) revert SplitNoOwner();
@@ -940,6 +1012,8 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVotingEscrow
   function lockPermanent(uint256 _tokenId) external {
+    if (_tokenIdNative[_tokenId] != 0) revert NativeNFT();
+
     if (token[_lockedToken[_tokenId]] == 0) revert InvalidToken();
     address sender = _msgSender();
     if (!_isApprovedOrOwner(sender, _tokenId)) revert NotApprovedOrOwner();
@@ -961,6 +1035,8 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVotingEscrow
   function unlockPermanent(uint256 _tokenId) external {
+    if (_tokenIdNative[_tokenId] != 0) revert NativeNFT();
+
     address sender = _msgSender();
     if (!_isApprovedOrOwner(sender, _tokenId)) revert NotApprovedOrOwner();
     if (voted[_tokenId]) revert AlreadyVoted();

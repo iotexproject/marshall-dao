@@ -85,6 +85,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   error InvalidToken();
   error TokenExist();
   error TokenNotExist();
+  error InvalidRoot();
+  error InvalidProof();
+  error NativeNFT();
 
   event Deposit(
     address indexed provider,
@@ -324,6 +327,13 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
     uint256 _amount,
     bytes32[] calldata proof
   ) external returns (uint256);
+
+  /// @notice Commit pending native root
+  /// @param _root native merkle root
+  function commitNativeRoot(bytes32 _root) external;
+
+  /// @notice Approve pending native root
+  function approveNativeRoot() external;
 
   /// @notice Extend the unlock time for `_tokenId`
   ///         Cannot extend lock time of permanent locks
