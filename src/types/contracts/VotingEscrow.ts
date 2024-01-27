@@ -144,14 +144,17 @@ export interface VotingEscrowInterface extends Interface {
       | "merge"
       | "name"
       | "nativeRoot"
+      | "nativeSnapshotTime"
       | "nativeTokenId"
       | "nonces"
       | "numCheckpoints"
       | "ownerOf"
       | "ownerToNFTokenIdList"
       | "pendingNativeRoot"
+      | "pendingNativeSnapshotTime"
       | "permanentLockBalance"
       | "pointHistory"
+      | "rejectNativeRoot"
       | "removePendingToken"
       | "removeToken"
       | "safeTransferFrom(address,address,uint256)"
@@ -362,6 +365,10 @@ export interface VotingEscrowInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "nativeSnapshotTime",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "nativeTokenId",
     values: [BigNumberish]
   ): string;
@@ -383,12 +390,20 @@ export interface VotingEscrowInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "pendingNativeSnapshotTime",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "permanentLockBalance",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "pointHistory",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rejectNativeRoot",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "removePendingToken",
@@ -599,6 +614,10 @@ export interface VotingEscrowInterface extends Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nativeRoot", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "nativeSnapshotTime",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "nativeTokenId",
     data: BytesLike
   ): Result;
@@ -617,11 +636,19 @@ export interface VotingEscrowInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "pendingNativeSnapshotTime",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "permanentLockBalance",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "pointHistory",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "rejectNativeRoot",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -911,11 +938,20 @@ export namespace MetadataUpdateEvent {
 }
 
 export namespace NativeRootApprovedEvent {
-  export type InputTuple = [_approver: AddressLike, _root: BytesLike];
-  export type OutputTuple = [_approver: string, _root: string];
+  export type InputTuple = [
+    _approver: AddressLike,
+    _root: BytesLike,
+    timestamp: BigNumberish
+  ];
+  export type OutputTuple = [
+    _approver: string,
+    _root: string,
+    timestamp: bigint
+  ];
   export interface OutputObject {
     _approver: string;
     _root: string;
+    timestamp: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -924,11 +960,20 @@ export namespace NativeRootApprovedEvent {
 }
 
 export namespace NativeRootCommittedEvent {
-  export type InputTuple = [_committer: AddressLike, _root: BytesLike];
-  export type OutputTuple = [_committer: string, _root: string];
+  export type InputTuple = [
+    _committer: AddressLike,
+    _root: BytesLike,
+    timestamp: BigNumberish
+  ];
+  export type OutputTuple = [
+    _committer: string,
+    _root: string,
+    timestamp: bigint
+  ];
   export interface OutputObject {
     _committer: string;
     _root: string;
+    timestamp: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -937,11 +982,20 @@ export namespace NativeRootCommittedEvent {
 }
 
 export namespace NativeRootRejectedEvent {
-  export type InputTuple = [_rejector: AddressLike, _root: BytesLike];
-  export type OutputTuple = [_rejector: string, _root: string];
+  export type InputTuple = [
+    _rejector: AddressLike,
+    _root: BytesLike,
+    timestamp: BigNumberish
+  ];
+  export type OutputTuple = [
+    _rejector: string,
+    _root: string,
+    timestamp: bigint
+  ];
   export interface OutputObject {
     _rejector: string;
     _root: string;
+    timestamp: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -1347,6 +1401,8 @@ export interface VotingEscrow extends BaseContract {
 
   nativeRoot: TypedContractMethod<[], [string], "view">;
 
+  nativeSnapshotTime: TypedContractMethod<[], [bigint], "view">;
+
   nativeTokenId: TypedContractMethod<
     [_bucketId: BigNumberish],
     [bigint],
@@ -1367,6 +1423,8 @@ export interface VotingEscrow extends BaseContract {
 
   pendingNativeRoot: TypedContractMethod<[], [string], "view">;
 
+  pendingNativeSnapshotTime: TypedContractMethod<[], [bigint], "view">;
+
   permanentLockBalance: TypedContractMethod<[], [bigint], "view">;
 
   pointHistory: TypedContractMethod<
@@ -1374,6 +1432,8 @@ export interface VotingEscrow extends BaseContract {
     [IVotingEscrow.GlobalPointStructOutput],
     "view"
   >;
+
+  rejectNativeRoot: TypedContractMethod<[], [void], "nonpayable">;
 
   removePendingToken: TypedContractMethod<
     [_token: AddressLike],
@@ -1705,6 +1765,9 @@ export interface VotingEscrow extends BaseContract {
     nameOrSignature: "nativeRoot"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "nativeSnapshotTime"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "nativeTokenId"
   ): TypedContractMethod<[_bucketId: BigNumberish], [bigint], "view">;
   getFunction(
@@ -1727,6 +1790,9 @@ export interface VotingEscrow extends BaseContract {
     nameOrSignature: "pendingNativeRoot"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "pendingNativeSnapshotTime"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "permanentLockBalance"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -1736,6 +1802,9 @@ export interface VotingEscrow extends BaseContract {
     [IVotingEscrow.GlobalPointStructOutput],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "rejectNativeRoot"
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "removePendingToken"
   ): TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
@@ -2115,7 +2184,7 @@ export interface VotingEscrow extends BaseContract {
       MetadataUpdateEvent.OutputObject
     >;
 
-    "NativeRootApproved(address,bytes32)": TypedContractEvent<
+    "NativeRootApproved(address,bytes32,uint256)": TypedContractEvent<
       NativeRootApprovedEvent.InputTuple,
       NativeRootApprovedEvent.OutputTuple,
       NativeRootApprovedEvent.OutputObject
@@ -2126,7 +2195,7 @@ export interface VotingEscrow extends BaseContract {
       NativeRootApprovedEvent.OutputObject
     >;
 
-    "NativeRootCommitted(address,bytes32)": TypedContractEvent<
+    "NativeRootCommitted(address,bytes32,uint256)": TypedContractEvent<
       NativeRootCommittedEvent.InputTuple,
       NativeRootCommittedEvent.OutputTuple,
       NativeRootCommittedEvent.OutputObject
@@ -2137,7 +2206,7 @@ export interface VotingEscrow extends BaseContract {
       NativeRootCommittedEvent.OutputObject
     >;
 
-    "NativeRootRejected(address,bytes32)": TypedContractEvent<
+    "NativeRootRejected(address,bytes32,uint256)": TypedContractEvent<
       NativeRootRejectedEvent.InputTuple,
       NativeRootRejectedEvent.OutputTuple,
       NativeRootRejectedEvent.OutputObject

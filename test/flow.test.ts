@@ -17,6 +17,11 @@ describe('Flow', function () {
       value: '10000000000000000000',
     });
     await tx.wait();
+    await expect(
+      ve.createLock('0x0000000000000000000000000000000000000000', '10000000000000000000', 126144000, {
+        value: '20000000000000000',
+      }),
+    ).to.be.revertedWithCustomError(ve, 'InvalidAmount');
 
     const poolFactory = await ethers.deployContract('EmptyPoolFactory', []);
     const votingRewardsFactory = await ethers.deployContract('VotingRewardsFactory', []);

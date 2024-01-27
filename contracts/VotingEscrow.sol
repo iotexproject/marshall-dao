@@ -428,7 +428,11 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVotingEscrow
   bytes32 public nativeRoot;
   /// @inheritdoc IVotingEscrow
+  uint256 public nativeSnapshotTime;
+  /// @inheritdoc IVotingEscrow
   bytes32 public pendingNativeRoot;
+  /// @inheritdoc IVotingEscrow
+  uint256 public pendingNativeSnapshotTime;
 
   mapping(uint256 => LockedBalance) internal _locked;
   mapping(uint256 => address) internal _lockedToken;
@@ -693,12 +697,14 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   }
 
   /// @notice Deposit and lock tokens for a user
+  /// @param _native Is native
   /// @param _tokenId NFT that holds lock
   /// @param _value Amount to deposit
   /// @param _unlockTime New time when to unlock the tokens, or 0 if unchanged
   /// @param _oldLocked Previous locked amount / timestamp
   /// @param _depositType The type of deposit
   function _depositFor(
+    bool _native,
     uint256 _tokenId,
     uint256 _value,
     uint256 _unlockTime,
@@ -731,7 +737,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     _checkpoint(_tokenId, _oldLocked, newLocked);
 
     address from = _msgSender();
-    if (_value != 0) {
+    if (_value != 0 && !_native) {
       address _token = _lockedToken[_tokenId];
       if (_token == address(0)) {
         if (msg.value < _value) revert InvalidAmount();
@@ -757,11 +763,18 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   }
 
   /// @dev Deposit `_value` tokens for `_to` and lock for `_lockDuration`
+  /// @param _native Is native
   /// @param _token Token to deposit
   /// @param _value Amount to deposit
   /// @param _lockDuration Number of seconds to lock tokens for (rounded down to nearest week)
   /// @param _to Address to deposit
-  function _createLock(address _token, uint256 _value, uint256 _lockDuration, address _to) internal returns (uint256) {
+  function _createLock(
+    bool _native,
+    address _token,
+    uint256 _value,
+    uint256 _lockDuration,
+    address _to
+  ) internal returns (uint256) {
     uint256 unlockTime = ((block.timestamp + _lockDuration) / WEEK) * WEEK; // Locktime is rounded down to weeks
 
     if (token[_token] == 0) revert InvalidToken();
@@ -773,7 +786,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     _mint(_to, _tokenId);
     _lockedToken[_tokenId] = _token;
 
-    _depositFor(_tokenId, _value, unlockTime, _locked[_tokenId], DepositType.CREATE_LOCK_TYPE);
+    _depositFor(_native, _tokenId, _value, unlockTime, _locked[_tokenId], DepositType.CREATE_LOCK_TYPE);
     return _tokenId;
   }
 
@@ -783,7 +796,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     uint256 _value,
     uint256 _lockDuration
   ) external payable nonReentrant returns (uint256) {
-    return _createLock(_token, _value, _lockDuration, _msgSender());
+    return _createLock(false, _token, _value, _lockDuration, _msgSender());
   }
 
   /// @inheritdoc IVotingEscrow
@@ -793,7 +806,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     uint256 _lockDuration,
     address _to
   ) external payable nonReentrant returns (uint256) {
-    return _createLock(_token, _value, _lockDuration, _to);
+    return _createLock(false, _token, _value, _lockDuration, _to);
   }
 
   function _increaseAmountFor(uint256 _tokenId, uint256 _value, DepositType _depositType) internal {
@@ -806,7 +819,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
     if (oldLocked.isPermanent) permanentLockBalance += _value;
     _checkpointDelegatee(_delegates[_tokenId], _value, true);
-    _depositFor(_tokenId, _value, 0, oldLocked, _depositType);
+    _depositFor(false, _tokenId, _value, 0, oldLocked, _depositType);
 
     emit MetadataUpdate(_tokenId);
   }
@@ -835,7 +848,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     if (unlockTime <= oldLocked.end) revert LockDurationNotInFuture();
     if (unlockTime > block.timestamp + MAXTIME) revert LockDurationTooLong();
 
-    _depositFor(_tokenId, 0, unlockTime, oldLocked, DepositType.INCREASE_UNLOCK_TIME);
+    _depositFor(false, _tokenId, 0, unlockTime, oldLocked, DepositType.INCREASE_UNLOCK_TIME);
 
     emit MetadataUpdate(_tokenId);
   }
@@ -845,7 +858,8 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     if (_msgSender() != team) revert NotTeam();
     if (bytes32(0) == _root) revert InvalidRoot();
     pendingNativeRoot = _root;
-    emit NativeRootCommitted(team, _root);
+    pendingNativeSnapshotTime = block.timestamp;
+    emit NativeRootCommitted(team, _root, pendingNativeSnapshotTime);
   }
 
   /// @inheritdoc IVotingEscrow
@@ -853,8 +867,17 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     if (_msgSender() != admin) revert NotAdmin();
     if (bytes32(0) == pendingNativeRoot) revert InvalidRoot();
     nativeRoot = pendingNativeRoot;
+    nativeSnapshotTime = pendingNativeSnapshotTime;
     pendingNativeRoot = bytes32(0);
-    emit NativeRootApproved(admin, nativeRoot);
+    pendingNativeSnapshotTime = 0;
+    emit NativeRootApproved(admin, nativeRoot, pendingNativeSnapshotTime);
+  }
+
+  /// @inheritdoc IVotingEscrow
+  function rejectNativeRoot() external {
+    if (_msgSender() != admin) revert NotAdmin();
+    pendingNativeRoot = bytes32(0);
+    emit NativeRootRejected(admin, nativeRoot, pendingNativeSnapshotTime);
   }
 
   /// @inheritdoc IVotingEscrow
@@ -871,7 +894,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
 
     uint256 _tokenId = _nativeTokenId[_bucketId];
     if (_tokenId == 0) {
-      _tokenId = _createLock(address(0), _amount, _end - block.timestamp, _voter);
+      _tokenId = _createLock(true, address(0), _amount, _end - block.timestamp, _voter);
       _nativeTokenId[_bucketId] = _tokenId;
       _tokenIdNative[_tokenId] = _bucketId;
       return _tokenId;
@@ -888,7 +911,7 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     if (oldAmount < _amount) {
       _checkpointDelegatee(_delegates[_tokenId], _amount, true);
     }
-    _depositFor(_tokenId, _amount - oldAmount, unlockTime, oldLocked, DepositType.DEPOSIT_FOR_TYPE);
+    _depositFor(true, _tokenId, _amount - oldAmount, unlockTime, oldLocked, DepositType.DEPOSIT_FOR_TYPE);
 
     emit MetadataUpdate(_tokenId);
     return _tokenId;

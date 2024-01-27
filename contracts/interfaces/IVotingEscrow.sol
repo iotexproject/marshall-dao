@@ -121,9 +121,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
     uint256 _locktime,
     uint256 _ts
   );
-  event NativeRootCommitted(address indexed _committer, bytes32 indexed _root);
-  event NativeRootApproved(address indexed _approver, bytes32 indexed _root);
-  event NativeRootRejected(address indexed _rejector, bytes32 indexed _root);
+  event NativeRootCommitted(address indexed _committer, bytes32 indexed _root, uint256 timestamp);
+  event NativeRootApproved(address indexed _approver, bytes32 indexed _root, uint256 timestamp);
+  event NativeRootRejected(address indexed _rejector, bytes32 indexed _root, uint256 timestamp);
 
   // State variables
   /// @notice Address of Meta-tx Forwarder
@@ -260,9 +260,17 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   /// @return Merkle proof root
   function nativeRoot() external view returns (bytes32);
 
+  /// @notice Native staking bucket merkle proof root snapshot timestamp
+  /// @return Timestamp of snapshot
+  function nativeSnapshotTime() external view returns (uint256);
+
   /// @notice Native staking bucket pending merkle proof root
   /// @return Merkle proof root
   function pendingNativeRoot() external view returns (bytes32);
+
+  /// @notice Native staking bucket merkle proof root snapshot timestamp
+  /// @return Timestamp of snapshot
+  function pendingNativeSnapshotTime() external view returns (uint256);
 
   /// @notice Get the native bucket mappinged tokenId
   /// @param _bucketId .
@@ -334,6 +342,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
 
   /// @notice Approve pending native root
   function approveNativeRoot() external;
+
+  /// @notice Reject pending native root
+  function rejectNativeRoot() external;
 
   /// @notice Extend the unlock time for `_tokenId`
   ///         Cannot extend lock time of permanent locks
