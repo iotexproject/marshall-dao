@@ -1,29 +1,40 @@
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
+import { VotingEscrow } from '../src/types';
 
 describe('VotingEscrow', function () {
-  it('Native bucket Mapping', async function () {
-    const accounts = await ethers.getSigners();
+  let accounts: HardhatEthersSigner[];
+  let ve: VotingEscrow;
+  let now: number;
+  const WEEK = 60 * 60 * 24 * 7;
+  const YEAR = 60 * 60 * 24 * 365;
+
+  before(async function () {
+    accounts = await ethers.getSigners();
     const forwarder = await ethers.deployContract('Forwarder');
-    const b = await ethers.deployContract('BalanceLogicLibrary');
-    const d = await ethers.deployContract('DelegationLogicLibrary');
-    const ve = await ethers.deployContract('VotingEscrow', [forwarder.target, []], {
+    const balanceLogic = await ethers.deployContract('BalanceLogicLibrary');
+    const delegationLogic = await ethers.deployContract('DelegationLogicLibrary');
+    ve = await ethers.deployContract('VotingEscrow', [forwarder.target, []], {
       signer: accounts[0],
       libraries: {
-        BalanceLogicLibrary: b.target,
-        DelegationLogicLibrary: d.target,
+        BalanceLogicLibrary: balanceLogic.target,
+        DelegationLogicLibrary: delegationLogic.target,
       },
     });
+  });
 
-    const now = Math.floor(new Date().getTime() / 1000);
-    const oneYear = now + 60 * 60 * 24 * 365;
+  beforeEach(function () {
+    now = Math.floor(new Date().getTime() / 1000);
+  });
 
+  it('Native bucket Mapping', async function () {
+    const bucketId = 200;
+    const voter = accounts[1].address;
+    const end = now + YEAR;
+    const stakedAmount = ethers.parseEther('100');
     const root = ethers.keccak256(
-      ethers.solidityPacked(
-        // bucketId, voter, end, amount
-        ['uint256', 'address', 'uint256', 'uint256'],
-        [200, accounts[1].address, oneYear, ethers.parseEther('100')],
-      ),
+      ethers.solidityPacked(['uint256', 'address', 'uint256', 'uint256'], [bucketId, voter, end, stakedAmount]),
     );
 
     await expect(ve.connect(accounts[1]).commitNativeRoot(root)).to.be.revertedWithCustomError(ve, 'NotTeam');
@@ -32,13 +43,13 @@ describe('VotingEscrow', function () {
 
     expect(await ve.nativeRoot()).to.equal(root);
 
-    expect(await ve.ownerOf(1)).to.equal('0x0000000000000000000000000000000000000000');
-    await ve.connect(accounts[2]).claimNative(200, accounts[1].address, oneYear, ethers.parseEther('100'), []);
+    expect(await ve.ownerOf(1)).to.equal(ethers.ZeroAddress);
+    await ve.connect(accounts[2]).claimNative(bucketId, voter, end, stakedAmount, []);
     expect(await ve.ownerOf(1)).to.equal(accounts[1].address);
     const locked = await ve.locked(1);
-    expect(locked.amount).to.equal(ethers.parseEther('100'));
+    expect(locked.amount).to.equal(stakedAmount);
     expect(locked.isPermanent).to.equal(false);
-    expect(await ve.nativeTokenId(200)).to.equal(1);
-    expect(await ve.tokenIdNative(1)).to.equal(200);
+    expect(await ve.nativeTokenId(bucketId)).to.equal(1);
+    expect(await ve.tokenIdNative(1)).to.equal(bucketId);
   });
 });
