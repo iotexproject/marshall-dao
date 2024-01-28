@@ -84,7 +84,6 @@ describe('VotingEscrow', function () {
       expect(locked.end).to.equal(end);
       expect(await ve.nativeTokenId(200)).to.equal(1);
       expect(await ve.tokenIdNative(1)).to.equal(200);
-      expect(await ve.tokenIdNative(1)).to.equal(200);
     });
   });
 });

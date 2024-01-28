@@ -138,7 +138,11 @@ contract RewardsDistributor is IRewardsDistributor {
     uint256 amount = _claim(_tokenId, _lastTokenTime);
     if (amount != 0) {
       IVotingEscrow.LockedBalance memory _locked = ve.locked(_tokenId);
-      if ((_timestamp >= _locked.end && !_locked.isPermanent) || ve.lockedToken(_tokenId) != address(0)) {
+      if (
+        ve.lockedToken(_tokenId) != address(0) ||
+        ve.tokenIdNative(_tokenId) != 0 ||
+        (_timestamp >= _locked.end && !_locked.isPermanent)
+      ) {
         address _owner = ve.ownerOf(_tokenId);
         payable(_owner).transfer(amount);
       } else {
@@ -164,7 +168,11 @@ contract RewardsDistributor is IRewardsDistributor {
       uint256 amount = _claim(_tokenId, _lastTokenTime);
       if (amount != 0) {
         IVotingEscrow.LockedBalance memory _locked = ve.locked(_tokenId);
-        if ((_timestamp >= _locked.end && !_locked.isPermanent) || ve.lockedToken(_tokenId) != address(0)) {
+        if (
+          ve.lockedToken(_tokenId) != address(0) ||
+          ve.tokenIdNative(_tokenId) != 0 ||
+          (_timestamp >= _locked.end && !_locked.isPermanent)
+        ) {
           address _owner = ve.ownerOf(_tokenId);
           payable(_owner).transfer(amount);
         } else {
