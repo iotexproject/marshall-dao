@@ -53,7 +53,7 @@ describe('VotingEscrow', function () {
       );
     });
 
-    it('Native bucket Mapping', async function () {
+    it('create native ve', async function () {
       await expect(ve.connect(accounts[1]).commitNativeRoot(root)).to.be.revertedWithCustomError(ve, 'NotTeam');
       await ve.connect(accounts[0]).commitNativeRoot(root);
       await ve.connect(accounts[0]).approveNativeRoot();
@@ -66,10 +66,24 @@ describe('VotingEscrow', function () {
         .connect(accounts[2])
         .claimNative(200, accounts[1].address, now + YEAR, ethers.parseEther('100'), [node2]);
       expect(await ve.ownerOf(1)).to.equal(accounts[1].address);
-      const locked = await ve.locked(1);
+      let locked = await ve.locked(1);
       expect(locked.amount).to.equal(ethers.parseEther('100'));
       expect(locked.isPermanent).to.equal(false);
       expect(await ve.nativeTokenId(200)).to.equal(1);
+      expect(await ve.tokenIdNative(1)).to.equal(200);
+
+      const end = locked.end;
+      expect(await ve.balanceOf(accounts[1].address)).to.equal(1);
+      await ve
+        .connect(accounts[2])
+        .claimNative(200, accounts[1].address, now + YEAR, ethers.parseEther('100'), [node2]);
+      expect(await ve.balanceOf(accounts[1].address)).to.equal(1);
+      locked = await ve.locked(1);
+      expect(locked.amount).to.equal(ethers.parseEther('100'));
+      expect(locked.isPermanent).to.equal(false);
+      expect(locked.end).to.equal(end);
+      expect(await ve.nativeTokenId(200)).to.equal(1);
+      expect(await ve.tokenIdNative(1)).to.equal(200);
       expect(await ve.tokenIdNative(1)).to.equal(200);
     });
   });

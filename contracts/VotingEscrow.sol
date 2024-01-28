@@ -903,10 +903,11 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     LockedBalance memory oldLocked = _locked[_tokenId];
     uint256 unlockTime = (_end / WEEK) * WEEK; // Locktime is rounded down to weeks
 
-    if (unlockTime <= oldLocked.end) revert LockDurationNotInFuture();
+    if (unlockTime < oldLocked.end) revert LockDurationNotInFuture();
     if (unlockTime > block.timestamp + MAXTIME) revert LockDurationTooLong();
 
     uint256 oldAmount = oldLocked.amount.toUint256();
+
     if (oldAmount > _amount) revert InvalidAmount();
     if (oldAmount < _amount) {
       _checkpointDelegatee(_delegates[_tokenId], _amount, true);
