@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv'
-import "@nomicfoundation/hardhat-toolbox";
+import '@nomicfoundation/hardhat-toolbox'
+import '@openzeppelin/hardhat-upgrades'
 
 import importToml from 'import-toml'
 // @ts-ignore
@@ -16,15 +17,15 @@ export default {
       allowUnlimitedContractSize: true,
     },
     dev: {
-      url: "http://127.0.0.1:8545",
+      url: 'http://127.0.0.1:8545',
       accounts: accounts,
     },
     mainnet: {
-      url: "https://babel-api.mainnet.iotex.io/",
+      url: 'https://babel-api.mainnet.iotex.io/',
       accounts: accounts,
     },
     testnet: {
-      url: "https://babel-api.testnet.iotex.io/",
+      url: 'https://babel-api.testnet.iotex.io/',
       accounts: accounts,
     }
   },
@@ -39,7 +40,7 @@ export default {
   },
   solidity: {
     compilers: [{
-      version: "0.8.19",
+      version: '0.8.19',
       settings: {
         viaIR: foundryConfig.default.via_ir,
         optimizer: {
@@ -53,6 +54,6 @@ export default {
     }]
   },
   typechain: {
-    outDir: "src/types"
+    outDir: 'src/types'
   },
 }

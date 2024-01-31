@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from 'hardhat';
 
 async function main() {
   const balanceLogicLibraryFactory = await ethers.getContractFactory('BalanceLogicLibrary');
@@ -11,20 +11,20 @@ async function main() {
   await delegationLogicLibrary.waitForDeployment();
   console.log(`DelegationLogicLibrary deployed to ${delegationLogicLibrary.target}`);
 
-  const forwarder = await ethers.deployContract('Forwarder');
-  await forwarder.waitForDeployment();
-  console.log(`Forwarder deployed to ${forwarder.target}`);
-
   const tokens = [];
   if (process.env.LST_ADDRESS) {
     tokens.push(process.env.LST_ADDRESS);
   }
 
-  const escrow = await ethers.deployContract('VotingEscrow', [forwarder, tokens], {
+  const VotingEscrow = await ethers.getContractFactory('VotingEscrow', {
     libraries: {
       BalanceLogicLibrary: balanceLogicLibrary.target,
       DelegationLogicLibrary: delegationLogicLibrary.target,
     }
+  });
+  const escrow = await upgrades.deployProxy(VotingEscrow, [tokens], {
+    unsafeAllowLinkedLibraries: true,
+    initializer: "initialize",
   });
   console.log(`VotingEscrow deployed to ${escrow.target}`);
 

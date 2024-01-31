@@ -126,10 +126,6 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   event NativeRootsApproved(address indexed _approver, uint256 timestamp);
   event NativeRootsRejected(address indexed _rejector, uint256 timestamp);
 
-  // State variables
-  /// @notice Address of Meta-tx Forwarder
-  function forwarder() external view returns (address);
-
   /// @notice Timestamp that token actived to create a veNFT
   function token(address _token) external view returns (uint);
 

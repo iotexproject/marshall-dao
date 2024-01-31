@@ -129,15 +129,14 @@ export interface VotingEscrowInterface extends Interface {
       | "delegates"
       | "depositFor"
       | "epoch"
-      | "forwarder"
       | "getApproved"
       | "getPastTotalSupply"
       | "getPastVotes"
       | "increaseAmount"
       | "increaseUnlockTime"
+      | "initialize"
       | "isApprovedForAll"
       | "isApprovedOrOwner"
-      | "isTrustedForwarder"
       | "lockPermanent"
       | "locked"
       | "lockedToken"
@@ -198,6 +197,7 @@ export interface VotingEscrowInterface extends Interface {
       | "DelegateChanged"
       | "DelegateVotesChanged"
       | "Deposit"
+      | "Initialized"
       | "LockPermanent"
       | "Merge"
       | "MetadataUpdate"
@@ -319,7 +319,6 @@ export interface VotingEscrowInterface extends Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "epoch", values?: undefined): string;
-  encodeFunctionData(functionFragment: "forwarder", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
@@ -341,16 +340,16 @@ export interface VotingEscrowInterface extends Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "initialize",
+    values: [AddressLike[]]
+  ): string;
+  encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedOrOwner",
     values: [AddressLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isTrustedForwarder",
-    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "lockPermanent",
@@ -585,7 +584,6 @@ export interface VotingEscrowInterface extends Interface {
   decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositFor", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "epoch", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "forwarder", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -606,16 +604,13 @@ export interface VotingEscrowInterface extends Interface {
     functionFragment: "increaseUnlockTime",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedOrOwner",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isTrustedForwarder",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -881,6 +876,18 @@ export namespace DepositEvent {
     value: bigint;
     locktime: bigint;
     ts: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace InitializedEvent {
+  export type InputTuple = [version: BigNumberish];
+  export type OutputTuple = [version: bigint];
+  export interface OutputObject {
+    version: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -1330,8 +1337,6 @@ export interface VotingEscrow extends BaseContract {
 
   epoch: TypedContractMethod<[], [bigint], "view">;
 
-  forwarder: TypedContractMethod<[], [string], "view">;
-
   getApproved: TypedContractMethod<[_tokenId: BigNumberish], [string], "view">;
 
   getPastTotalSupply: TypedContractMethod<
@@ -1358,6 +1363,12 @@ export interface VotingEscrow extends BaseContract {
     "nonpayable"
   >;
 
+  initialize: TypedContractMethod<
+    [_tokens: AddressLike[]],
+    [void],
+    "nonpayable"
+  >;
+
   isApprovedForAll: TypedContractMethod<
     [_owner: AddressLike, _operator: AddressLike],
     [boolean],
@@ -1366,12 +1377,6 @@ export interface VotingEscrow extends BaseContract {
 
   isApprovedOrOwner: TypedContractMethod<
     [_spender: AddressLike, _tokenId: BigNumberish],
-    [boolean],
-    "view"
-  >;
-
-  isTrustedForwarder: TypedContractMethod<
-    [forwarder: AddressLike],
     [boolean],
     "view"
   >;
@@ -1700,9 +1705,6 @@ export interface VotingEscrow extends BaseContract {
     nameOrSignature: "epoch"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "forwarder"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "getApproved"
   ): TypedContractMethod<[_tokenId: BigNumberish], [string], "view">;
   getFunction(
@@ -1730,6 +1732,9 @@ export interface VotingEscrow extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "initialize"
+  ): TypedContractMethod<[_tokens: AddressLike[]], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "isApprovedForAll"
   ): TypedContractMethod<
     [_owner: AddressLike, _operator: AddressLike],
@@ -1743,9 +1748,6 @@ export interface VotingEscrow extends BaseContract {
     [boolean],
     "view"
   >;
-  getFunction(
-    nameOrSignature: "isTrustedForwarder"
-  ): TypedContractMethod<[forwarder: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "lockPermanent"
   ): TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;
@@ -1993,6 +1995,13 @@ export interface VotingEscrow extends BaseContract {
     DepositEvent.OutputObject
   >;
   getEvent(
+    key: "Initialized"
+  ): TypedContractEvent<
+    InitializedEvent.InputTuple,
+    InitializedEvent.OutputTuple,
+    InitializedEvent.OutputObject
+  >;
+  getEvent(
     key: "LockPermanent"
   ): TypedContractEvent<
     LockPermanentEvent.InputTuple,
@@ -2163,6 +2172,17 @@ export interface VotingEscrow extends BaseContract {
       DepositEvent.InputTuple,
       DepositEvent.OutputTuple,
       DepositEvent.OutputObject
+    >;
+
+    "Initialized(uint8)": TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+    Initialized: TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
     >;
 
     "LockPermanent(address,uint256,uint256,uint256)": TypedContractEvent<

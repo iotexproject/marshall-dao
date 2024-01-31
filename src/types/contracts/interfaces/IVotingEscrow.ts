@@ -125,7 +125,6 @@ export interface IVotingEscrowInterface extends Interface {
       | "delegates"
       | "depositFor"
       | "epoch"
-      | "forwarder"
       | "getApproved"
       | "getPastTotalSupply"
       | "getPastVotes"
@@ -292,7 +291,6 @@ export interface IVotingEscrowInterface extends Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "epoch", values?: undefined): string;
-  encodeFunctionData(functionFragment: "forwarder", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
@@ -530,7 +528,6 @@ export interface IVotingEscrowInterface extends Interface {
   decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "depositFor", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "epoch", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "forwarder", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -1199,8 +1196,6 @@ export interface IVotingEscrow extends BaseContract {
 
   epoch: TypedContractMethod<[], [bigint], "view">;
 
-  forwarder: TypedContractMethod<[], [string], "view">;
-
   getApproved: TypedContractMethod<[_tokenId: BigNumberish], [string], "view">;
 
   getPastTotalSupply: TypedContractMethod<
@@ -1550,9 +1545,6 @@ export interface IVotingEscrow extends BaseContract {
   getFunction(
     nameOrSignature: "epoch"
   ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "forwarder"
-  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "getApproved"
   ): TypedContractMethod<[_tokenId: BigNumberish], [string], "view">;
