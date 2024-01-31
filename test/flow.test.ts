@@ -6,12 +6,13 @@ describe('Flow', function () {
     const forwarder = await ethers.deployContract('Forwarder');
     const b = await ethers.deployContract('BalanceLogicLibrary');
     const d = await ethers.deployContract('DelegationLogicLibrary');
-    const ve = await ethers.deployContract('VotingEscrow', [forwarder.target, []], {
+    const ve = await ethers.deployContract('VotingEscrow', [], {
       libraries: {
         BalanceLogicLibrary: b.target,
         DelegationLogicLibrary: d.target,
       },
     });
+    await ve.initialize([]);
 
     let tx = await ve.createLock('0x0000000000000000000000000000000000000000', '10000000000000000000', 126144000, {
       value: '10000000000000000000',
@@ -37,7 +38,8 @@ describe('Flow', function () {
     const rewardsDistributor = await ethers.deployContract('RewardsDistributor', [ve.target]);
     await rewardsDistributor.waitForDeployment();
 
-    const vault = await ethers.deployContract('Vault', [voter.target, ve.target, rewardsDistributor.target]);
+    const vault = await ethers.deployContract('Vault');
+    await vault.initialize(voter.target, ve.target, rewardsDistributor.target);
 
     await voter.initialize([], vault.target);
     await rewardsDistributor.setVault(vault.target);

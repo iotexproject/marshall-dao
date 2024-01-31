@@ -12,16 +12,16 @@ describe('VotingEscrow', function () {
 
   before(async function () {
     accounts = await ethers.getSigners();
-    const forwarder = await ethers.deployContract('Forwarder');
     const balanceLogic = await ethers.deployContract('BalanceLogicLibrary');
     const delegationLogic = await ethers.deployContract('DelegationLogicLibrary');
-    ve = await ethers.deployContract('VotingEscrow', [forwarder.target, []], {
+    ve = await ethers.deployContract('VotingEscrow', [], {
       signer: accounts[0],
       libraries: {
         BalanceLogicLibrary: balanceLogic.target,
         DelegationLogicLibrary: delegationLogic.target,
       },
     });
+    await ve.initialize([]);
   });
 
   describe('native bucket', function () {
