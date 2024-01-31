@@ -34,6 +34,7 @@ export interface VaultInterface extends Interface {
       | "donate()"
       | "epochCount"
       | "governor"
+      | "initialize"
       | "rewardsDistributor"
       | "setGovernor"
       | "updatePeriod"
@@ -48,6 +49,7 @@ export interface VaultInterface extends Interface {
     nameOrSignatureOrTopic:
       | "Donation"
       | "Emission"
+      | "Initialized"
       | "VeRateChanged"
       | "WeeklyChanged"
       | "Withdraw"
@@ -76,6 +78,10 @@ export interface VaultInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "governor", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "initialize",
+    values: [AddressLike, AddressLike, AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "rewardsDistributor",
     values?: undefined
@@ -117,6 +123,7 @@ export interface VaultInterface extends Interface {
   decodeFunctionResult(functionFragment: "donate()", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "epochCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "governor", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "rewardsDistributor",
     data: BytesLike
@@ -160,6 +167,18 @@ export namespace EmissionEvent {
   export interface OutputObject {
     sender: string;
     weekly: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace InitializedEvent {
+  export type InputTuple = [version: BigNumberish];
+  export type OutputTuple = [version: bigint];
+  export interface OutputObject {
+    version: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -287,6 +306,12 @@ export interface Vault extends BaseContract {
 
   governor: TypedContractMethod<[], [string], "view">;
 
+  initialize: TypedContractMethod<
+    [_voter: AddressLike, _ve: AddressLike, _rewardsDistributor: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   rewardsDistributor: TypedContractMethod<[], [string], "view">;
 
   setGovernor: TypedContractMethod<
@@ -344,6 +369,13 @@ export interface Vault extends BaseContract {
     nameOrSignature: "governor"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
+    nameOrSignature: "initialize"
+  ): TypedContractMethod<
+    [_voter: AddressLike, _ve: AddressLike, _rewardsDistributor: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "rewardsDistributor"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
@@ -383,6 +415,13 @@ export interface Vault extends BaseContract {
     EmissionEvent.InputTuple,
     EmissionEvent.OutputTuple,
     EmissionEvent.OutputObject
+  >;
+  getEvent(
+    key: "Initialized"
+  ): TypedContractEvent<
+    InitializedEvent.InputTuple,
+    InitializedEvent.OutputTuple,
+    InitializedEvent.OutputObject
   >;
   getEvent(
     key: "VeRateChanged"
@@ -427,6 +466,17 @@ export interface Vault extends BaseContract {
       EmissionEvent.InputTuple,
       EmissionEvent.OutputTuple,
       EmissionEvent.OutputObject
+    >;
+
+    "Initialized(uint8)": TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
+    >;
+    Initialized: TypedContractEvent<
+      InitializedEvent.InputTuple,
+      InitializedEvent.OutputTuple,
+      InitializedEvent.OutputObject
     >;
 
     "VeRateChanged(uint256)": TypedContractEvent<

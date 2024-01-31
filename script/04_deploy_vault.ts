@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers, upgrades } from 'hardhat';
 
 async function main() {
   if (!process.env.VE) {
@@ -21,7 +21,7 @@ async function main() {
   const voter = await ethers.deployContract('Voter', [
     process.env.FORWARDER,
     process.env.VE,
-    process.env.FACTORY_REGISTRY
+    process.env.FACTORY_REGISTRY,
   ]);
   await voter.waitForDeployment();
   console.log(`Voter deployed to ${voter.target}`);
@@ -29,17 +29,14 @@ async function main() {
   // let tx = await voter.setGovernor(process.env.GOVERNOR);
   // await tx.wait();
 
-  const rewardsDistributor = await ethers.deployContract('RewardsDistributor', [
-    process.env.VE
-  ]);
+  const rewardsDistributor = await ethers.deployContract('RewardsDistributor', [process.env.VE]);
   await rewardsDistributor.waitForDeployment();
   console.log(`RewardsDistributor deployed to ${rewardsDistributor.target}`);
-  
-  const vault = await ethers.deployContract('Vault', [
-    voter.target,
-    process.env.VE,
-    rewardsDistributor.target
-  ]);
+
+  const Vault = await ethers.getContractFactory('Vault');
+  const vault = await upgrades.deployProxy(Vault, [voter.target, process.env.VE, rewardsDistributor.target], {
+    initializer: 'initialize',
+  });
   await vault.waitForDeployment();
   console.log(`Vault deployed to ${vault.target}`);
 

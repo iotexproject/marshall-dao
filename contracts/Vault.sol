@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IVault} from "./interfaces/IVault.sol";
 import {IRewardsDistributor} from "./interfaces/IRewardsDistributor.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
@@ -11,38 +12,40 @@ import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 
 /// @title Vault
 /// @notice Controls minting of emissions and rebases for the Protocol
-contract Vault is IVault {
+contract Vault is IVault, Initializable {
   using SafeERC20 for IERC20;
 
   /// @inheritdoc IVault
-  IVoter public immutable voter;
+  IVoter public voter;
   /// @inheritdoc IVault
   address public governor;
   /// @inheritdoc IVault
-  IVotingEscrow public immutable ve;
+  IVotingEscrow public ve;
   /// @inheritdoc IVault
-  IRewardsDistributor public immutable rewardsDistributor;
+  IRewardsDistributor public rewardsDistributor;
 
   /// @inheritdoc IVault
   uint256 public constant WEEK = 1 weeks;
   /// @inheritdoc IVault
-  uint256 public veRate = 1000; // 10%
+  uint256 public veRate;
   /// @inheritdoc IVault
-  uint256 public weekly = 100_000 * 1e18;
+  uint256 public weekly;
   /// @inheritdoc IVault
   uint256 public activePeriod;
   /// @inheritdoc IVault
   uint256 public epochCount;
 
-  constructor(
+  function initialize(
     address _voter, // the voting & distribution system
     address _ve, // the ve(3,3) system that will be locked into
     address _rewardsDistributor // the distribution system that ensures users aren't diluted
-  ) {
+  ) public initializer {
     voter = IVoter(_voter);
     ve = IVotingEscrow(_ve);
     governor = msg.sender;
     rewardsDistributor = IRewardsDistributor(_rewardsDistributor);
+    veRate = 1000;
+    weekly = 100_000 * 1e18; // 10%
     activePeriod = ((block.timestamp) / WEEK) * WEEK; // allow emissions this coming epoch
   }
 

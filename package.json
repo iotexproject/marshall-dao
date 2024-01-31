@@ -11,7 +11,7 @@
     "test": "hardhat test",
     "snapshots": "UPDATE_SNAPSHOT=1 hardhat test",
     "build": "yarn clean && yarn compile && tsc",
-    "lint:fix": "yarn lint:sol:fix && prettier --write '{src,scripts,deploy,test}/**/*.ts'",
+    "lint:fix": "yarn lint:sol:fix && prettier --write '{src,script,scripts,deploy,test}/**/*.ts'",
     "lint": "yarn lint:sol && prettier --check 'test/**/*.ts'",
     "lint:sol": "prettier --ignore-path .gitignore '{contracts,test}/**/*.sol' --check",
     "lint:sol:fix": "prettier --ignore-path .gitignore '{contracts,test}/**/*.sol' --write"

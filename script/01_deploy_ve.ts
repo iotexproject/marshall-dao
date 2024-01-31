@@ -24,11 +24,11 @@ async function main() {
     libraries: {
       BalanceLogicLibrary: balanceLogicLibrary.target,
       DelegationLogicLibrary: delegationLogicLibrary.target,
-    }
+    },
   });
   const escrow = await upgrades.deployProxy(VotingEscrow, [tokens], {
     unsafeAllowLinkedLibraries: true,
-    initializer: "initialize",
+    initializer: 'initialize',
   });
   console.log(`VotingEscrow deployed to ${escrow.target}`);
 
@@ -45,7 +45,7 @@ async function main() {
     libraries: {
       Trig: trig.target,
       PerlinNoise: perlinNoise.target,
-    }
+    },
   });
   console.log(`VeArtProxy deployed to ${veArtProxy.target}`);
 
