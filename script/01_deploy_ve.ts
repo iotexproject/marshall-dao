@@ -1,6 +1,10 @@
 import { ethers, upgrades } from 'hardhat';
 
 async function main() {
+  const forwarder = await ethers.deployContract('Forwarder');
+  await forwarder.waitForDeployment();
+  console.log(`Forwarder deployed to ${forwarder.target}`);
+
   const balanceLogicLibraryFactory = await ethers.getContractFactory('BalanceLogicLibrary');
   const balanceLogicLibrary = await balanceLogicLibraryFactory.deploy();
   await balanceLogicLibrary.waitForDeployment();
