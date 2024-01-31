@@ -426,14 +426,13 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   uint256 public supply;
 
   /// @inheritdoc IVotingEscrow
-  bytes32 public nativeRoot;
-  /// @inheritdoc IVotingEscrow
   uint256 public nativeSnapshotTime;
-  /// @inheritdoc IVotingEscrow
-  bytes32 public pendingNativeRoot;
   /// @inheritdoc IVotingEscrow
   uint256 public pendingNativeSnapshotTime;
 
+  bytes32[] internal _nativeRoots;
+  bytes32[] internal _pendingNativeRoots;
+  mapping(bytes32 => bool) internal _roots;
   mapping(uint256 => LockedBalance) internal _locked;
   mapping(uint256 => address) internal _lockedToken;
   mapping(uint256 => uint256) internal _nativeTokenId;
@@ -446,6 +445,23 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   mapping(address => bool) public canSplit;
   /// @inheritdoc IVotingEscrow
   uint256 public permanentLockBalance;
+
+  /// @inheritdoc IVotingEscrow
+  function nativeRootsLength() external view returns (uint256) {
+    return _nativeRoots.length;
+  }
+  /// @inheritdoc IVotingEscrow
+  function nativeRoot(uint256 _index) external view returns (bytes32) {
+    return _nativeRoots[_index];
+  }
+  /// @inheritdoc IVotingEscrow
+  function pendingNativeRootsLength() external view returns (uint256) {
+    return _pendingNativeRoots.length;
+  }
+  /// @inheritdoc IVotingEscrow
+  function pendingNativeRoot(uint256 _index) external view returns (bytes32) {
+    return _pendingNativeRoots[_index];
+  }
 
   /// @inheritdoc IVotingEscrow
   function locked(uint256 _tokenId) external view returns (LockedBalance memory) {
@@ -854,30 +870,37 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVotingEscrow
-  function commitNativeRoot(bytes32 _root) external {
+  function commitNativeRoots(bytes32[] memory _pendingRoots) external {
     if (_msgSender() != team) revert NotTeam();
-    if (bytes32(0) == _root) revert InvalidRoot();
-    pendingNativeRoot = _root;
+    for (uint256 i = 0; i < _pendingRoots.length; i++) {
+      if (bytes32(0) == _pendingRoots[i]) revert InvalidRoot();
+    }
+    _pendingNativeRoots = _pendingRoots;
     pendingNativeSnapshotTime = block.timestamp;
-    emit NativeRootCommitted(team, _root, pendingNativeSnapshotTime);
+    emit NativeRootsCommitted(team, pendingNativeSnapshotTime);
   }
 
   /// @inheritdoc IVotingEscrow
-  function approveNativeRoot() external {
+  function approveNativeRoots() external {
     if (_msgSender() != admin) revert NotAdmin();
-    if (bytes32(0) == pendingNativeRoot) revert InvalidRoot();
-    nativeRoot = pendingNativeRoot;
+    if (_pendingNativeRoots.length == 0) revert InvalidRoots();
+    for (uint256 i = 0; i < _nativeRoots.length; i++) {
+      _roots[_nativeRoots[i]] = false;
+    }
+    for (uint256 i = 0; i < _pendingNativeRoots.length; i++) {
+      _roots[_pendingNativeRoots[i]] = true;
+    }
+    _nativeRoots = _pendingNativeRoots;
     nativeSnapshotTime = pendingNativeSnapshotTime;
-    pendingNativeRoot = bytes32(0);
     pendingNativeSnapshotTime = 0;
-    emit NativeRootApproved(admin, nativeRoot, pendingNativeSnapshotTime);
+    emit NativeRootsApproved(admin, pendingNativeSnapshotTime);
   }
 
   /// @inheritdoc IVotingEscrow
-  function rejectNativeRoot() external {
+  function rejectNativeRoots() external {
     if (_msgSender() != admin) revert NotAdmin();
-    pendingNativeRoot = bytes32(0);
-    emit NativeRootRejected(admin, nativeRoot, pendingNativeSnapshotTime);
+    emit NativeRootsRejected(admin, pendingNativeSnapshotTime);
+    pendingNativeSnapshotTime = 0;
   }
 
   /// @inheritdoc IVotingEscrow
@@ -886,11 +909,13 @@ contract VotingEscrow is IVotingEscrow, ERC2771Context, ReentrancyGuard {
     address _voter,
     uint256 _end,
     uint256 _amount,
-    bytes32[] calldata proof
+    bytes32 _root,
+    bytes32[] calldata _proof
   ) external returns (uint256) {
+    if (!_roots[_root]) revert InvalidRoot();
     if (_end < block.timestamp) revert LockDurationNotInFuture();
     bytes32 node = keccak256(abi.encodePacked(_bucketId, _voter, _end, _amount));
-    if (!MerkleProof.verify(proof, nativeRoot, node)) revert InvalidProof();
+    if (!MerkleProof.verify(_proof, _root, node)) revert InvalidProof();
 
     uint256 _tokenId = _nativeTokenId[_bucketId];
     if (_tokenId == 0) {

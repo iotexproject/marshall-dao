@@ -106,7 +106,7 @@ export interface IVotingEscrowInterface extends Interface {
       | "CLOCK_MODE"
       | "admin"
       | "approve"
-      | "approveNativeRoot"
+      | "approveNativeRoots"
       | "artProxy"
       | "balanceOf"
       | "balanceOfNFT"
@@ -116,7 +116,7 @@ export interface IVotingEscrowInterface extends Interface {
       | "checkpoints"
       | "claimNative"
       | "clock"
-      | "commitNativeRoot"
+      | "commitNativeRoots"
       | "createLock"
       | "createLockFor"
       | "decimals"
@@ -139,6 +139,7 @@ export interface IVotingEscrowInterface extends Interface {
       | "merge"
       | "name"
       | "nativeRoot"
+      | "nativeRootsLength"
       | "nativeSnapshotTime"
       | "nativeTokenId"
       | "nonces"
@@ -146,10 +147,11 @@ export interface IVotingEscrowInterface extends Interface {
       | "ownerOf"
       | "ownerToNFTokenIdList"
       | "pendingNativeRoot"
+      | "pendingNativeRootsLength"
       | "pendingNativeSnapshotTime"
       | "permanentLockBalance"
       | "pointHistory"
-      | "rejectNativeRoot"
+      | "rejectNativeRoots"
       | "safeTransferFrom(address,address,uint256)"
       | "safeTransferFrom(address,address,uint256,bytes)"
       | "setAdmin"
@@ -192,9 +194,9 @@ export interface IVotingEscrowInterface extends Interface {
       | "LockPermanent"
       | "Merge"
       | "MetadataUpdate"
-      | "NativeRootApproved"
-      | "NativeRootCommitted"
-      | "NativeRootRejected"
+      | "NativeRootsApproved"
+      | "NativeRootsCommitted"
+      | "NativeRootsRejected"
       | "Split"
       | "Supply"
       | "Transfer"
@@ -212,7 +214,7 @@ export interface IVotingEscrowInterface extends Interface {
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "approveNativeRoot",
+    functionFragment: "approveNativeRoots",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "artProxy", values?: undefined): string;
@@ -242,12 +244,19 @@ export interface IVotingEscrowInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "claimNative",
-    values: [BigNumberish, AddressLike, BigNumberish, BigNumberish, BytesLike[]]
+    values: [
+      BigNumberish,
+      AddressLike,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike[]
+    ]
   ): string;
   encodeFunctionData(functionFragment: "clock", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "commitNativeRoot",
-    values: [BytesLike]
+    functionFragment: "commitNativeRoots",
+    values: [BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "createLock",
@@ -331,6 +340,10 @@ export interface IVotingEscrowInterface extends Interface {
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "nativeRoot",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nativeRootsLength",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -356,6 +369,10 @@ export interface IVotingEscrowInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "pendingNativeRoot",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "pendingNativeRootsLength",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -371,7 +388,7 @@ export interface IVotingEscrowInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "rejectNativeRoot",
+    functionFragment: "rejectNativeRoots",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -471,7 +488,7 @@ export interface IVotingEscrowInterface extends Interface {
   decodeFunctionResult(functionFragment: "admin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "approveNativeRoot",
+    functionFragment: "approveNativeRoots",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "artProxy", data: BytesLike): Result;
@@ -496,7 +513,7 @@ export interface IVotingEscrowInterface extends Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "clock", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "commitNativeRoot",
+    functionFragment: "commitNativeRoots",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "createLock", data: BytesLike): Result;
@@ -555,6 +572,10 @@ export interface IVotingEscrowInterface extends Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nativeRoot", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "nativeRootsLength",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "nativeSnapshotTime",
     data: BytesLike
   ): Result;
@@ -577,6 +598,10 @@ export interface IVotingEscrowInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "pendingNativeRootsLength",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "pendingNativeSnapshotTime",
     data: BytesLike
   ): Result;
@@ -589,7 +614,7 @@ export interface IVotingEscrowInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "rejectNativeRoot",
+    functionFragment: "rejectNativeRoots",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -870,20 +895,11 @@ export namespace MetadataUpdateEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace NativeRootApprovedEvent {
-  export type InputTuple = [
-    _approver: AddressLike,
-    _root: BytesLike,
-    timestamp: BigNumberish
-  ];
-  export type OutputTuple = [
-    _approver: string,
-    _root: string,
-    timestamp: bigint
-  ];
+export namespace NativeRootsApprovedEvent {
+  export type InputTuple = [_approver: AddressLike, timestamp: BigNumberish];
+  export type OutputTuple = [_approver: string, timestamp: bigint];
   export interface OutputObject {
     _approver: string;
-    _root: string;
     timestamp: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -892,20 +908,11 @@ export namespace NativeRootApprovedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace NativeRootCommittedEvent {
-  export type InputTuple = [
-    _committer: AddressLike,
-    _root: BytesLike,
-    timestamp: BigNumberish
-  ];
-  export type OutputTuple = [
-    _committer: string,
-    _root: string,
-    timestamp: bigint
-  ];
+export namespace NativeRootsCommittedEvent {
+  export type InputTuple = [_committer: AddressLike, timestamp: BigNumberish];
+  export type OutputTuple = [_committer: string, timestamp: bigint];
   export interface OutputObject {
     _committer: string;
-    _root: string;
     timestamp: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -914,20 +921,11 @@ export namespace NativeRootCommittedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace NativeRootRejectedEvent {
-  export type InputTuple = [
-    _rejector: AddressLike,
-    _root: BytesLike,
-    timestamp: BigNumberish
-  ];
-  export type OutputTuple = [
-    _rejector: string,
-    _root: string,
-    timestamp: bigint
-  ];
+export namespace NativeRootsRejectedEvent {
+  export type InputTuple = [_rejector: AddressLike, timestamp: BigNumberish];
+  export type OutputTuple = [_rejector: string, timestamp: bigint];
   export interface OutputObject {
     _rejector: string;
-    _root: string;
     timestamp: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -1107,7 +1105,7 @@ export interface IVotingEscrow extends BaseContract {
     "nonpayable"
   >;
 
-  approveNativeRoot: TypedContractMethod<[], [void], "nonpayable">;
+  approveNativeRoots: TypedContractMethod<[], [void], "nonpayable">;
 
   artProxy: TypedContractMethod<[], [string], "view">;
 
@@ -1137,7 +1135,8 @@ export interface IVotingEscrow extends BaseContract {
       _voter: AddressLike,
       _end: BigNumberish,
       _amount: BigNumberish,
-      proof: BytesLike[]
+      _root: BytesLike,
+      _proof: BytesLike[]
     ],
     [bigint],
     "nonpayable"
@@ -1145,8 +1144,8 @@ export interface IVotingEscrow extends BaseContract {
 
   clock: TypedContractMethod<[], [bigint], "view">;
 
-  commitNativeRoot: TypedContractMethod<
-    [_root: BytesLike],
+  commitNativeRoots: TypedContractMethod<
+    [_roots: BytesLike[]],
     [void],
     "nonpayable"
   >;
@@ -1262,7 +1261,9 @@ export interface IVotingEscrow extends BaseContract {
 
   name: TypedContractMethod<[], [string], "view">;
 
-  nativeRoot: TypedContractMethod<[], [string], "view">;
+  nativeRoot: TypedContractMethod<[_index: BigNumberish], [string], "view">;
+
+  nativeRootsLength: TypedContractMethod<[], [bigint], "view">;
 
   nativeSnapshotTime: TypedContractMethod<[], [bigint], "view">;
 
@@ -1288,7 +1289,13 @@ export interface IVotingEscrow extends BaseContract {
     "view"
   >;
 
-  pendingNativeRoot: TypedContractMethod<[], [string], "view">;
+  pendingNativeRoot: TypedContractMethod<
+    [_index: BigNumberish],
+    [string],
+    "view"
+  >;
+
+  pendingNativeRootsLength: TypedContractMethod<[], [bigint], "view">;
 
   pendingNativeSnapshotTime: TypedContractMethod<[], [bigint], "view">;
 
@@ -1300,7 +1307,7 @@ export interface IVotingEscrow extends BaseContract {
     "view"
   >;
 
-  rejectNativeRoot: TypedContractMethod<[], [void], "nonpayable">;
+  rejectNativeRoots: TypedContractMethod<[], [void], "nonpayable">;
 
   "safeTransferFrom(address,address,uint256)": TypedContractMethod<
     [from: AddressLike, to: AddressLike, tokenId: BigNumberish],
@@ -1435,7 +1442,7 @@ export interface IVotingEscrow extends BaseContract {
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "approveNativeRoot"
+    nameOrSignature: "approveNativeRoots"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "artProxy"
@@ -1474,7 +1481,8 @@ export interface IVotingEscrow extends BaseContract {
       _voter: AddressLike,
       _end: BigNumberish,
       _amount: BigNumberish,
-      proof: BytesLike[]
+      _root: BytesLike,
+      _proof: BytesLike[]
     ],
     [bigint],
     "nonpayable"
@@ -1483,8 +1491,8 @@ export interface IVotingEscrow extends BaseContract {
     nameOrSignature: "clock"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "commitNativeRoot"
-  ): TypedContractMethod<[_root: BytesLike], [void], "nonpayable">;
+    nameOrSignature: "commitNativeRoots"
+  ): TypedContractMethod<[_roots: BytesLike[]], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "createLock"
   ): TypedContractMethod<
@@ -1611,7 +1619,10 @@ export interface IVotingEscrow extends BaseContract {
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "nativeRoot"
-  ): TypedContractMethod<[], [string], "view">;
+  ): TypedContractMethod<[_index: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "nativeRootsLength"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "nativeSnapshotTime"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -1636,7 +1647,10 @@ export interface IVotingEscrow extends BaseContract {
   >;
   getFunction(
     nameOrSignature: "pendingNativeRoot"
-  ): TypedContractMethod<[], [string], "view">;
+  ): TypedContractMethod<[_index: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "pendingNativeRootsLength"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "pendingNativeSnapshotTime"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -1651,7 +1665,7 @@ export interface IVotingEscrow extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "rejectNativeRoot"
+    nameOrSignature: "rejectNativeRoots"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "safeTransferFrom(address,address,uint256)"
@@ -1842,25 +1856,25 @@ export interface IVotingEscrow extends BaseContract {
     MetadataUpdateEvent.OutputObject
   >;
   getEvent(
-    key: "NativeRootApproved"
+    key: "NativeRootsApproved"
   ): TypedContractEvent<
-    NativeRootApprovedEvent.InputTuple,
-    NativeRootApprovedEvent.OutputTuple,
-    NativeRootApprovedEvent.OutputObject
+    NativeRootsApprovedEvent.InputTuple,
+    NativeRootsApprovedEvent.OutputTuple,
+    NativeRootsApprovedEvent.OutputObject
   >;
   getEvent(
-    key: "NativeRootCommitted"
+    key: "NativeRootsCommitted"
   ): TypedContractEvent<
-    NativeRootCommittedEvent.InputTuple,
-    NativeRootCommittedEvent.OutputTuple,
-    NativeRootCommittedEvent.OutputObject
+    NativeRootsCommittedEvent.InputTuple,
+    NativeRootsCommittedEvent.OutputTuple,
+    NativeRootsCommittedEvent.OutputObject
   >;
   getEvent(
-    key: "NativeRootRejected"
+    key: "NativeRootsRejected"
   ): TypedContractEvent<
-    NativeRootRejectedEvent.InputTuple,
-    NativeRootRejectedEvent.OutputTuple,
-    NativeRootRejectedEvent.OutputObject
+    NativeRootsRejectedEvent.InputTuple,
+    NativeRootsRejectedEvent.OutputTuple,
+    NativeRootsRejectedEvent.OutputObject
   >;
   getEvent(
     key: "Split"
@@ -1998,37 +2012,37 @@ export interface IVotingEscrow extends BaseContract {
       MetadataUpdateEvent.OutputObject
     >;
 
-    "NativeRootApproved(address,bytes32,uint256)": TypedContractEvent<
-      NativeRootApprovedEvent.InputTuple,
-      NativeRootApprovedEvent.OutputTuple,
-      NativeRootApprovedEvent.OutputObject
+    "NativeRootsApproved(address,uint256)": TypedContractEvent<
+      NativeRootsApprovedEvent.InputTuple,
+      NativeRootsApprovedEvent.OutputTuple,
+      NativeRootsApprovedEvent.OutputObject
     >;
-    NativeRootApproved: TypedContractEvent<
-      NativeRootApprovedEvent.InputTuple,
-      NativeRootApprovedEvent.OutputTuple,
-      NativeRootApprovedEvent.OutputObject
-    >;
-
-    "NativeRootCommitted(address,bytes32,uint256)": TypedContractEvent<
-      NativeRootCommittedEvent.InputTuple,
-      NativeRootCommittedEvent.OutputTuple,
-      NativeRootCommittedEvent.OutputObject
-    >;
-    NativeRootCommitted: TypedContractEvent<
-      NativeRootCommittedEvent.InputTuple,
-      NativeRootCommittedEvent.OutputTuple,
-      NativeRootCommittedEvent.OutputObject
+    NativeRootsApproved: TypedContractEvent<
+      NativeRootsApprovedEvent.InputTuple,
+      NativeRootsApprovedEvent.OutputTuple,
+      NativeRootsApprovedEvent.OutputObject
     >;
 
-    "NativeRootRejected(address,bytes32,uint256)": TypedContractEvent<
-      NativeRootRejectedEvent.InputTuple,
-      NativeRootRejectedEvent.OutputTuple,
-      NativeRootRejectedEvent.OutputObject
+    "NativeRootsCommitted(address,uint256)": TypedContractEvent<
+      NativeRootsCommittedEvent.InputTuple,
+      NativeRootsCommittedEvent.OutputTuple,
+      NativeRootsCommittedEvent.OutputObject
     >;
-    NativeRootRejected: TypedContractEvent<
-      NativeRootRejectedEvent.InputTuple,
-      NativeRootRejectedEvent.OutputTuple,
-      NativeRootRejectedEvent.OutputObject
+    NativeRootsCommitted: TypedContractEvent<
+      NativeRootsCommittedEvent.InputTuple,
+      NativeRootsCommittedEvent.OutputTuple,
+      NativeRootsCommittedEvent.OutputObject
+    >;
+
+    "NativeRootsRejected(address,uint256)": TypedContractEvent<
+      NativeRootsRejectedEvent.InputTuple,
+      NativeRootsRejectedEvent.OutputTuple,
+      NativeRootsRejectedEvent.OutputObject
+    >;
+    NativeRootsRejected: TypedContractEvent<
+      NativeRootsRejectedEvent.InputTuple,
+      NativeRootsRejectedEvent.OutputTuple,
+      NativeRootsRejectedEvent.OutputObject
     >;
 
     "Split(uint256,uint256,uint256,address,uint256,uint256,uint256,uint256)": TypedContractEvent<

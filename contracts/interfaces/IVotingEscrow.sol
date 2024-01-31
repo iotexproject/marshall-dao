@@ -86,6 +86,7 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   error TokenExist();
   error TokenNotExist();
   error InvalidRoot();
+  error InvalidRoots();
   error InvalidProof();
   error NativeNFT();
 
@@ -121,9 +122,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
     uint256 _locktime,
     uint256 _ts
   );
-  event NativeRootCommitted(address indexed _committer, bytes32 indexed _root, uint256 timestamp);
-  event NativeRootApproved(address indexed _approver, bytes32 indexed _root, uint256 timestamp);
-  event NativeRootRejected(address indexed _rejector, bytes32 indexed _root, uint256 timestamp);
+  event NativeRootsCommitted(address indexed _committer, uint256 timestamp);
+  event NativeRootsApproved(address indexed _approver, uint256 timestamp);
+  event NativeRootsRejected(address indexed _rejector, uint256 timestamp);
 
   // State variables
   /// @notice Address of Meta-tx Forwarder
@@ -256,17 +257,27 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   /// @return Address of token
   function lockedToken(uint256 _tokenId) external view returns (address);
 
+  /// @notice Get native roots length
+  /// @return Length of roots
+  function nativeRootsLength() external view returns (uint256);
+
   /// @notice Native staking bucket merkle proof root
+  /// @param _index index
   /// @return Merkle proof root
-  function nativeRoot() external view returns (bytes32);
+  function nativeRoot(uint256 _index) external view returns (bytes32);
 
   /// @notice Native staking bucket merkle proof root snapshot timestamp
   /// @return Timestamp of snapshot
   function nativeSnapshotTime() external view returns (uint256);
 
+  /// @notice Get pending native roots length
+  /// @return Length of roots
+  function pendingNativeRootsLength() external view returns (uint256);
+
   /// @notice Native staking bucket pending merkle proof root
+  /// @param _index index
   /// @return Merkle proof root
-  function pendingNativeRoot() external view returns (bytes32);
+  function pendingNativeRoot(uint256 _index) external view returns (bytes32);
 
   /// @notice Native staking bucket merkle proof root snapshot timestamp
   /// @return Timestamp of snapshot
@@ -333,18 +344,19 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
     address _voter,
     uint256 _end,
     uint256 _amount,
-    bytes32[] calldata proof
+    bytes32 _root,
+    bytes32[] calldata _proof
   ) external returns (uint256);
 
-  /// @notice Commit pending native root
-  /// @param _root native merkle root
-  function commitNativeRoot(bytes32 _root) external;
+  /// @notice Commit pending native roots
+  /// @param _roots native merkle roots
+  function commitNativeRoots(bytes32[] memory _roots) external;
 
   /// @notice Approve pending native root
-  function approveNativeRoot() external;
+  function approveNativeRoots() external;
 
   /// @notice Reject pending native root
-  function rejectNativeRoot() external;
+  function rejectNativeRoots() external;
 
   /// @notice Extend the unlock time for `_tokenId`
   ///         Cannot extend lock time of permanent locks

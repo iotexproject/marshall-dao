@@ -51,6 +51,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "InvalidRoots",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "InvalidSignature",
     type: "error",
   },
@@ -500,19 +505,13 @@ const _abi = [
         type: "address",
       },
       {
-        indexed: true,
-        internalType: "bytes32",
-        name: "_root",
-        type: "bytes32",
-      },
-      {
         indexed: false,
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",
       },
     ],
-    name: "NativeRootApproved",
+    name: "NativeRootsApproved",
     type: "event",
   },
   {
@@ -525,19 +524,13 @@ const _abi = [
         type: "address",
       },
       {
-        indexed: true,
-        internalType: "bytes32",
-        name: "_root",
-        type: "bytes32",
-      },
-      {
         indexed: false,
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",
       },
     ],
-    name: "NativeRootCommitted",
+    name: "NativeRootsCommitted",
     type: "event",
   },
   {
@@ -550,19 +543,13 @@ const _abi = [
         type: "address",
       },
       {
-        indexed: true,
-        internalType: "bytes32",
-        name: "_root",
-        type: "bytes32",
-      },
-      {
         indexed: false,
         internalType: "uint256",
         name: "timestamp",
         type: "uint256",
       },
     ],
-    name: "NativeRootRejected",
+    name: "NativeRootsRejected",
     type: "event",
   },
   {
@@ -772,7 +759,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "approveNativeRoot",
+    name: "approveNativeRoots",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -947,8 +934,13 @@ const _abi = [
         type: "uint256",
       },
       {
+        internalType: "bytes32",
+        name: "_root",
+        type: "bytes32",
+      },
+      {
         internalType: "bytes32[]",
-        name: "proof",
+        name: "_proof",
         type: "bytes32[]",
       },
     ],
@@ -979,12 +971,12 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "bytes32",
-        name: "_root",
-        type: "bytes32",
+        internalType: "bytes32[]",
+        name: "_roots",
+        type: "bytes32[]",
       },
     ],
-    name: "commitNativeRoot",
+    name: "commitNativeRoots",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -1440,13 +1432,32 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "nativeRoot",
     outputs: [
       {
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "nativeRootsLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -1566,13 +1577,32 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
     name: "pendingNativeRoot",
     outputs: [
       {
         internalType: "bytes32",
         name: "",
         type: "bytes32",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "pendingNativeRootsLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -1652,7 +1682,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "rejectNativeRoot",
+    name: "rejectNativeRoots",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
