@@ -32,21 +32,10 @@ async function main() {
   });
   console.log(`VotingEscrow deployed to ${escrow.target}`);
 
-  const trigFactory = await ethers.getContractFactory('Trig');
-  const trig = await trigFactory.deploy();
-  await trig.waitForDeployment();
-  console.log(`Trig deployed to ${trig.target}`);
-  const perlinNoiseFactory = await ethers.getContractFactory('PerlinNoise');
-  const perlinNoise = await perlinNoiseFactory.deploy();
-  await perlinNoise.waitForDeployment();
-  console.log(`PerlinNoise deployed to ${perlinNoise.target}`);
-
-  const veArtProxy = await ethers.deployContract('VeArtProxy', [escrow.target], {
-    libraries: {
-      Trig: trig.target,
-      PerlinNoise: perlinNoise.target,
-    },
-  });
+  const veArtProxy = await ethers.deployContract('VeArtProxy', [
+    escrow.target,
+    'https://nft.iotex.io/tokens/dao/ve.png',
+  ]);
   console.log(`VeArtProxy deployed to ${veArtProxy.target}`);
 
   await escrow.setArtProxy(veArtProxy.target);
