@@ -54,8 +54,8 @@ describe('VotingEscrow', function () {
     });
 
     it('create native ve', async function () {
-      await expect(ve.connect(accounts[1]).commitNativeRoots([root])).to.be.revertedWithCustomError(ve, 'NotTeam');
-      await ve.connect(accounts[0]).commitNativeRoots([root]);
+      await expect(ve.connect(accounts[1]).commitNativeRoots(now, [root])).to.be.revertedWithCustomError(ve, 'NotTeam');
+      await ve.connect(accounts[0]).commitNativeRoots(now, [root]);
       await ve.connect(accounts[0]).approveNativeRoots();
 
       expect(await ve.nativeRoot(0)).to.equal(root);
@@ -91,7 +91,7 @@ describe('VotingEscrow', function () {
       expect(await ve.pendingNativeRootsLength()).to.equal(1);
       await ve
         .connect(accounts[0])
-        .commitNativeRoots([
+        .commitNativeRoots(now, [
           '0xbd9f4afe55a5d8d2a8e6877c836619210f7e4cad731a462d21ed21810cf95f69',
           '0x87a28a9921aec2784a49cd425412717a5d0138966baa1087c305429e7cd4fd20',
         ]);
