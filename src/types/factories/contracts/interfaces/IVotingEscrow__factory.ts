@@ -66,6 +66,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "InvalidTimestamp",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "InvalidToken",
     type: "error",
   },
@@ -970,6 +975,11 @@ const _abi = [
   },
   {
     inputs: [
+      {
+        internalType: "uint256",
+        name: "_timestamp",
+        type: "uint256",
+      },
       {
         internalType: "bytes32[]",
         name: "_roots",

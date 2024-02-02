@@ -89,6 +89,7 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   error InvalidRoots();
   error InvalidProof();
   error NativeNFT();
+  error InvalidTimestamp();
 
   event Deposit(
     address indexed provider,
@@ -345,8 +346,9 @@ interface IVotingEscrow is IVotes, IERC4906, IERC6372, IERC721Metadata {
   ) external returns (uint256);
 
   /// @notice Commit pending native roots
+  /// @param _timestamp timestamp of proof generated
   /// @param _roots native merkle roots
-  function commitNativeRoots(bytes32[] memory _roots) external;
+  function commitNativeRoots(uint256 _timestamp, bytes32[] memory _roots) external;
 
   /// @notice Approve pending native root
   function approveNativeRoots() external;

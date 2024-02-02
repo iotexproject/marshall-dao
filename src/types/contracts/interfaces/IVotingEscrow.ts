@@ -255,7 +255,7 @@ export interface IVotingEscrowInterface extends Interface {
   encodeFunctionData(functionFragment: "clock", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "commitNativeRoots",
-    values: [BytesLike[]]
+    values: [BigNumberish, BytesLike[]]
   ): string;
   encodeFunctionData(
     functionFragment: "createLock",
@@ -1142,7 +1142,7 @@ export interface IVotingEscrow extends BaseContract {
   clock: TypedContractMethod<[], [bigint], "view">;
 
   commitNativeRoots: TypedContractMethod<
-    [_roots: BytesLike[]],
+    [_timestamp: BigNumberish, _roots: BytesLike[]],
     [void],
     "nonpayable"
   >;
@@ -1487,7 +1487,11 @@ export interface IVotingEscrow extends BaseContract {
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "commitNativeRoots"
-  ): TypedContractMethod<[_roots: BytesLike[]], [void], "nonpayable">;
+  ): TypedContractMethod<
+    [_timestamp: BigNumberish, _roots: BytesLike[]],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "createLock"
   ): TypedContractMethod<
