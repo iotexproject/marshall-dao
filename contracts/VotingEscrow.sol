@@ -868,7 +868,7 @@ contract VotingEscrow is IVotingEscrow, ReentrancyGuardUpgradeable {
 
   /// @inheritdoc IVotingEscrow
   function commitNativeRoots(uint256 _timestamp, bytes32[] memory _pendingRoots) external {
-    if (_timestamp < nativeSnapshotTime) revert InvalidTimestamp();
+    if (_timestamp < nativeSnapshotTime || _timestamp > block.timestamp) revert InvalidTimestamp();
     if (msg.sender != team) revert NotTeam();
     for (uint256 i = 0; i < _pendingRoots.length; i++) {
       if (bytes32(0) == _pendingRoots[i]) revert InvalidRoot();

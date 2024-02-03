@@ -29,7 +29,7 @@ describe('VotingEscrow', function () {
     let node1: string;
     let node2: string;
 
-    before(function () {
+    before(async function () {
       now = Math.floor(new Date().getTime() / 1000);
 
       node1 = ethers.keccak256(
@@ -54,6 +54,7 @@ describe('VotingEscrow', function () {
     });
 
     it('create native ve', async function () {
+      await ethers.provider.send("evm_mine");
       await expect(ve.connect(accounts[1]).commitNativeRoots(now, [root])).to.be.revertedWithCustomError(ve, 'NotTeam');
       await ve.connect(accounts[0]).commitNativeRoots(now, [root]);
       await ve.connect(accounts[0]).approveNativeRoots();
