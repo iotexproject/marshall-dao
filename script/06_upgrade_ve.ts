@@ -20,6 +20,7 @@ async function main() {
       DelegationLogicLibrary: process.env.DELEGATIONLOGICLIBRARY,
     },
   });
+  await upgrades.forceImport(process.env.VE, VotingEscrow);
   await upgrades.upgradeProxy(process.env.VE, VotingEscrow, {
     unsafeAllowLinkedLibraries: true,
   });
