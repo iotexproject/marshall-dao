@@ -30,7 +30,7 @@ See [SPECIFICATION.md](./SPECIFICATION.md) for more detail.
 
 | Filename | Description |
 | --- | --- |
-| `VetoGovernor.sol` | OpenZeppelin's Governor contracts used in protocol-wide access control to whitelist tokens for gauges within Marshall DAO, and update minting emissions. |
+| `MarshallGovernor.sol` | OpenZeppelin's Governor contracts used in protocol-wide access control to whitelist tokens for gauges within Marshall DAO, and update minting emissions. |
 
 ### Deployment
 
