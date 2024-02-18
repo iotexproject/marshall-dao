@@ -4,6 +4,34 @@
 
 See [SPECIFICATION.md](./SPECIFICATION.md) for more detail.
 
+### Protocol Overview
+
+#### VotingEscrow contracts
+
+| Filename | Description |
+| --- | --- |
+| `VotingEscrow.sol` | Protocol ERC-721 (ve)NFT representing the protocol vote-escrow lock. Beyond standard ve-type functions, there is also the ability to merge and split nfts. And support $IOTX, $stIOTX and native staked buckets create ve. |
+| `Vault.sol` | Protocol token Vault. Distributes emissions to `Voter.sol` and distribute to `RewardsDistributor.sol`. The vault also can accept donate from other projects. |
+| `RewardsDistributor.sol` | Is used to handle the distribution for (ve)NFTs/lockers. |
+| `VeArtProxy.sol` | (ve)NFT art proxy contract, exists for upgradability purposes |
+
+#### Protocol mechanics contracts
+
+| Filename | Description |
+| --- | --- |
+| `Voter.sol` | Handles votes for the current epoch, gauge and voting reward creation as well as emission distribution to `Gauge.sol` contracts. |
+| `Gauge.sol` | Gauges are attached to a Pool and based on the (ve)NFT votes it receives, it distributes proportional emissions in the form of protocol tokens. Deposits to the gauge take the form of LP tokens for the Pool. In exchange for receiving protocol emissions, claims on fees from the pool are relinquished to the gauge. Standard rewards contract. |
+| `rewards/` | |
+| `Reward.sol` | Base reward contract to be inherited for distribution of rewards to stakers.
+| `VotingReward.sol` | Rewards contracts used by `BribeVotingReward.sol` which inherits `Reward.sol`. Rewards are distributed in the following epoch proportionally based on the last checkpoint created by the user, and are earned through "voting" for a pool or gauge. |
+| `BribeVotingReward.sol` | Stores the users/externally provided rewards for the current voting epoch to it's voters. These are deposited externally every week. |
+
+#### Governance contracts
+
+| Filename | Description |
+| --- | --- |
+| `VetoGovernor.sol` | OpenZeppelin's Governor contracts used in protocol-wide access control to whitelist tokens for gauges within Marshall DAO, and update minting emissions. |
+
 ### Deployment
 
 #### Testnet
