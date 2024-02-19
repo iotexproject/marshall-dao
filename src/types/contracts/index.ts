@@ -20,6 +20,7 @@ export type { test };
 export type { DAOForwarder } from "./DAOForwarder";
 export type { MarshallGovernor } from "./MarshallGovernor";
 export type { RewardsDistributor } from "./RewardsDistributor";
+export type { Test } from "./Test";
 export type { Vault } from "./Vault";
 export type { VeArtProxy } from "./VeArtProxy";
 export type { Voter } from "./Voter";

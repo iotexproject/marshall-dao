@@ -23,6 +23,7 @@ async function main() {
   await upgrades.forceImport(process.env.VE, VotingEscrow);
   await upgrades.upgradeProxy(process.env.VE, VotingEscrow, {
     unsafeAllowLinkedLibraries: true,
+    redeployImplementation: 'always',
   });
   console.log(`Upgrade VotingEscrow ${process.env.VE} successfull!`);
 }

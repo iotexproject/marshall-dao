@@ -12,6 +12,7 @@ export * as test from "./test";
 export { DAOForwarder__factory } from "./DAOForwarder__factory";
 export { MarshallGovernor__factory } from "./MarshallGovernor__factory";
 export { RewardsDistributor__factory } from "./RewardsDistributor__factory";
+export { Test__factory } from "./Test__factory";
 export { Vault__factory } from "./Vault__factory";
 export { VeArtProxy__factory } from "./VeArtProxy__factory";
 export { Voter__factory } from "./Voter__factory";

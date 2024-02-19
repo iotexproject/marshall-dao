@@ -114,6 +114,8 @@ export type { VotingReward } from "./contracts/rewards/VotingReward";
 export { VotingReward__factory } from "./factories/contracts/rewards/VotingReward__factory";
 export type { RewardsDistributor } from "./contracts/RewardsDistributor";
 export { RewardsDistributor__factory } from "./factories/contracts/RewardsDistributor__factory";
+export type { Test } from "./contracts/Test";
+export { Test__factory } from "./factories/contracts/Test__factory";
 export type { TestToken } from "./contracts/test/TestToken";
 export { TestToken__factory } from "./factories/contracts/test/TestToken__factory";
 export type { Vault } from "./contracts/Vault";
