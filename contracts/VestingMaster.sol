@@ -3,12 +3,9 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 contract VestingMaster is ReentrancyGuard, Ownable {
-  using SafeMath for uint256;
   using EnumerableSet for EnumerableSet.AddressSet;
 
   struct LockedReward {
@@ -43,7 +40,7 @@ contract VestingMaster is ReentrancyGuard, Ownable {
     for (uint256 i = 0; i < oldLockedRewards.length; i++) {
       lockedReward = oldLockedRewards[i];
       if (lockedReward.locked > 0 && currentTimestamp >= lockedReward.timestamp) {
-        claimableAmount = claimableAmount.add(lockedReward.locked);
+        claimableAmount += lockedReward.locked;
         delete oldLockedRewards[i];
       }
     }
@@ -57,19 +54,19 @@ contract VestingMaster is ReentrancyGuard, Ownable {
       userLockedRewards[account].push(LockedReward({locked: claimableAmount, timestamp: newStartTimestamp}));
     }
     for (uint256 i = 0; i < lockedPeriodAmount; i++) {
-      newTimestamp = newStartTimestamp.add((i + 1) * period);
+      newTimestamp = newStartTimestamp + (i + 1) * period;
       newLockedReward = LockedReward({locked: amount / lockedPeriodAmount, timestamp: newTimestamp});
       for (uint256 j = jj; j < oldLockedRewards.length; j++) {
         lockedReward = oldLockedRewards[j];
         if (lockedReward.timestamp == newTimestamp) {
-          newLockedReward.locked = newLockedReward.locked.add(lockedReward.locked);
+          newLockedReward.locked += lockedReward.locked;
           jj = j + 1;
           break;
         }
       }
       userLockedRewards[account].push(newLockedReward);
     }
-    totalLockedRewards = totalLockedRewards.add(amount);
+    totalLockedRewards += amount;
     emit Lock(account, amount);
     return true;
   }
@@ -82,11 +79,11 @@ contract VestingMaster is ReentrancyGuard, Ownable {
     for (uint256 i = 0; i < lockedRewards.length; i++) {
       lockedReward = lockedRewards[i];
       if (lockedReward.locked > 0 && currentTimestamp > lockedReward.timestamp) {
-        claimableAmount = claimableAmount.add(lockedReward.locked);
+        claimableAmount += lockedReward.locked;
         delete lockedRewards[i];
       }
     }
-    totalLockedRewards = totalLockedRewards.sub(claimableAmount);
+    totalLockedRewards == claimableAmount;
     payable(msg.sender).transfer(claimableAmount);
     emit Claim(msg.sender, claimableAmount);
     return true;
@@ -99,9 +96,9 @@ contract VestingMaster is ReentrancyGuard, Ownable {
     for (uint256 i = 0; i < lockedRewards.length; i++) {
       lockedReward = lockedRewards[i];
       if (currentTimestamp > lockedReward.timestamp) {
-        claimableAmount = claimableAmount.add(lockedReward.locked);
+        claimableAmount += lockedReward.locked;
       } else {
-        lockedAmount = lockedAmount.add(lockedReward.locked);
+        lockedAmount += lockedReward.locked;
       }
     }
   }
