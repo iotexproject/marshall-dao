@@ -226,10 +226,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.RewardsDistributor__factory>;
     getContractFactory(
-      name: "Test",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Test__factory>;
-    getContractFactory(
       name: "TestToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.TestToken__factory>;
@@ -241,6 +237,10 @@ declare module "hardhat/types/runtime" {
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.VeArtProxy__factory>;
+    getContractFactory(
+      name: "VestingMaster",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VestingMaster__factory>;
     getContractFactory(
       name: "Voter",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -516,11 +516,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.RewardsDistributor>;
     getContractAt(
-      name: "Test",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Test>;
-    getContractAt(
       name: "TestToken",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -535,6 +530,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.VeArtProxy>;
+    getContractAt(
+      name: "VestingMaster",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VestingMaster>;
     getContractAt(
       name: "Voter",
       address: string | ethers.Addressable,
@@ -759,10 +759,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.RewardsDistributor>;
     deployContract(
-      name: "Test",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Test>;
-    deployContract(
       name: "TestToken",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.TestToken>;
@@ -774,6 +770,10 @@ declare module "hardhat/types/runtime" {
       name: "VeArtProxy",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.VeArtProxy>;
+    deployContract(
+      name: "VestingMaster",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VestingMaster>;
     deployContract(
       name: "Voter",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -1049,11 +1049,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.RewardsDistributor>;
     deployContract(
-      name: "Test",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Test>;
-    deployContract(
       name: "TestToken",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -1068,6 +1063,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.VeArtProxy>;
+    deployContract(
+      name: "VestingMaster",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.VestingMaster>;
     deployContract(
       name: "Voter",
       args: any[],

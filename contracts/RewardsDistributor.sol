@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {IRewardsDistributor} from "./interfaces/IRewardsDistributor.sol";
 import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IVault} from "./interfaces/IVault.sol";
@@ -12,7 +13,7 @@ import {IVault} from "./interfaces/IVault.sol";
  * @author velodrome.finance, @figs999, @pegahcarter
  * @license MIT
  */
-contract RewardsDistributor is IRewardsDistributor {
+contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
   /// @inheritdoc IRewardsDistributor
   uint256 public constant WEEK = 7 * 86400;
 
@@ -130,7 +131,7 @@ contract RewardsDistributor is IRewardsDistributor {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function claim(uint256 _tokenId) external returns (uint256) {
+  function claim(uint256 _tokenId) external nonReentrant returns (uint256) {
     if (IVault(vault).activePeriod() < ((block.timestamp / WEEK) * WEEK)) revert UpdatePeriod();
     uint256 _timestamp = block.timestamp;
     uint256 _lastTokenTime = lastTokenTime;
@@ -154,7 +155,7 @@ contract RewardsDistributor is IRewardsDistributor {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function claimMany(uint256[] calldata _tokenIds) external returns (bool) {
+  function claimMany(uint256[] calldata _tokenIds) external nonReentrant returns (bool) {
     if (IVault(vault).activePeriod() < ((block.timestamp / WEEK) * WEEK)) revert UpdatePeriod();
     uint256 _timestamp = block.timestamp;
     uint256 _lastTokenTime = lastTokenTime;
