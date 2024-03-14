@@ -229,6 +229,20 @@ contract VotingEscrow is IVotingEscrow, ReentrancyGuardUpgradeable {
 
   /* TRANSFER FUNCTIONS */
 
+  function _adminTransferFrom(address _from, address _to, uint256 _tokenId) internal {
+    delete idToApprovals[_tokenId];
+    // Remove NFT. Throws if `_tokenId` is not a valid NFT
+    _removeTokenFrom(_from, _tokenId);
+    // Update voting checkpoints
+    _checkpointDelegator(_tokenId, 0, _to);
+    // Add NFT
+    _addTokenTo(_to, _tokenId);
+    // Set the block of ownership transfer (for Flash NFT protection)
+    ownershipChange[_tokenId] = block.number;
+    // Log the transfer
+    emit Transfer(_from, _to, _tokenId);
+  }
+
   function _transferFrom(address _from, address _to, uint256 _tokenId, address _sender) internal {
     // Check requirements
     if (!_isApprovedOrOwner(_sender, _tokenId)) revert NotApprovedOrOwner();
@@ -921,6 +935,10 @@ contract VotingEscrow is IVotingEscrow, ReentrancyGuardUpgradeable {
       _nativeTokenId[_bucketId] = _tokenId;
       _tokenIdNative[_tokenId] = _bucketId;
       return _tokenId;
+    }
+    address _owner = _ownerOf(_tokenId);
+    if (_owner != _voter) {
+      _adminTransferFrom(_owner, _voter, _tokenId);
     }
 
     LockedBalance memory oldLocked = _locked[_tokenId];
