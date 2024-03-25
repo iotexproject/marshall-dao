@@ -73,7 +73,7 @@ contract VotingEscrow is IVotingEscrow, ReentrancyGuardUpgradeable {
   /// @inheritdoc IVotingEscrow
   uint256 public tokenId;
 
-  function initialize(address[] memory _tokens) public initializer {
+  function initialize(address[] calldata _tokens) public initializer {
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
     token[address(0)] = block.timestamp;
