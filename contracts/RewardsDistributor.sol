@@ -145,7 +145,8 @@ contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
         (_timestamp >= _locked.end && !_locked.isPermanent)
       ) {
         address _owner = ve.ownerOf(_tokenId);
-        payable(_owner).transfer(amount);
+        (bool success, ) = payable(_owner).call{value: amount}("");
+        require(success, "transfer rewards failed.");
       } else {
         ve.depositFor{value: amount}(_tokenId, amount);
       }
@@ -175,7 +176,8 @@ contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
           (_timestamp >= _locked.end && !_locked.isPermanent)
         ) {
           address _owner = ve.ownerOf(_tokenId);
-          payable(_owner).transfer(amount);
+          (bool success, ) = payable(_owner).call{value: amount}("");
+          require(success, "transfer rewards failed.");
         } else {
           ve.depositFor{value: amount}(_tokenId, amount);
         }

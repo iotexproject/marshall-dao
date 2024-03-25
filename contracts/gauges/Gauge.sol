@@ -76,7 +76,8 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     uint256 reward = rewards[_account];
     if (reward > 0) {
       rewards[_account] = 0;
-      payable(_account).transfer(reward);
+      (bool success, ) = payable(_account).call{value: reward}("");
+      require(success, "transfer rewards failed.");
       emit ClaimRewards(_account, reward);
     }
   }
