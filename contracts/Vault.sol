@@ -54,6 +54,7 @@ contract Vault is IVault, Initializable {
     if (msg.sender != governor) revert NotGovernor();
     if (_governor == address(0)) revert ZeroAddress();
     governor = _governor;
+    emit GovernorChanged(_governor);
   }
 
   /// @inheritdoc IVault
@@ -61,9 +62,11 @@ contract Vault is IVault, Initializable {
     _period = activePeriod;
     if (block.timestamp >= _period + WEEK) {
       epochCount++;
-      _period = (block.timestamp / WEEK) * WEEK;
+      uint256 _currentPeriod = (block.timestamp / WEEK) * WEEK;
+      uint256 elapsed = (_currentPeriod - _period) / WEEK;
+      _period = _currentPeriod;
       activePeriod = _period;
-      uint256 _emission = weekly;
+      uint256 _emission = weekly * elapsed;
 
       uint256 _balanceOf = address(this).balance;
       if (_balanceOf < _emission) {

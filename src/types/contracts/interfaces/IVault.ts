@@ -48,6 +48,7 @@ export interface IVaultInterface extends Interface {
     nameOrSignatureOrTopic:
       | "Donation"
       | "Emission"
+      | "GovernorChanged"
       | "VeRateChanged"
       | "WeeklyChanged"
       | "Withdraw"
@@ -160,6 +161,18 @@ export namespace EmissionEvent {
   export interface OutputObject {
     sender: string;
     weekly: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace GovernorChangedEvent {
+  export type InputTuple = [governor: AddressLike];
+  export type OutputTuple = [governor: string];
+  export interface OutputObject {
+    governor: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -385,6 +398,13 @@ export interface IVault extends BaseContract {
     EmissionEvent.OutputObject
   >;
   getEvent(
+    key: "GovernorChanged"
+  ): TypedContractEvent<
+    GovernorChangedEvent.InputTuple,
+    GovernorChangedEvent.OutputTuple,
+    GovernorChangedEvent.OutputObject
+  >;
+  getEvent(
     key: "VeRateChanged"
   ): TypedContractEvent<
     VeRateChangedEvent.InputTuple,
@@ -427,6 +447,17 @@ export interface IVault extends BaseContract {
       EmissionEvent.InputTuple,
       EmissionEvent.OutputTuple,
       EmissionEvent.OutputObject
+    >;
+
+    "GovernorChanged(address)": TypedContractEvent<
+      GovernorChangedEvent.InputTuple,
+      GovernorChangedEvent.OutputTuple,
+      GovernorChangedEvent.OutputObject
+    >;
+    GovernorChanged: TypedContractEvent<
+      GovernorChangedEvent.InputTuple,
+      GovernorChangedEvent.OutputTuple,
+      GovernorChangedEvent.OutputObject
     >;
 
     "VeRateChanged(uint256)": TypedContractEvent<
