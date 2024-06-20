@@ -12,7 +12,7 @@ interface IReward {
   error ZeroAmount();
 
   event Deposit(address indexed from, uint256 indexed tokenId, uint256 amount);
-  event Withdraw(address indexed from, uint256 indexed tokenId, uint256 amount);
+  event Withdraw(address indexed from, address indexed user, uint256 amount);
   event NotifyReward(address indexed from, address indexed reward, uint256 indexed epoch, uint256 amount);
   event ClaimRewards(address indexed from, address indexed reward, uint256 amount);
 
@@ -71,18 +71,18 @@ interface IReward {
   /// @dev Internal notation used as only callable internally by `authorized`.
   /// @param amount   Amount deposited for the veNFT
   /// @param tokenId  Unique identifier of the veNFT
-  function _deposit(uint256 amount, uint256 tokenId) external;
+  function _deposit(uint256 amount, address voter) external;
 
   /// @notice Withdraw an amount from the rewards contract associated to a veNFT
   /// @dev Internal notation used as only callable internally by `authorized`.
   /// @param amount   Amount deposited for the veNFT
   /// @param tokenId  Unique identifier of the veNFT
-  function _withdraw(uint256 amount, uint256 tokenId) external;
+  function _withdraw(uint256 amount, address user) external;
 
   /// @notice Claim the rewards earned by a veNFT staker
   /// @param tokenId  Unique identifier of the veNFT
   /// @param tokens   Array of tokens to claim rewards of
-  function getReward(uint256 tokenId, address[] memory tokens) external;
+  function getReward(address _voter, address[] memory tokens) external;
 
   /// @notice Add rewards for stakers to earn
   /// @param token    Address of token to reward
@@ -109,5 +109,5 @@ interface IReward {
   /// @param token Address of token to fetch rewards of
   /// @param tokenId Unique identifier of the veNFT
   /// @return Amount of token earned in rewards
-  function earned(address token, uint256 tokenId) external view returns (uint256);
+  function earned(address token, address user) external view returns (uint256);
 }

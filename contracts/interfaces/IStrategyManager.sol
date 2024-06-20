@@ -6,6 +6,11 @@ import "./IStrategy.sol";
 interface IStrategyManager {
 
     /**
+     * @notice convenience function for fetching the total shares of `user`
+     */
+    function shares(address user) external view returns (uint256);
+
+    /**
      * @notice Distribute rewards with native token to strategyManager.
      */
     function distributeRewards(uint256 amount) external payable;

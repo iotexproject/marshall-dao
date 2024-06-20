@@ -20,12 +20,8 @@ abstract contract VotingReward is Reward {
   }
 
   /// @inheritdoc Reward
-  function getReward(uint256 tokenId, address[] memory tokens) external override nonReentrant {
-    address sender = _msgSender();
-    if (!IVotingEscrow(ve).isApprovedOrOwner(sender, tokenId) && sender != voter) revert NotAuthorized();
-
-    address _owner = IVotingEscrow(ve).ownerOf(tokenId);
-    _getReward(_owner, tokenId, tokens);
+  function getReward(address _voter, address[] memory tokens) external override nonReentrant {
+    _getReward(_voter, tokens);
   }
 
   /// @inheritdoc Reward

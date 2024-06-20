@@ -40,7 +40,6 @@ interface IVoter {
   event Voted(
     address indexed voter,
     address indexed pool,
-    uint256 indexed tokenId,
     uint256 weight,
     uint256 totalWeight,
     uint256 timestamp
@@ -48,7 +47,6 @@ interface IVoter {
   event Abstained(
     address indexed voter,
     address indexed pool,
-    uint256 indexed tokenId,
     uint256 weight,
     uint256 totalWeight,
     uint256 timestamp
@@ -148,14 +146,14 @@ interface IVoter {
   /// @param _tokenId     Id of veNFT you are voting with.
   /// @param _poolVote    Array of pools you are voting for.
   /// @param _weights     Weights of pools.
-  function vote(uint256 _tokenId, address[] calldata _poolVote, uint256[] calldata _weights) external;
+  function vote(address[] calldata _poolVote, uint256[] calldata _weights) external;
 
   /// @notice Called by users to reset voting state. Required if you wish to make changes to
   ///         veNFT state (e.g. merge, split, deposit into managed etc).
   ///         Cannot reset in the same epoch that you voted in.
   ///         Can vote or deposit into a managed NFT again after reset.
   /// @param _tokenId Id of veNFT you are reseting.
-  function reset(uint256 _tokenId) external;
+  function reset() external;
 
   /// @notice Claim emissions from gauges.
   /// @param _gauges Array of gauges to collect emissions from.

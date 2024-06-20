@@ -40,9 +40,9 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   mapping(address => bool) public isReward;
 
   /// @notice A record of balance checkpoints for each account, by index
-  mapping(uint256 => mapping(uint256 => Checkpoint)) public checkpoints;
+  mapping(address => mapping(uint256 => Checkpoint)) public checkpoints;
   /// @inheritdoc IReward
-  mapping(uint256 => uint256) public numCheckpoints;
+  mapping(address => uint256) public numCheckpoints;
   /// @notice A record of balance checkpoints for each token, by index
   mapping(uint256 => SupplyCheckpoint) public supplyCheckpoints;
   /// @inheritdoc IReward
@@ -119,19 +119,19 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
     return lower;
   }
 
-  function _writeCheckpoint(uint256 tokenId, uint256 balance) internal {
-    uint256 _nCheckPoints = numCheckpoints[tokenId];
+  function _writeCheckpoint(address user, uint256 balance) internal {
+    uint256 _nCheckPoints = numCheckpoints[user];
     uint256 _timestamp = block.timestamp;
 
     if (
       _nCheckPoints > 0 &&
-      ProtocolTimeLibrary.epochStart(checkpoints[tokenId][_nCheckPoints - 1].timestamp) ==
+      ProtocolTimeLibrary.epochStart(checkpoints[user][_nCheckPoints - 1].timestamp) ==
       ProtocolTimeLibrary.epochStart(_timestamp)
     ) {
-      checkpoints[tokenId][_nCheckPoints - 1] = Checkpoint(_timestamp, balance);
+      checkpoints[user][_nCheckPoints - 1] = Checkpoint(_timestamp, balance);
     } else {
-      checkpoints[tokenId][_nCheckPoints] = Checkpoint(_timestamp, balance);
-      numCheckpoints[tokenId] = _nCheckPoints + 1;
+      checkpoints[user][_nCheckPoints] = Checkpoint(_timestamp, balance);
+      numCheckpoints[user] = _nCheckPoints + 1;
     }
   }
 
@@ -157,16 +157,16 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IReward
-  function earned(address token, uint256 tokenId) public view returns (uint256) {
-    if (numCheckpoints[tokenId] == 0) {
+  function earned(address token, address user) public view returns (uint256) {
+    if (numCheckpoints[user] == 0) {
       return 0;
     }
 
     uint256 reward = 0;
     uint256 _supply = 1;
-    uint256 _currTs = ProtocolTimeLibrary.epochStart(lastEarn[token][tokenId]); // take epoch last claimed in as starting point
-    uint256 _index = getPriorBalanceIndex(tokenId, _currTs);
-    Checkpoint memory cp0 = checkpoints[tokenId][_index];
+    uint256 _currTs = ProtocolTimeLibrary.epochStart(lastEarn[token][user]); // take epoch last claimed in as starting point
+    uint256 _index = getPriorBalanceIndex(user, _currTs);
+    Checkpoint memory cp0 = checkpoints[user][_index];
 
     // accounts for case where lastEarn is before first checkpoint
     _currTs = Math.max(_currTs, ProtocolTimeLibrary.epochStart(cp0.timestamp));
@@ -177,9 +177,9 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
     if (numEpochs > 0) {
       for (uint256 i = 0; i < numEpochs; i++) {
         // get index of last checkpoint in this epoch
-        _index = getPriorBalanceIndex(tokenId, _currTs + DURATION - 1);
+        _index = getPriorBalanceIndex(user, _currTs + DURATION - 1);
         // get checkpoint in this epoch
-        cp0 = checkpoints[tokenId][_index];
+        cp0 = checkpoints[user][_index];
         // get supply of last checkpoint in this epoch
         _supply = Math.max(supplyCheckpoints[getPriorSupplyIndex(_currTs + DURATION - 1)].supply, 1);
         reward += (cp0.balanceOf * tokenRewardsPerEpoch[token][_currTs]) / _supply;
@@ -191,42 +191,42 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IReward
-  function _deposit(uint256 amount, uint256 tokenId) external {
+  function _deposit(uint256 amount, address voter) external {
     address sender = _msgSender();
     if (sender != authorized) revert NotAuthorized();
 
     totalSupply += amount;
-    balanceOf[tokenId] += amount;
+    balanceOf[voter] += amount;
 
-    _writeCheckpoint(tokenId, balanceOf[tokenId]);
+    _writeCheckpoint(voter, balanceOf[voter]);
     _writeSupplyCheckpoint();
 
-    emit Deposit(sender, tokenId, amount);
+    emit Deposit(sender, voter, amount);
   }
 
   /// @inheritdoc IReward
-  function _withdraw(uint256 amount, uint256 tokenId) external {
+  function _withdraw(uint256 amount, address _user) external {
     address sender = _msgSender();
     if (sender != authorized) revert NotAuthorized();
 
     totalSupply -= amount;
-    balanceOf[tokenId] -= amount;
+    balanceOf[_user] -= amount;
 
-    _writeCheckpoint(tokenId, balanceOf[tokenId]);
+    _writeCheckpoint(_user, balanceOf[_user]);
     _writeSupplyCheckpoint();
 
-    emit Withdraw(sender, tokenId, amount);
+    emit Withdraw(sender, _user, amount);
   }
 
   /// @inheritdoc IReward
-  function getReward(uint256 tokenId, address[] memory tokens) external virtual nonReentrant {}
+  function getReward(address user, address[] memory tokens) external virtual nonReentrant {}
 
   /// @dev used with all getReward implementations
-  function _getReward(address recipient, uint256 tokenId, address[] memory tokens) internal {
+  function _getReward(address recipient, address[] memory tokens) internal {
     uint256 _length = tokens.length;
     for (uint256 i = 0; i < _length; i++) {
-      uint256 _reward = earned(tokens[i], tokenId);
-      lastEarn[tokens[i]][tokenId] = block.timestamp;
+      uint256 _reward = earned(tokens[i], recipient);
+      lastEarn[tokens[i]][recipient] = block.timestamp;
       if (_reward > 0) IERC20(tokens[i]).safeTransfer(recipient, _reward);
 
       emit ClaimRewards(recipient, tokens[i], _reward);
