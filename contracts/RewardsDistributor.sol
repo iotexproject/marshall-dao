@@ -36,7 +36,7 @@ contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
     if (msg.sender != vault) revert NotVault();
     uint256 _amount = msg.value;
     if (_amount == 0) revert ZeroAmount();
-    strategyManager.rewards{value: _amount}(_amount);
+    strategyManager.distributeRewards{value: _amount}(_amount);
   }
 
   /// @inheritdoc distribute rewards in erc20 format
@@ -44,7 +44,7 @@ contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
     if (msg.sender != vault) revert NotVault();
     if (_amount == 0) revert ZeroAmount();
     IERC20(_token).safeTransfer(address(strategyManager), _amount);
-    strategyManager.rewards(_token, _amount);
+    strategyManager.distributeRewards(_token, _amount);
   }
 
   /// @inheritdoc update strategyManager
