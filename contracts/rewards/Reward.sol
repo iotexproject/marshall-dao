@@ -33,7 +33,7 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IReward
   mapping(address => mapping(uint256 => uint256)) public tokenRewardsPerEpoch;
   /// @inheritdoc IReward
-  mapping(address => mapping(uint256 => uint256)) public lastEarn;
+  mapping(address => mapping(address => uint256)) public lastEarn;
 
   address[] public rewards;
   /// @inheritdoc IReward
@@ -54,19 +54,19 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IReward
-  function getPriorBalanceIndex(uint256 tokenId, uint256 timestamp) public view returns (uint256) {
-    uint256 nCheckpoints = numCheckpoints[tokenId];
+  function getPriorBalanceIndex(address user, uint256 timestamp) public view returns (uint256) {
+    uint256 nCheckpoints = numCheckpoints[user];
     if (nCheckpoints == 0) {
       return 0;
     }
 
     // First check most recent balance
-    if (checkpoints[tokenId][nCheckpoints - 1].timestamp <= timestamp) {
+    if (checkpoints[user][nCheckpoints - 1].timestamp <= timestamp) {
       return (nCheckpoints - 1);
     }
 
     // Next check implicit zero balance
-    if (checkpoints[tokenId][0].timestamp > timestamp) {
+    if (checkpoints[user][0].timestamp > timestamp) {
       return 0;
     }
 
@@ -74,7 +74,7 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
     uint256 upper = nCheckpoints - 1;
     while (upper > lower) {
       uint256 center = upper - (upper - lower) / 2; // ceil, avoiding overflow
-      Checkpoint memory cp = checkpoints[tokenId][center];
+      Checkpoint memory cp = checkpoints[user][center];
       if (cp.timestamp == timestamp) {
         return center;
       } else if (cp.timestamp < timestamp) {

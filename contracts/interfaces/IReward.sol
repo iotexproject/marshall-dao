@@ -94,7 +94,7 @@ interface IReward {
   /// @param tokenId      The token of the NFT to check
   /// @param timestamp    The timestamp to get the balance at
   /// @return The balance the account had as of the given block
-  function getPriorBalanceIndex(uint256 tokenId, uint256 timestamp) external view returns (uint256);
+  function getPriorBalanceIndex(address user, uint256 timestamp) external view returns (uint256);
 
   /// @notice Determine the prior index of supply staked by of a timestamp
   /// @dev Timestamp must be <= current timestamp

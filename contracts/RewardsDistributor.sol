@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {IRewardsDistributor} from "./interfaces/IRewardsDistributor.sol";
-import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IVault} from "./interfaces/IVault.sol";
 import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";

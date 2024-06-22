@@ -53,10 +53,10 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) public weights;
   /// @inheritdoc IVoter
   mapping(address => mapping(address => uint256)) public votes;
-  /// @dev NFT => List of pools voted for by NFT
+  /// @dev NFT => List of pools voted for by address
   mapping(address => address[]) public poolVote;
   /// @inheritdoc IVoter
-  mapping(uint256 => uint256) public usedWeights;
+  mapping(address => uint256) public usedWeights;
   /// @inheritdoc IVoter
   mapping(address => uint256) public lastVoted;
   /// @inheritdoc IVoter
@@ -170,7 +170,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function poke(uint256 _tokenId) external nonReentrant {
+  function poke() external nonReentrant {
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
     address _sender = msg.sender;
     uint256 _weight = strategyManager.shares(_sender);
@@ -370,7 +370,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function claimBribes(address[] memory _bribes, address[][] memory _tokens, uint256 _tokenId) external {
+  function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
     address _sender = msg.sender;
     uint256 _length = _bribes.length;
     for (uint256 i = 0; i < _length; i++) {

@@ -148,11 +148,9 @@ interface IVoter {
   /// @param _weights     Weights of pools.
   function vote(address[] calldata _poolVote, uint256[] calldata _weights) external;
 
-  /// @notice Called by users to reset voting state. Required if you wish to make changes to
-  ///         veNFT state (e.g. merge, split, deposit into managed etc).
+  /// @notice Called by users to reset voting state.
   ///         Cannot reset in the same epoch that you voted in.
   ///         Can vote or deposit into a managed NFT again after reset.
-  /// @param _tokenId Id of veNFT you are reseting.
   function reset() external;
 
   /// @notice Claim emissions from gauges.

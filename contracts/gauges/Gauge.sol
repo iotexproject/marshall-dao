@@ -11,6 +11,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {ProtocolTimeLibrary} from "../libraries/ProtocolTimeLibrary.sol";
+import {IStrategyManager} from "../interfaces/IStrategyManager.sol";
 
 /// @title Protocol Gauge
 /// @author veldorome.finance, @figs999, @pegahcarter
@@ -152,7 +153,8 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   function notifyRewardWithoutClaim() external payable nonReentrant {
     address sender = _msgSender();
     uint256 _amount = msg.value;
-    if (sender != IVotingEscrow(ve).team()) revert NotTeam();
+//    todo. yyx, whether to delete with IStrategyManager
+//    if (sender != IVotingEscrow(ve).team()) revert NotTeam();
     if (_amount == 0) revert ZeroAmount();
     _notifyRewardAmount(sender, _amount);
   }
