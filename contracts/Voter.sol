@@ -254,7 +254,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     address sender = _msgSender();
     if (gauges[_pool] != address(0)) revert GaugeExists();
 
-    (address votingRewardsFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
+    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
       _poolFactory
     );
     if (sender != governor) {
@@ -270,7 +270,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     _updateFor(_gauge);
     pools.push(_pool);
 
-    emit GaugeCreated(_poolFactory, votingRewardsFactory, gaugeFactory, _pool, _gauge, sender);
+    emit GaugeCreated(_poolFactory, gaugeFactory, _pool, _gauge, sender);
     return _gauge;
   }
 
