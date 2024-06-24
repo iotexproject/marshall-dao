@@ -17,7 +17,6 @@ interface IVoter {
   error NotGovernor();
   error NotEmergencyCouncil();
   error NotVault();
-  error NotWhitelistedNFT();
   error NotWhitelistedToken();
   error SameValue();
   error SpecialVotingWindow();
@@ -31,7 +30,6 @@ interface IVoter {
     address indexed votingRewardsFactory,
     address indexed gaugeFactory,
     address pool,
-    address bribeVotingReward,
     address gauge,
     address creator
   );
@@ -54,13 +52,12 @@ interface IVoter {
   event NotifyReward(address indexed sender, uint256 amount);
   event DistributeReward(address indexed sender, address indexed gauge, uint256 amount);
   event WhitelistToken(address indexed whitelister, address indexed token, bool indexed _bool);
-  event WhitelistNFT(address indexed whitelister, uint256 indexed tokenId, bool indexed _bool);
 
   /// @notice Store trusted forwarder address to pass into factories
   function forwarder() external view returns (address);
 
-  /// @notice The ve token that governs these contracts
-  function ve() external view returns (address);
+  /// @notice The team that governs these rewards in guage
+  function team() external view returns (address);
 
   /// @notice Factory registry for valid gauge / rewards factories
   function factoryRegistry() external view returns (address);
@@ -87,9 +84,6 @@ interface IVoter {
   /// @dev Gauge => Pool
   function poolForGauge(address gauge) external view returns (address);
 
-  /// @dev Gauge => Bribes Voting Reward
-  function gaugeToBribe(address gauge) external view returns (address);
-
   /// @dev Pool => Weights
   function weights(address pool) external view returns (uint256);
 
@@ -107,9 +101,6 @@ interface IVoter {
 
   /// @dev Token => Whitelisted status
   function isWhitelistedToken(address token) external view returns (bool);
-
-  /// @dev TokenId => Whitelisted status
-  function isWhitelistedNFT(uint256 tokenId) external view returns (bool);
 
   /// @dev Gauge => Liveness status
   function isAlive(address gauge) external view returns (bool);
@@ -157,13 +148,6 @@ interface IVoter {
   /// @param _gauges Array of gauges to collect emissions from.
   function claimRewards(address[] memory _gauges) external;
 
-  /// @notice Claim bribes for a given NFT.
-  /// @dev Utility to help batch bribe claims.
-  /// @param _bribes  Array of BribeVotingReward contracts to collect from.
-  /// @param _tokens  Array of tokens that are used as bribes.
-  /// @param _tokenId Id of veNFT that you wish to claim bribes for.
-  function claimBribes(address[] memory _bribes, address[][] memory _tokens, uint256 _tokenId) external;
-
   /// @notice Set new governor.
   /// @dev Throws if not called by governor.
   /// @param _governor .
@@ -186,13 +170,6 @@ interface IVoter {
   /// @param _token .
   /// @param _bool .
   function whitelistToken(address _token, bool _bool) external;
-
-  /// @notice Whitelist (or unwhitelist) token id for voting in last hour prior to epoch flip.
-  /// @dev Throws if not called by governor.
-  ///      Throws if already whitelisted.
-  /// @param _tokenId .
-  /// @param _bool .
-  function whitelistNFT(uint256 _tokenId, bool _bool) external;
 
   /// @notice Create a new gauge (unpermissioned).
   /// @dev Governor can create a new gauge for a pool with any address.

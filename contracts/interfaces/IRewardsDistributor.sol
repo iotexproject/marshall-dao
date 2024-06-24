@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IVotingEscrow} from "./IVotingEscrow.sol";
-
 interface IRewardsDistributor {
 
   error NotVault();

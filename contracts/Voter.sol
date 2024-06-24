@@ -34,6 +34,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   address public governor;
   /// @inheritdoc IVoter
   address public emergencyCouncil;
+  /// @inheritdoc to control notify rewards in guage
+  address public team;
 
   /// @inheritdoc IVoter
   uint256 public totalWeight;
@@ -47,8 +49,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   mapping(address => address) public gauges;
   /// @inheritdoc IVoter
   mapping(address => address) public poolForGauge;
-  /// @inheritdoc IVoter
-  mapping(address => address) public gaugeToBribe;
   /// @inheritdoc IVoter
   mapping(address => uint256) public weights;
   /// @inheritdoc IVoter
@@ -79,6 +79,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     address _sender = _msgSender();
     vault = _sender;
     governor = _sender;
+    team = _sender;
     emergencyCouncil = _sender;
     maxVotingNum = 30;
   }
@@ -157,13 +158,10 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
         _updateFor(gauges[_pool]);
         weights[_pool] -= _votes;
         delete votes[_user][_pool];
-        IReward(gaugeToBribe[gauges[_pool]])._withdraw(_votes, _user);
         _totalWeight += _votes;
         emit Abstained(_msgSender(), _pool, _votes, weights[_pool], block.timestamp);
       }
     }
-    // todo. yyx, need discuss how to reset vote in IStrategyManager
-//    IVotingEscrow(ve).voting(_user, false);
     totalWeight -= _totalWeight;
     usedWeights[_user] = 0;
     delete poolVote[_user];
@@ -215,7 +213,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
         weights[_pool] += _poolWeight;
         votes[_voter][_pool] += _poolWeight;
-        IReward(gaugeToBribe[_gauge])._deposit(_poolWeight, _voter);
         _usedWeight += _poolWeight;
         _totalWeight += _poolWeight;
         emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
@@ -234,9 +231,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     if (_poolVote.length != _weights.length) revert UnequalLengths();
     if (_poolVote.length > maxVotingNum) revert TooManyPools();
     uint256 _timestamp = block.timestamp;
-//    todo. yyx how to handler the condition
-//    if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp)) && !isWhitelistedNFT[_tokenId])
-//      revert NotWhitelistedNFT();
+    if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp)) )
+      revert NotWhitelistedNFT();
     lastVoted[_voter] = _timestamp;
     uint256 _weight = strategyManager.shares(_voter);
     _vote(_voter, _weight, _poolVote, _weights);
@@ -265,11 +261,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       if (!isWhitelistedToken[_pool]) revert NotWhitelistedToken();
     }
 
-    address _bribeVotingReward = IVotingRewardsFactory(votingRewardsFactory).createRewards(forwarder, _pool);
-
     address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
 
-    gaugeToBribe[_gauge] = _bribeVotingReward;
     gauges[_pool] = _gauge;
     poolForGauge[_gauge] = _pool;
     isGauge[_gauge] = true;
@@ -277,7 +270,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     _updateFor(_gauge);
     pools.push(_pool);
 
-    emit GaugeCreated(_poolFactory, votingRewardsFactory, gaugeFactory, _pool, _bribeVotingReward, _gauge, sender);
+    emit GaugeCreated(_poolFactory, votingRewardsFactory, gaugeFactory, _pool, _gauge, sender);
     return _gauge;
   }
 
@@ -366,15 +359,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
       IGauge(_gauges[i]).getReward(_msgSender());
-    }
-  }
-
-  /// @inheritdoc IVoter
-  function claimBribes(address[] memory _bribes, address[][] memory _tokens) external {
-    address _sender = msg.sender;
-    uint256 _length = _bribes.length;
-    for (uint256 i = 0; i < _length; i++) {
-      IReward(_bribes[i]).getReward(_sender, _tokens[i]);
     }
   }
 
