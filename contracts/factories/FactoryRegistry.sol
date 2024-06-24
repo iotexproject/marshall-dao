@@ -22,7 +22,6 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
   EnumerableSet.AddressSet private _poolFactories;
 
   struct FactoriesToPoolFactory {
-    address votingRewardsFactory;
     address gaugeFactory;
   }
   /// @dev the factories linked to the poolFactory
@@ -35,8 +34,8 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
   }
 
   /// @inheritdoc IFactoryRegistry
-  function approve(address poolFactory, address votingRewardsFactory, address gaugeFactory) public onlyOwner {
-    if (poolFactory == address(0) || votingRewardsFactory == address(0) || gaugeFactory == address(0))
+  function approve(address poolFactory, address gaugeFactory) public onlyOwner {
+    if (poolFactory == address(0) || gaugeFactory == address(0))
       revert ZeroAddress();
     if (_poolFactories.contains(poolFactory)) revert PathAlreadyApproved();
 
@@ -44,17 +43,17 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
 
     // If the poolFactory *has not* been approved before, can approve any gauge/votingRewards factory
     // Only one check is sufficient
-    if (usedFactories.votingRewardsFactory == address(0)) {
-      _factoriesToPoolsFactory[poolFactory] = FactoriesToPoolFactory(votingRewardsFactory, gaugeFactory);
+    if (usedFactories.gaugeFactory == address(0)) {
+      _factoriesToPoolsFactory[poolFactory] = FactoriesToPoolFactory(gaugeFactory);
     } else {
       // If the poolFactory *has* been approved before, can only approve the same used gauge/votingRewards factory to
       //     to maintain state within Voter
-      if (votingRewardsFactory != usedFactories.votingRewardsFactory || gaugeFactory != usedFactories.gaugeFactory)
+      if (gaugeFactory != usedFactories.gaugeFactory)
         revert InvalidFactoriesToPoolFactory();
     }
 
     _poolFactories.add(poolFactory);
-    emit Approve(poolFactory, votingRewardsFactory, gaugeFactory);
+    emit Approve(poolFactory, gaugeFactory);
   }
 
   /// @inheritdoc IFactoryRegistry
@@ -62,16 +61,15 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
     if (poolFactory == fallbackPoolFactory) revert FallbackFactory();
     if (!_poolFactories.contains(poolFactory)) revert PathNotApproved();
     _poolFactories.remove(poolFactory);
-    (address votingRewardsFactory, address gaugeFactory) = factoriesToPoolFactory(poolFactory);
-    emit Unapprove(poolFactory, votingRewardsFactory, gaugeFactory);
+    address gaugeFactory = factoriesToPoolFactory(poolFactory);
+    emit Unapprove(poolFactory, gaugeFactory);
   }
 
   /// @inheritdoc IFactoryRegistry
   function factoriesToPoolFactory(
     address poolFactory
-  ) public view returns (address votingRewardsFactory, address gaugeFactory) {
+  ) public view returns (address gaugeFactory) {
     FactoriesToPoolFactory memory f = _factoriesToPoolsFactory[poolFactory];
-    votingRewardsFactory = f.votingRewardsFactory;
     gaugeFactory = f.gaugeFactory;
   }
 
