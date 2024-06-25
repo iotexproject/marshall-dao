@@ -6,7 +6,6 @@ import {IVotingRewardsFactory} from "./interfaces/factories/IVotingRewardsFactor
 import {IGauge} from "./interfaces/IGauge.sol";
 import {IGaugeFactory} from "./interfaces/factories/IGaugeFactory.sol";
 import {IVault} from "./interfaces/IVault.sol";
-import {IReward} from "./interfaces/IReward.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
 import {IFactoryRegistry} from "./interfaces/factories/IFactoryRegistry.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
