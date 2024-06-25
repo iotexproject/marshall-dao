@@ -24,10 +24,10 @@ interface IVoter {
   error UnequalLengths();
   error ZeroBalance();
   error ZeroAddress();
+  error EpochVoteEnd();
 
   event GaugeCreated(
     address indexed poolFactory,
-    address indexed votingRewardsFactory,
     address indexed gaugeFactory,
     address pool,
     address gauge,
@@ -87,14 +87,17 @@ interface IVoter {
   /// @dev Pool => Weights
   function weights(address pool) external view returns (uint256);
 
-  /// @dev NFT => Pool => Votes
-  function votes(uint256 tokenId, address pool) external view returns (uint256);
+  /// @dev address => Pool => Votes
+  function votes(address user, address pool) external view returns (uint256);
+
+  /// @dev IStrategyManager to control votes for user
+  function strategyManager() external view returns (address);
 
   /// @dev NFT => Total voting weight of NFT
-  function usedWeights(uint256 tokenId) external view returns (uint256);
+  function usedWeights(address user) external view returns (uint256);
 
   /// @dev Nft => Timestamp of last vote (ensures single vote per epoch)
-  function lastVoted(uint256 tokenId) external view returns (uint256);
+  function lastVoted(address user) external view returns (uint256);
 
   /// @dev Address => Gauge
   function isGauge(address) external view returns (bool);
@@ -126,15 +129,13 @@ interface IVoter {
   function distribute(address[] memory _gauges) external;
 
   /// @notice Called by users to update voting balances in voting rewards contracts.
-  /// @param _tokenId Id of veNFT whose balance you wish to update.
-  function poke(uint256 _tokenId) external;
+  function poke() external;
 
   /// @notice Called by users to vote for pools. Votes distributed proportionally based on weights.
-  ///         Can only vote or deposit into a managed NFT once per epoch.
+  ///         Can only vote or deposit into once per epoch.
   ///         Can only vote for gauges that have not been killed.
   /// @dev Weights are distributed proportional to the sum of the weights in the array.
   ///      Throws if length of _poolVote and _weights do not match.
-  /// @param _tokenId     Id of veNFT you are voting with.
   /// @param _poolVote    Array of pools you are voting for.
   /// @param _weights     Weights of pools.
   function vote(address[] calldata _poolVote, uint256[] calldata _weights) external;

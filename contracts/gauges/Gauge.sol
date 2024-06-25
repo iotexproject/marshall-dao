@@ -46,7 +46,6 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
-    ve = IVoter(voter).ve();
   }
 
   /// @inheritdoc IGauge

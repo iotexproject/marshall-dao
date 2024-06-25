@@ -20,8 +20,8 @@ import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVoter
   address public immutable forwarder;
-  /// @inheritdoc strategy manager
-  IStrategyManager public strategyManager;
+  /// @inheritdoc IVoter
+  address public strategyManager;
 
   /// @inheritdoc IVoter
   address public immutable factoryRegistry;
@@ -33,7 +33,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   address public governor;
   /// @inheritdoc IVoter
   address public emergencyCouncil;
-  /// @inheritdoc to control notify rewards in guage
+  /// @inheritdoc IVoter
   address public team;
 
   /// @inheritdoc IVoter
@@ -73,7 +73,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   constructor(address _forwarder, address _strategyManager, address _factoryRegistry) ERC2771Context(_forwarder) {
     forwarder = _forwarder;
-    strategyManager = IStrategyManager(_strategyManager);
+    strategyManager = _strategyManager;
     factoryRegistry = _factoryRegistry;
     address _sender = _msgSender();
     vault = _sender;
@@ -170,7 +170,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function poke() external nonReentrant {
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
     address _sender = msg.sender;
-    uint256 _weight = strategyManager.shares(_sender);
+    uint256 _weight = IStrategyManager(strategyManager).shares(_sender);
     _poke(_sender, _weight);
   }
 
@@ -231,9 +231,9 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     if (_poolVote.length > maxVotingNum) revert TooManyPools();
     uint256 _timestamp = block.timestamp;
     if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp)) )
-      revert NotWhitelistedNFT();
+      revert EpochVoteEnd();
     lastVoted[_voter] = _timestamp;
-    uint256 _weight = strategyManager.shares(_voter);
+    uint256 _weight = IStrategyManager(strategyManager).shares(_voter);
     _vote(_voter, _weight, _poolVote, _weights);
   }
 

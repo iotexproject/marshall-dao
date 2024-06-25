@@ -27,10 +27,10 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
   /// @dev the factories linked to the poolFactory
   mapping(address => FactoriesToPoolFactory) private _factoriesToPoolsFactory;
 
-  constructor(address _fallbackPoolFactory, address _fallbackVotingRewardsFactory, address _fallbackGaugeFactory) {
+  constructor(address _fallbackPoolFactory, address _fallbackGaugeFactory) {
     fallbackPoolFactory = _fallbackPoolFactory;
 
-    approve(_fallbackPoolFactory, _fallbackVotingRewardsFactory, _fallbackGaugeFactory);
+    approve(_fallbackPoolFactory, _fallbackGaugeFactory);
   }
 
   /// @inheritdoc IFactoryRegistry

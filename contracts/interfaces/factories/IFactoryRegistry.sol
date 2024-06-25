@@ -22,7 +22,6 @@ interface IFactoryRegistry {
   ///         VotingRewardsFactories and GaugeFactories may use the same address across multiple poolFactories.
   /// @dev Callable by onlyOwner
   /// @param poolFactory .
-  /// @param votingRewardsFactory .
   /// @param gaugeFactory .
   function approve(address poolFactory, address gaugeFactory) external;
 

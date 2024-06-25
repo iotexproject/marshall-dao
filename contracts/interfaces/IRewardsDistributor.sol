@@ -16,7 +16,7 @@ interface IRewardsDistributor {
   /// @notice update strategy manager only vault.
   function setStrategyManager(address _manager) external;
 
-  /// @notice
+  /// @notice address of  strategyManager
   function strategyManager() external view returns (address);
 
   /// @notice Address of Vault.sol
