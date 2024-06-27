@@ -43,7 +43,7 @@ contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
   function distributeRewards(address _token, uint256 _amount) external nonReentrant{
     if (msg.sender != vault) revert NotVault();
     if (_amount == 0) revert ZeroAmount();
-    IERC20(_token).safeTransfer(strategyManager, _amount);
+    IERC20(_token).safeTransferFrom(msg.sender, strategyManager, _amount);
     IStrategyManager(strategyManager).distributeRewards(_token, _amount);
   }
 
@@ -57,6 +57,7 @@ contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
   /// @inheritdoc IRewardsDistributor
   function setVault(address _vault) external {
     if (msg.sender != vault) revert NotVault();
+    if (_vault == address(0)) revert ZeroAddress();
     vault = _vault;
   }
 }
