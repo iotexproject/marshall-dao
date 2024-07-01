@@ -37,7 +37,6 @@ export interface IVaultInterface extends Interface {
       | "rewardsDistributor"
       | "setGovernor"
       | "updatePeriod"
-      | "ve"
       | "veRate"
       | "voter"
       | "weekly"
@@ -89,7 +88,6 @@ export interface IVaultInterface extends Interface {
     functionFragment: "updatePeriod",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "ve", values?: undefined): string;
   encodeFunctionData(functionFragment: "veRate", values?: undefined): string;
   encodeFunctionData(functionFragment: "voter", values?: undefined): string;
   encodeFunctionData(functionFragment: "weekly", values?: undefined): string;
@@ -130,7 +128,6 @@ export interface IVaultInterface extends Interface {
     functionFragment: "updatePeriod",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "ve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "veRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "voter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weekly", data: BytesLike): Result;
@@ -310,8 +307,6 @@ export interface IVault extends BaseContract {
 
   updatePeriod: TypedContractMethod<[], [bigint], "nonpayable">;
 
-  ve: TypedContractMethod<[], [string], "view">;
-
   veRate: TypedContractMethod<[], [bigint], "view">;
 
   voter: TypedContractMethod<[], [string], "view">;
@@ -365,7 +360,6 @@ export interface IVault extends BaseContract {
   getFunction(
     nameOrSignature: "updatePeriod"
   ): TypedContractMethod<[], [bigint], "nonpayable">;
-  getFunction(nameOrSignature: "ve"): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "veRate"
   ): TypedContractMethod<[], [bigint], "view">;

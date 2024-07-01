@@ -3,4 +3,3 @@
 /* eslint-disable */
 export { FactoryRegistry__factory } from "./FactoryRegistry__factory";
 export { GaugeFactory__factory } from "./GaugeFactory__factory";
-export { VotingRewardsFactory__factory } from "./VotingRewardsFactory__factory";

@@ -398,19 +398,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "ve",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "voter",
     outputs: [
       {

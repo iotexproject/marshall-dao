@@ -292,19 +292,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "ve",
-    outputs: [
-      {
-        internalType: "contract IVotingEscrow",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "veRate",
     outputs: [
       {
