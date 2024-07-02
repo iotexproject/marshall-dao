@@ -8,7 +8,6 @@ import type {
   FunctionFragment,
   Result,
   Interface,
-  EventFragment,
   AddressLike,
   ContractRunner,
   ContractMethod,
@@ -18,7 +17,6 @@ import type {
   TypedContractEvent,
   TypedDeferredTopicFilter,
   TypedEventLog,
-  TypedLogDescription,
   TypedListener,
   TypedContractMethod,
 } from "../../common";
@@ -26,120 +24,54 @@ import type {
 export interface IRewardsDistributorInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "WEEK"
-      | "checkpointToken"
-      | "claim"
-      | "claimMany"
-      | "claimable"
-      | "lastTokenTime"
+      | "distributeRewards()"
+      | "distributeRewards(address,uint256)"
+      | "setStrategyManager"
       | "setVault"
-      | "startTime"
-      | "timeCursorOf"
-      | "tokenLastBalance"
+      | "strategyManager"
       | "vault"
-      | "ve"
   ): FunctionFragment;
 
-  getEvent(
-    nameOrSignatureOrTopic: "CheckpointToken" | "Claimed"
-  ): EventFragment;
-
-  encodeFunctionData(functionFragment: "WEEK", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "checkpointToken",
+    functionFragment: "distributeRewards()",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "claim", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "claimMany",
-    values: [BigNumberish[]]
+    functionFragment: "distributeRewards(address,uint256)",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "claimable",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "lastTokenTime",
-    values?: undefined
+    functionFragment: "setStrategyManager",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "setVault",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "startTime", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "timeCursorOf",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "tokenLastBalance",
+    functionFragment: "strategyManager",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
-  encodeFunctionData(functionFragment: "ve", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "WEEK", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "checkpointToken",
+    functionFragment: "distributeRewards()",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "claimMany", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "claimable", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "lastTokenTime",
+    functionFragment: "distributeRewards(address,uint256)",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setStrategyManager",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setVault", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "startTime", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "timeCursorOf",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenLastBalance",
+    functionFragment: "strategyManager",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "ve", data: BytesLike): Result;
-}
-
-export namespace CheckpointTokenEvent {
-  export type InputTuple = [time: BigNumberish, tokens: BigNumberish];
-  export type OutputTuple = [time: bigint, tokens: bigint];
-  export interface OutputObject {
-    time: bigint;
-    tokens: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace ClaimedEvent {
-  export type InputTuple = [
-    tokenId: BigNumberish,
-    epochStart: BigNumberish,
-    epochEnd: BigNumberish,
-    amount: BigNumberish
-  ];
-  export type OutputTuple = [
-    tokenId: bigint,
-    epochStart: bigint,
-    epochEnd: bigint,
-    amount: bigint
-  ];
-  export interface OutputObject {
-    tokenId: bigint;
-    epochStart: bigint;
-    epochEnd: bigint;
-    amount: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
 }
 
 export interface IRewardsDistributor extends BaseContract {
@@ -185,109 +117,52 @@ export interface IRewardsDistributor extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  WEEK: TypedContractMethod<[], [bigint], "view">;
+  "distributeRewards()": TypedContractMethod<[], [void], "payable">;
 
-  checkpointToken: TypedContractMethod<[], [void], "nonpayable">;
-
-  claim: TypedContractMethod<[tokenId: BigNumberish], [bigint], "nonpayable">;
-
-  claimMany: TypedContractMethod<
-    [tokenIds: BigNumberish[]],
-    [boolean],
+  "distributeRewards(address,uint256)": TypedContractMethod<
+    [_token: AddressLike, _amount: BigNumberish],
+    [void],
     "nonpayable"
   >;
 
-  claimable: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
-
-  lastTokenTime: TypedContractMethod<[], [bigint], "view">;
+  setStrategyManager: TypedContractMethod<
+    [_manager: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   setVault: TypedContractMethod<[_vault: AddressLike], [void], "nonpayable">;
 
-  startTime: TypedContractMethod<[], [bigint], "view">;
-
-  timeCursorOf: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
-
-  tokenLastBalance: TypedContractMethod<[], [bigint], "view">;
+  strategyManager: TypedContractMethod<[], [string], "view">;
 
   vault: TypedContractMethod<[], [string], "view">;
-
-  ve: TypedContractMethod<[], [string], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "WEEK"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "distributeRewards()"
+  ): TypedContractMethod<[], [void], "payable">;
   getFunction(
-    nameOrSignature: "checkpointToken"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: "distributeRewards(address,uint256)"
+  ): TypedContractMethod<
+    [_token: AddressLike, _amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
-    nameOrSignature: "claim"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "nonpayable">;
-  getFunction(
-    nameOrSignature: "claimMany"
-  ): TypedContractMethod<[tokenIds: BigNumberish[]], [boolean], "nonpayable">;
-  getFunction(
-    nameOrSignature: "claimable"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "lastTokenTime"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "setStrategyManager"
+  ): TypedContractMethod<[_manager: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setVault"
   ): TypedContractMethod<[_vault: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "startTime"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "timeCursorOf"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "tokenLastBalance"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "strategyManager"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "vault"
   ): TypedContractMethod<[], [string], "view">;
-  getFunction(nameOrSignature: "ve"): TypedContractMethod<[], [string], "view">;
 
-  getEvent(
-    key: "CheckpointToken"
-  ): TypedContractEvent<
-    CheckpointTokenEvent.InputTuple,
-    CheckpointTokenEvent.OutputTuple,
-    CheckpointTokenEvent.OutputObject
-  >;
-  getEvent(
-    key: "Claimed"
-  ): TypedContractEvent<
-    ClaimedEvent.InputTuple,
-    ClaimedEvent.OutputTuple,
-    ClaimedEvent.OutputObject
-  >;
-
-  filters: {
-    "CheckpointToken(uint256,uint256)": TypedContractEvent<
-      CheckpointTokenEvent.InputTuple,
-      CheckpointTokenEvent.OutputTuple,
-      CheckpointTokenEvent.OutputObject
-    >;
-    CheckpointToken: TypedContractEvent<
-      CheckpointTokenEvent.InputTuple,
-      CheckpointTokenEvent.OutputTuple,
-      CheckpointTokenEvent.OutputObject
-    >;
-
-    "Claimed(uint256,uint256,uint256,uint256)": TypedContractEvent<
-      ClaimedEvent.InputTuple,
-      ClaimedEvent.OutputTuple,
-      ClaimedEvent.OutputObject
-    >;
-    Claimed: TypedContractEvent<
-      ClaimedEvent.InputTuple,
-      ClaimedEvent.OutputTuple,
-      ClaimedEvent.OutputObject
-    >;
-  };
+  filters: {};
 }

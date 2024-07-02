@@ -45,7 +45,6 @@ export interface IGaugeInterface extends Interface {
       | "stakingToken"
       | "totalSupply"
       | "userRewardPerTokenPaid"
-      | "ve"
       | "voter"
       | "withdraw"
   ): FunctionFragment;
@@ -128,7 +127,6 @@ export interface IGaugeInterface extends Interface {
     functionFragment: "userRewardPerTokenPaid",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "ve", values?: undefined): string;
   encodeFunctionData(functionFragment: "voter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "withdraw",
@@ -193,7 +191,6 @@ export interface IGaugeInterface extends Interface {
     functionFragment: "userRewardPerTokenPaid",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "ve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "voter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 }
@@ -352,8 +349,6 @@ export interface IGauge extends BaseContract {
     "view"
   >;
 
-  ve: TypedContractMethod<[], [string], "view">;
-
   voter: TypedContractMethod<[], [string], "view">;
 
   withdraw: TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
@@ -423,7 +418,6 @@ export interface IGauge extends BaseContract {
   getFunction(
     nameOrSignature: "userRewardPerTokenPaid"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
-  getFunction(nameOrSignature: "ve"): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "voter"
   ): TypedContractMethod<[], [string], "view">;

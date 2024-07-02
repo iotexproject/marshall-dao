@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import {IVoter} from "./IVoter.sol";
-import {IVotingEscrow} from "./IVotingEscrow.sol";
 import {IRewardsDistributor} from "./IRewardsDistributor.sol";
 
 interface IVault {
@@ -24,9 +23,6 @@ interface IVault {
 
   /// @notice Standard OZ IGovernor using ve for vote weights.
   function governor() external view returns (address);
-
-  /// @notice Interface of IVotingEscrow.sol
-  function ve() external view returns (IVotingEscrow);
 
   /// @notice Interface of RewardsDistributor.sol
   function rewardsDistributor() external view returns (IRewardsDistributor);

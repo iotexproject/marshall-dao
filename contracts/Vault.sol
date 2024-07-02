@@ -8,7 +8,6 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {IVault} from "./interfaces/IVault.sol";
 import {IRewardsDistributor} from "./interfaces/IRewardsDistributor.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
-import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 
 /// @title Vault
 /// @notice Controls minting of emissions and rebases for the Protocol
@@ -19,8 +18,6 @@ contract Vault is IVault, Initializable {
   IVoter public voter;
   /// @inheritdoc IVault
   address public governor;
-  /// @inheritdoc IVault
-  IVotingEscrow public ve;
   /// @inheritdoc IVault
   IRewardsDistributor public rewardsDistributor;
 
@@ -37,11 +34,9 @@ contract Vault is IVault, Initializable {
 
   function initialize(
     address _voter, // the voting & distribution system
-    address _ve, // the ve(3,3) system that will be locked into
     address _rewardsDistributor // the distribution system that ensures users aren't diluted
   ) public initializer {
     voter = IVoter(_voter);
-    ve = IVotingEscrow(_ve);
     governor = msg.sender;
     rewardsDistributor = IRewardsDistributor(_rewardsDistributor);
     veRate = 1000;
@@ -74,9 +69,7 @@ contract Vault is IVault, Initializable {
       }
       uint256 _veEmission = (_emission * veRate) / 10000;
 
-      payable(address(rewardsDistributor)).transfer(_veEmission);
-      rewardsDistributor.checkpointToken(); // checkpoint token balance that was just minted in rewards distributor
-
+      rewardsDistributor.distributeRewards{value: _veEmission}();
       voter.notifyRewardAmount{value: _emission - _veEmission}();
 
       emit Emission(msg.sender, _emission);

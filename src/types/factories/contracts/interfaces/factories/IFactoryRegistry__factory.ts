@@ -51,12 +51,6 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "votingRewardsFactory",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
         name: "gaugeFactory",
         type: "address",
       },
@@ -89,12 +83,6 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "votingRewardsFactory",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
         name: "gaugeFactory",
         type: "address",
       },
@@ -107,11 +95,6 @@ const _abi = [
       {
         internalType: "address",
         name: "poolFactory",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "votingRewardsFactory",
         type: "address",
       },
       {
@@ -135,11 +118,6 @@ const _abi = [
     ],
     name: "factoriesToPoolFactory",
     outputs: [
-      {
-        internalType: "address",
-        name: "votingRewardsFactory",
-        type: "address",
-      },
       {
         internalType: "address",
         name: "gaugeFactory",

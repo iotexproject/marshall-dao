@@ -47,7 +47,7 @@ export interface FactoryRegistryInterface extends Interface {
 
   encodeFunctionData(
     functionFragment: "approve",
-    values: [AddressLike, AddressLike, AddressLike]
+    values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "factoriesToPoolFactory",
@@ -119,17 +119,11 @@ export interface FactoryRegistryInterface extends Interface {
 export namespace ApproveEvent {
   export type InputTuple = [
     poolFactory: AddressLike,
-    votingRewardsFactory: AddressLike,
     gaugeFactory: AddressLike
   ];
-  export type OutputTuple = [
-    poolFactory: string,
-    votingRewardsFactory: string,
-    gaugeFactory: string
-  ];
+  export type OutputTuple = [poolFactory: string, gaugeFactory: string];
   export interface OutputObject {
     poolFactory: string;
-    votingRewardsFactory: string;
     gaugeFactory: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -166,17 +160,11 @@ export namespace SetManagedRewardsFactoryEvent {
 export namespace UnapproveEvent {
   export type InputTuple = [
     poolFactory: AddressLike,
-    votingRewardsFactory: AddressLike,
     gaugeFactory: AddressLike
   ];
-  export type OutputTuple = [
-    poolFactory: string,
-    votingRewardsFactory: string,
-    gaugeFactory: string
-  ];
+  export type OutputTuple = [poolFactory: string, gaugeFactory: string];
   export interface OutputObject {
     poolFactory: string;
-    votingRewardsFactory: string;
     gaugeFactory: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
@@ -229,18 +217,14 @@ export interface FactoryRegistry extends BaseContract {
   ): Promise<this>;
 
   approve: TypedContractMethod<
-    [
-      poolFactory: AddressLike,
-      votingRewardsFactory: AddressLike,
-      gaugeFactory: AddressLike
-    ],
+    [poolFactory: AddressLike, gaugeFactory: AddressLike],
     [void],
     "nonpayable"
   >;
 
   factoriesToPoolFactory: TypedContractMethod<
     [poolFactory: AddressLike],
-    [[string, string] & { votingRewardsFactory: string; gaugeFactory: string }],
+    [string],
     "view"
   >;
 
@@ -279,21 +263,13 @@ export interface FactoryRegistry extends BaseContract {
   getFunction(
     nameOrSignature: "approve"
   ): TypedContractMethod<
-    [
-      poolFactory: AddressLike,
-      votingRewardsFactory: AddressLike,
-      gaugeFactory: AddressLike
-    ],
+    [poolFactory: AddressLike, gaugeFactory: AddressLike],
     [void],
     "nonpayable"
   >;
   getFunction(
     nameOrSignature: "factoriesToPoolFactory"
-  ): TypedContractMethod<
-    [poolFactory: AddressLike],
-    [[string, string] & { votingRewardsFactory: string; gaugeFactory: string }],
-    "view"
-  >;
+  ): TypedContractMethod<[poolFactory: AddressLike], [string], "view">;
   getFunction(
     nameOrSignature: "fallbackPoolFactory"
   ): TypedContractMethod<[], [string], "view">;
@@ -349,7 +325,7 @@ export interface FactoryRegistry extends BaseContract {
   >;
 
   filters: {
-    "Approve(address,address,address)": TypedContractEvent<
+    "Approve(address,address)": TypedContractEvent<
       ApproveEvent.InputTuple,
       ApproveEvent.OutputTuple,
       ApproveEvent.OutputObject
@@ -382,7 +358,7 @@ export interface FactoryRegistry extends BaseContract {
       SetManagedRewardsFactoryEvent.OutputObject
     >;
 
-    "Unapprove(address,address,address)": TypedContractEvent<
+    "Unapprove(address,address)": TypedContractEvent<
       UnapproveEvent.InputTuple,
       UnapproveEvent.OutputTuple,
       UnapproveEvent.OutputObject

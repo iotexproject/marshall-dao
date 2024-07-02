@@ -9,8 +9,8 @@ interface IFactoryRegistry {
   error SameAddress();
   error ZeroAddress();
 
-  event Approve(address indexed poolFactory, address indexed votingRewardsFactory, address indexed gaugeFactory);
-  event Unapprove(address indexed poolFactory, address indexed votingRewardsFactory, address indexed gaugeFactory);
+  event Approve(address indexed poolFactory, address indexed gaugeFactory);
+  event Unapprove(address indexed poolFactory, address indexed gaugeFactory);
   event SetManagedRewardsFactory(address indexed _newRewardsFactory);
 
   /// @notice Approve a set of factories used in the Protocol.
@@ -22,9 +22,8 @@ interface IFactoryRegistry {
   ///         VotingRewardsFactories and GaugeFactories may use the same address across multiple poolFactories.
   /// @dev Callable by onlyOwner
   /// @param poolFactory .
-  /// @param votingRewardsFactory .
   /// @param gaugeFactory .
-  function approve(address poolFactory, address votingRewardsFactory, address gaugeFactory) external;
+  function approve(address poolFactory, address gaugeFactory) external;
 
   /// @notice Unapprove a set of factories used in the Protocol.
   ///         While a poolFactory is unapproved, Router.sol cannot swap with pools made from the corresponding factory
@@ -37,9 +36,7 @@ interface IFactoryRegistry {
   /// @notice Get the factories correlated to a poolFactory.
   ///         Once set, this can never be modified.
   ///         Returns the correlated factories even after an approved poolFactory is unapproved.
-  function factoriesToPoolFactory(
-    address poolFactory
-  ) external view returns (address votingRewardsFactory, address gaugeFactory);
+  function factoriesToPoolFactory(address poolFactory) external view returns (address gaugeFactory);
 
   /// @notice Get all PoolFactories approved by the registry
   /// @dev The same PoolFactory address cannot be used twice

@@ -4,16 +4,11 @@
 export * as art from "./art";
 export * as factories from "./factories";
 export * as gauges from "./gauges";
-export * as governance from "./governance";
 export * as interfaces from "./interfaces";
 export * as libraries from "./libraries";
-export * as rewards from "./rewards";
 export * as test from "./test";
 export { DAOForwarder__factory } from "./DAOForwarder__factory";
-export { MarshallGovernor__factory } from "./MarshallGovernor__factory";
 export { RewardsDistributor__factory } from "./RewardsDistributor__factory";
 export { Vault__factory } from "./Vault__factory";
-export { VeArtProxy__factory } from "./VeArtProxy__factory";
 export { VestingMaster__factory } from "./VestingMaster__factory";
 export { Voter__factory } from "./Voter__factory";
-export { VotingEscrow__factory } from "./VotingEscrow__factory";

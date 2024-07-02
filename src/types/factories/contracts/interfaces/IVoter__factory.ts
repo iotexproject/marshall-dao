@@ -21,6 +21,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "EpochVoteEnd",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "FactoryPathNotApproved",
     type: "error",
   },
@@ -98,11 +103,6 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "NotWhitelistedNFT",
-    type: "error",
-  },
-  {
-    inputs: [],
     name: "NotWhitelistedToken",
     type: "error",
   },
@@ -150,12 +150,6 @@ const _abi = [
         internalType: "address",
         name: "pool",
         type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
       },
       {
         indexed: false,
@@ -216,12 +210,6 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "votingRewardsFactory",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
         name: "gaugeFactory",
         type: "address",
       },
@@ -229,12 +217,6 @@ const _abi = [
         indexed: false,
         internalType: "address",
         name: "pool",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "bribeVotingReward",
         type: "address",
       },
       {
@@ -314,12 +296,6 @@ const _abi = [
         type: "address",
       },
       {
-        indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
         indexed: false,
         internalType: "uint256",
         name: "weight",
@@ -352,31 +328,6 @@ const _abi = [
       },
       {
         indexed: true,
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-      {
-        indexed: true,
-        internalType: "bool",
-        name: "_bool",
-        type: "bool",
-      },
-    ],
-    name: "WhitelistNFT",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "whitelister",
-        type: "address",
-      },
-      {
-        indexed: true,
         internalType: "address",
         name: "token",
         type: "address",
@@ -390,29 +341,6 @@ const _abi = [
     ],
     name: "WhitelistToken",
     type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address[]",
-        name: "_bribes",
-        type: "address[]",
-      },
-      {
-        internalType: "address[][]",
-        name: "_tokens",
-        type: "address[][]",
-      },
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "claimBribes",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
   },
   {
     inputs: [
@@ -544,25 +472,6 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "gauge",
-        type: "address",
-      },
-    ],
-    name: "gaugeToBribe",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
         name: "pool",
         type: "address",
       },
@@ -632,25 +541,6 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "isWhitelistedNFT",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
         internalType: "address",
         name: "token",
         type: "address",
@@ -683,9 +573,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
+        internalType: "address",
+        name: "user",
+        type: "address",
       },
     ],
     name: "lastVoted",
@@ -733,13 +623,7 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-    ],
+    inputs: [],
     name: "poke",
     outputs: [],
     stateMutability: "nonpayable",
@@ -765,13 +649,7 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-    ],
+    inputs: [],
     name: "reset",
     outputs: [],
     stateMutability: "nonpayable",
@@ -827,6 +705,32 @@ const _abi = [
     name: "setMaxVotingNum",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "strategyManager",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "team",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -889,9 +793,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
+        internalType: "address",
+        name: "user",
+        type: "address",
       },
     ],
     name: "usedWeights",
@@ -919,25 +823,7 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "ve",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
       {
         internalType: "address[]",
         name: "_poolVote",
@@ -957,9 +843,9 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "tokenId",
-        type: "uint256",
+        internalType: "address",
+        name: "user",
+        type: "address",
       },
       {
         internalType: "address",
@@ -995,24 +881,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "_bool",
-        type: "bool",
-      },
-    ],
-    name: "whitelistNFT",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
