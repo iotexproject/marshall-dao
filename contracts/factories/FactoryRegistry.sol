@@ -35,8 +35,7 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
 
   /// @inheritdoc IFactoryRegistry
   function approve(address poolFactory, address gaugeFactory) public onlyOwner {
-    if (poolFactory == address(0) || gaugeFactory == address(0))
-      revert ZeroAddress();
+    if (poolFactory == address(0) || gaugeFactory == address(0)) revert ZeroAddress();
     if (_poolFactories.contains(poolFactory)) revert PathAlreadyApproved();
 
     FactoriesToPoolFactory memory usedFactories = _factoriesToPoolsFactory[poolFactory];
@@ -48,8 +47,7 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
     } else {
       // If the poolFactory *has* been approved before, can only approve the same used gauge/votingRewards factory to
       //     to maintain state within Voter
-      if (gaugeFactory != usedFactories.gaugeFactory)
-        revert InvalidFactoriesToPoolFactory();
+      if (gaugeFactory != usedFactories.gaugeFactory) revert InvalidFactoriesToPoolFactory();
     }
 
     _poolFactories.add(poolFactory);
@@ -66,9 +64,7 @@ contract FactoryRegistry is IFactoryRegistry, Ownable {
   }
 
   /// @inheritdoc IFactoryRegistry
-  function factoriesToPoolFactory(
-    address poolFactory
-  ) public view returns (address gaugeFactory) {
+  function factoriesToPoolFactory(address poolFactory) public view returns (address gaugeFactory) {
     FactoriesToPoolFactory memory f = _factoriesToPoolsFactory[poolFactory];
     gaugeFactory = f.gaugeFactory;
   }

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 interface IRewardsDistributor {
-
   error NotVault();
   error ZeroAddress();
   error ZeroAmount();

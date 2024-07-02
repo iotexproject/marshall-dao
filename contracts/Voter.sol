@@ -230,8 +230,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     if (_poolVote.length != _weights.length) revert UnequalLengths();
     if (_poolVote.length > maxVotingNum) revert TooManyPools();
     uint256 _timestamp = block.timestamp;
-    if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp)) )
-      revert EpochVoteEnd();
+    if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp))) revert EpochVoteEnd();
     lastVoted[_voter] = _timestamp;
     uint256 _weight = IStrategyManager(strategyManager).shares(_voter);
     _vote(_voter, _weight, _poolVote, _weights);
@@ -253,9 +252,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     address sender = _msgSender();
     if (gauges[_pool] != address(0)) revert GaugeExists();
 
-    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
-      _poolFactory
-    );
+    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
     if (sender != governor) {
       if (!isWhitelistedToken[_pool]) revert NotWhitelistedToken();
     }

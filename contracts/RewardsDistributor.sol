@@ -40,7 +40,7 @@ contract RewardsDistributor is IRewardsDistributor, ReentrancyGuard {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function distributeRewards(address _token, uint256 _amount) external nonReentrant{
+  function distributeRewards(address _token, uint256 _amount) external nonReentrant {
     if (msg.sender != vault) revert NotVault();
     if (_amount == 0) revert ZeroAmount();
     IERC20(_token).safeTransferFrom(msg.sender, strategyManager, _amount);

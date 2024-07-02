@@ -35,20 +35,9 @@ interface IVoter {
   );
   event GaugeKilled(address indexed gauge);
   event GaugeRevived(address indexed gauge);
-  event Voted(
-    address indexed voter,
-    address indexed pool,
-    uint256 weight,
-    uint256 totalWeight,
-    uint256 timestamp
-  );
-  event Abstained(
-    address indexed voter,
-    address indexed pool,
-    uint256 weight,
-    uint256 totalWeight,
-    uint256 timestamp
-  );
+  event Voted(address indexed voter, address indexed pool, uint256 weight, uint256 totalWeight, uint256 timestamp);
+  event Abstained(address indexed voter, address indexed pool, uint256 weight, uint256 totalWeight, uint256 timestamp);
+  event UpdateFor(address indexed gauge, uint256 share, uint256 delta);
   event NotifyReward(address indexed sender, uint256 amount);
   event DistributeReward(address indexed sender, address indexed gauge, uint256 amount);
   event WhitelistToken(address indexed whitelister, address indexed token, bool indexed _bool);
