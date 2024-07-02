@@ -13,13 +13,14 @@ import {DAOForwarder} from "../contracts/DAOForwarder.sol";
 import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
+import {RewardsDistributor} from "../contracts/RewardsDistributor.sol";
 
 contract TestVoter is Test {
   Voter public voter;
   Vault public vault;
   TestToken public pool;
-  address public rdb;
   address public poolFactory;
+  RewardsDistributor public rdb;
   DAOForwarder public forwarder;
   GaugeFactory public gaugeFactory;
   FactoryRegistry public factoryRegistry;
@@ -34,8 +35,9 @@ contract TestVoter is Test {
     factoryRegistry = new FactoryRegistry(poolFactory, address(gaugeFactory));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
     vault = new Vault();
-    rdb = address(999);
-    vault.initialize(address(voter), rdb);
+    rdb = new RewardsDistributor(address(strategyManager));
+    rdb.setVault(address(vault));
+    vault.initialize(address(voter), address(rdb));
     voter.initialize(new address[](0), address(vault));
   }
 
@@ -118,37 +120,8 @@ contract TestVoter is Test {
     assertEq(0, voter.votes(address(this), address(pool)));
   }
 
-  //  function test_distribute() external {
-  //    // 0. setup
-  //    voter.createGauge(poolFactory, address(pool));
-  //    address gauge = voter.gauges(address(pool));
-  //    strategyManager.setShare(address(this), 1000);
-  //    address[] memory poolvote = new address[](1);
-  //    uint256[] memory weights = new uint256[](1);
-  //    poolvote[0] = address(pool);
-  //    weights[0] = 100;
-  //    skip(8 days);
-  //    voter.vote(poolvote, weights);
-  //    assertEq(strategyManager.shares(address(this)), voter.weights(address(pool)));
-  //
-  //    vault.donate{value: vault.weekly()}();
-  //    assertEq(vault.weekly(), address(vault).balance);
-  //
-  //    // 1. distribute
-  //    voter.distribute(0, 1);
-  //  }
-
-  //  function test_vault() external {
-  //    IVault(voter.vault()).donate{value: 2 ether}();
-  //    assertEq(2 ether, address(vault).balance);
-  //
-  //    skip(7 days);
-  //    vm.expectRevert(IVault.InsufficientFund.selector);
-  //    uint256 _period = IVault(voter.vault()).updatePeriod();
-  //  }
-
   function test_notifyReward_updateFor_distribute_claimRewards() external {
-    // 0. setup
+    // 0. setup to create gauge and vote for the gauge
     voter.createGauge(poolFactory, address(pool));
     address gauge = voter.gauges(address(pool));
     strategyManager.setShare(address(this), 1000);
@@ -165,45 +138,21 @@ contract TestVoter is Test {
     assertEq(vault.weekly(), address(vault).balance);
 
     // 3. distribute emission from vault to voter
-    assertEq(address(vault), voter.vault());
-    console.log("actual vault: ", address(vault), ", in contract vault: ", voter.vault());
-    //        vm.expectRevert(IVault.InsufficientFund.selector);
-    //    vault.updatePeriod();
-    //    voter.distribute(0, 1);
-    //
-    //    // 1. update for special gauge
-    //    voter.updateFor(gauge);
-    //    assertTrue(voter.isAlive(gauge));
-    //    console.log("claimable rewards for gauge ", voter.claimable(address(gauge)));
-    //
-    //    // 4. user deposit lp to gauge
-    //    pool.approve(gauge, 3 ether);
-    //    IGauge(gauge).deposit(1 ether);
-    //
-    //    // 5. claim rewards by user
-    //    skip(3 days);
-    //    address[] memory gauges = new address[](1);
-    //    gauges[0] = gauge;
-    //    vm.expectEmit(true, false, false, false);
-    //    //        emit IGauge.ClaimRewards(address (this), 0);
-    //    voter.claimRewards(gauges);
+    voter.distribute(0, 1);
+
+    // 4. update for special gauge
+    voter.updateFor(gauge);
+
+    // 5. user deposit lp to gauge
+    pool.approve(gauge, 3 ether);
+    IGauge(gauge).deposit(1 ether);
+
+    // 5. claim rewards by user
+    skip(3 days);
+    address[] memory gauges = new address[](1);
+    gauges[0] = gauge;
+    voter.claimRewards(gauges);
   }
 
-  function test_distribute_claimRewards() external {
-    // 投票
-    // 1. 调用voter将ve投票按指定比例投票给多个gauge；每个世代只能voter一次
-    // 2. 世代期间如果用户ve票数变动，可以调用poke进行票数更新；poke无法更新gauge之间接收投票的比例
-    // 3. 新世代可以调用reset重置投票结果
-    // 充值奖励资金
-    // 1. 调用 distribute 将奖励资金通过vault的updatePeriod调用充值到voter
-    // 1.1 vault 充值资金至voter时调用voter的notifyRewardAmount实现
-    // 1.1 distribute 内部基于投票结果将奖励资金从voter充值到gauge
-    // 计算gauge的奖励数
-    // 1. 调用updateFor基于每个gauge的投票权重，计算指定gauge的奖励资金数值；
-    // distribute分发奖励至gauge时基于这个计算的数值
-    // 用户claim奖励
-    // 1. 调用claimRewards获取指定gauge中可以拿到的奖励
-    // 1.1 用户如果想拿到gauge的奖励，需要将pool的lp deposit给gauge
-    // 1.2 voter中记录的gauge奖励为通过ve投票引导的额外emission激励
-  }
+  receive() external payable {}
 }
