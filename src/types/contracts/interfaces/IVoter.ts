@@ -26,7 +26,6 @@ import type {
 export interface IVoterInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "claimBribes"
       | "claimRewards"
       | "claimable"
       | "createGauge"
@@ -35,12 +34,10 @@ export interface IVoterInterface extends Interface {
       | "emergencyCouncil"
       | "factoryRegistry"
       | "forwarder"
-      | "gaugeToBribe"
       | "gauges"
       | "governor"
       | "isAlive"
       | "isGauge"
-      | "isWhitelistedNFT"
       | "isWhitelistedToken"
       | "killGauge"
       | "lastVoted"
@@ -54,17 +51,17 @@ export interface IVoterInterface extends Interface {
       | "setEmergencyCouncil"
       | "setGovernor"
       | "setMaxVotingNum"
+      | "strategyManager"
+      | "team"
       | "totalWeight"
       | "updateFor(address)"
       | "updateFor(uint256,uint256)"
       | "updateFor(address[])"
       | "usedWeights"
       | "vault"
-      | "ve"
       | "vote"
       | "votes"
       | "weights"
-      | "whitelistNFT"
       | "whitelistToken"
   ): FunctionFragment;
 
@@ -77,14 +74,9 @@ export interface IVoterInterface extends Interface {
       | "GaugeRevived"
       | "NotifyReward"
       | "Voted"
-      | "WhitelistNFT"
       | "WhitelistToken"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "claimBribes",
-    values: [AddressLike[], AddressLike[][], BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "claimRewards",
     values: [AddressLike[]]
@@ -114,10 +106,6 @@ export interface IVoterInterface extends Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "forwarder", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "gaugeToBribe",
-    values: [AddressLike]
-  ): string;
   encodeFunctionData(functionFragment: "gauges", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "governor", values?: undefined): string;
   encodeFunctionData(
@@ -129,10 +117,6 @@ export interface IVoterInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "isWhitelistedNFT",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "isWhitelistedToken",
     values: [AddressLike]
   ): string;
@@ -142,7 +126,7 @@ export interface IVoterInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "lastVoted",
-    values: [BigNumberish]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "length", values?: undefined): string;
   encodeFunctionData(
@@ -153,12 +137,12 @@ export interface IVoterInterface extends Interface {
     functionFragment: "notifyRewardAmount",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "poke", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "poke", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "poolForGauge",
     values: [AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "reset", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "reset", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "reviveGauge",
     values: [AddressLike]
@@ -175,6 +159,11 @@ export interface IVoterInterface extends Interface {
     functionFragment: "setMaxVotingNum",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "strategyManager",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "team", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalWeight",
     values?: undefined
@@ -193,35 +182,26 @@ export interface IVoterInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "usedWeights",
-    values: [BigNumberish]
+    values: [AddressLike]
   ): string;
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
-  encodeFunctionData(functionFragment: "ve", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "vote",
-    values: [BigNumberish, AddressLike[], BigNumberish[]]
+    values: [AddressLike[], BigNumberish[]]
   ): string;
   encodeFunctionData(
     functionFragment: "votes",
-    values: [BigNumberish, AddressLike]
+    values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "weights",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "whitelistNFT",
-    values: [BigNumberish, boolean]
-  ): string;
-  encodeFunctionData(
     functionFragment: "whitelistToken",
     values: [AddressLike, boolean]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "claimBribes",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "claimRewards",
     data: BytesLike
@@ -248,18 +228,10 @@ export interface IVoterInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "forwarder", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "gaugeToBribe",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "gauges", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "governor", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isAlive", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isGauge", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "isWhitelistedNFT",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "isWhitelistedToken",
     data: BytesLike
@@ -298,6 +270,11 @@ export interface IVoterInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "strategyManager",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "team", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "totalWeight",
     data: BytesLike
   ): Result;
@@ -318,14 +295,9 @@ export interface IVoterInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "ve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "vote", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "votes", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weights", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "whitelistNFT",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "whitelistToken",
     data: BytesLike
@@ -336,7 +308,6 @@ export namespace AbstainedEvent {
   export type InputTuple = [
     voter: AddressLike,
     pool: AddressLike,
-    tokenId: BigNumberish,
     weight: BigNumberish,
     totalWeight: BigNumberish,
     timestamp: BigNumberish
@@ -344,7 +315,6 @@ export namespace AbstainedEvent {
   export type OutputTuple = [
     voter: string,
     pool: string,
-    tokenId: bigint,
     weight: bigint,
     totalWeight: bigint,
     timestamp: bigint
@@ -352,7 +322,6 @@ export namespace AbstainedEvent {
   export interface OutputObject {
     voter: string;
     pool: string;
-    tokenId: bigint;
     weight: bigint;
     totalWeight: bigint;
     timestamp: bigint;
@@ -384,28 +353,22 @@ export namespace DistributeRewardEvent {
 export namespace GaugeCreatedEvent {
   export type InputTuple = [
     poolFactory: AddressLike,
-    votingRewardsFactory: AddressLike,
     gaugeFactory: AddressLike,
     pool: AddressLike,
-    bribeVotingReward: AddressLike,
     gauge: AddressLike,
     creator: AddressLike
   ];
   export type OutputTuple = [
     poolFactory: string,
-    votingRewardsFactory: string,
     gaugeFactory: string,
     pool: string,
-    bribeVotingReward: string,
     gauge: string,
     creator: string
   ];
   export interface OutputObject {
     poolFactory: string;
-    votingRewardsFactory: string;
     gaugeFactory: string;
     pool: string;
-    bribeVotingReward: string;
     gauge: string;
     creator: string;
   }
@@ -456,7 +419,6 @@ export namespace VotedEvent {
   export type InputTuple = [
     voter: AddressLike,
     pool: AddressLike,
-    tokenId: BigNumberish,
     weight: BigNumberish,
     totalWeight: BigNumberish,
     timestamp: BigNumberish
@@ -464,7 +426,6 @@ export namespace VotedEvent {
   export type OutputTuple = [
     voter: string,
     pool: string,
-    tokenId: bigint,
     weight: bigint,
     totalWeight: bigint,
     timestamp: bigint
@@ -472,32 +433,9 @@ export namespace VotedEvent {
   export interface OutputObject {
     voter: string;
     pool: string;
-    tokenId: bigint;
     weight: bigint;
     totalWeight: bigint;
     timestamp: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export namespace WhitelistNFTEvent {
-  export type InputTuple = [
-    whitelister: AddressLike,
-    tokenId: BigNumberish,
-    _bool: boolean
-  ];
-  export type OutputTuple = [
-    whitelister: string,
-    tokenId: bigint,
-    _bool: boolean
-  ];
-  export interface OutputObject {
-    whitelister: string;
-    tokenId: bigint;
-    _bool: boolean;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -570,12 +508,6 @@ export interface IVoter extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  claimBribes: TypedContractMethod<
-    [_bribes: AddressLike[], _tokens: AddressLike[][], _tokenId: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
   claimRewards: TypedContractMethod<
     [_gauges: AddressLike[]],
     [void],
@@ -608,8 +540,6 @@ export interface IVoter extends BaseContract {
 
   forwarder: TypedContractMethod<[], [string], "view">;
 
-  gaugeToBribe: TypedContractMethod<[gauge: AddressLike], [string], "view">;
-
   gauges: TypedContractMethod<[pool: AddressLike], [string], "view">;
 
   governor: TypedContractMethod<[], [string], "view">;
@@ -617,12 +547,6 @@ export interface IVoter extends BaseContract {
   isAlive: TypedContractMethod<[gauge: AddressLike], [boolean], "view">;
 
   isGauge: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
-
-  isWhitelistedNFT: TypedContractMethod<
-    [tokenId: BigNumberish],
-    [boolean],
-    "view"
-  >;
 
   isWhitelistedToken: TypedContractMethod<
     [token: AddressLike],
@@ -632,7 +556,7 @@ export interface IVoter extends BaseContract {
 
   killGauge: TypedContractMethod<[_gauge: AddressLike], [void], "nonpayable">;
 
-  lastVoted: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  lastVoted: TypedContractMethod<[user: AddressLike], [bigint], "view">;
 
   length: TypedContractMethod<[], [bigint], "view">;
 
@@ -640,11 +564,11 @@ export interface IVoter extends BaseContract {
 
   notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
 
-  poke: TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;
+  poke: TypedContractMethod<[], [void], "nonpayable">;
 
   poolForGauge: TypedContractMethod<[gauge: AddressLike], [string], "view">;
 
-  reset: TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;
+  reset: TypedContractMethod<[], [void], "nonpayable">;
 
   reviveGauge: TypedContractMethod<[_gauge: AddressLike], [void], "nonpayable">;
 
@@ -666,6 +590,10 @@ export interface IVoter extends BaseContract {
     "nonpayable"
   >;
 
+  strategyManager: TypedContractMethod<[], [string], "view">;
+
+  team: TypedContractMethod<[], [string], "view">;
+
   totalWeight: TypedContractMethod<[], [bigint], "view">;
 
   "updateFor(address)": TypedContractMethod<
@@ -686,35 +614,23 @@ export interface IVoter extends BaseContract {
     "nonpayable"
   >;
 
-  usedWeights: TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  usedWeights: TypedContractMethod<[user: AddressLike], [bigint], "view">;
 
   vault: TypedContractMethod<[], [string], "view">;
 
-  ve: TypedContractMethod<[], [string], "view">;
-
   vote: TypedContractMethod<
-    [
-      _tokenId: BigNumberish,
-      _poolVote: AddressLike[],
-      _weights: BigNumberish[]
-    ],
+    [_poolVote: AddressLike[], _weights: BigNumberish[]],
     [void],
     "nonpayable"
   >;
 
   votes: TypedContractMethod<
-    [tokenId: BigNumberish, pool: AddressLike],
+    [user: AddressLike, pool: AddressLike],
     [bigint],
     "view"
   >;
 
   weights: TypedContractMethod<[pool: AddressLike], [bigint], "view">;
-
-  whitelistNFT: TypedContractMethod<
-    [_tokenId: BigNumberish, _bool: boolean],
-    [void],
-    "nonpayable"
-  >;
 
   whitelistToken: TypedContractMethod<
     [_token: AddressLike, _bool: boolean],
@@ -726,13 +642,6 @@ export interface IVoter extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
-  getFunction(
-    nameOrSignature: "claimBribes"
-  ): TypedContractMethod<
-    [_bribes: AddressLike[], _tokens: AddressLike[][], _tokenId: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
   getFunction(
     nameOrSignature: "claimRewards"
   ): TypedContractMethod<[_gauges: AddressLike[]], [void], "nonpayable">;
@@ -766,9 +675,6 @@ export interface IVoter extends BaseContract {
     nameOrSignature: "forwarder"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "gaugeToBribe"
-  ): TypedContractMethod<[gauge: AddressLike], [string], "view">;
-  getFunction(
     nameOrSignature: "gauges"
   ): TypedContractMethod<[pool: AddressLike], [string], "view">;
   getFunction(
@@ -781,9 +687,6 @@ export interface IVoter extends BaseContract {
     nameOrSignature: "isGauge"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
-    nameOrSignature: "isWhitelistedNFT"
-  ): TypedContractMethod<[tokenId: BigNumberish], [boolean], "view">;
-  getFunction(
     nameOrSignature: "isWhitelistedToken"
   ): TypedContractMethod<[token: AddressLike], [boolean], "view">;
   getFunction(
@@ -791,7 +694,7 @@ export interface IVoter extends BaseContract {
   ): TypedContractMethod<[_gauge: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "lastVoted"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "length"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -803,13 +706,13 @@ export interface IVoter extends BaseContract {
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
     nameOrSignature: "poke"
-  ): TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "poolForGauge"
   ): TypedContractMethod<[gauge: AddressLike], [string], "view">;
   getFunction(
     nameOrSignature: "reset"
-  ): TypedContractMethod<[_tokenId: BigNumberish], [void], "nonpayable">;
+  ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "reviveGauge"
   ): TypedContractMethod<[_gauge: AddressLike], [void], "nonpayable">;
@@ -826,6 +729,12 @@ export interface IVoter extends BaseContract {
   getFunction(
     nameOrSignature: "setMaxVotingNum"
   ): TypedContractMethod<[_maxVotingNum: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "strategyManager"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "team"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "totalWeight"
   ): TypedContractMethod<[], [bigint], "view">;
@@ -844,39 +753,27 @@ export interface IVoter extends BaseContract {
   ): TypedContractMethod<[_gauges: AddressLike[]], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "usedWeights"
-  ): TypedContractMethod<[tokenId: BigNumberish], [bigint], "view">;
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "vault"
   ): TypedContractMethod<[], [string], "view">;
-  getFunction(nameOrSignature: "ve"): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "vote"
   ): TypedContractMethod<
-    [
-      _tokenId: BigNumberish,
-      _poolVote: AddressLike[],
-      _weights: BigNumberish[]
-    ],
+    [_poolVote: AddressLike[], _weights: BigNumberish[]],
     [void],
     "nonpayable"
   >;
   getFunction(
     nameOrSignature: "votes"
   ): TypedContractMethod<
-    [tokenId: BigNumberish, pool: AddressLike],
+    [user: AddressLike, pool: AddressLike],
     [bigint],
     "view"
   >;
   getFunction(
     nameOrSignature: "weights"
   ): TypedContractMethod<[pool: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "whitelistNFT"
-  ): TypedContractMethod<
-    [_tokenId: BigNumberish, _bool: boolean],
-    [void],
-    "nonpayable"
-  >;
   getFunction(
     nameOrSignature: "whitelistToken"
   ): TypedContractMethod<
@@ -935,13 +832,6 @@ export interface IVoter extends BaseContract {
     VotedEvent.OutputObject
   >;
   getEvent(
-    key: "WhitelistNFT"
-  ): TypedContractEvent<
-    WhitelistNFTEvent.InputTuple,
-    WhitelistNFTEvent.OutputTuple,
-    WhitelistNFTEvent.OutputObject
-  >;
-  getEvent(
     key: "WhitelistToken"
   ): TypedContractEvent<
     WhitelistTokenEvent.InputTuple,
@@ -950,7 +840,7 @@ export interface IVoter extends BaseContract {
   >;
 
   filters: {
-    "Abstained(address,address,uint256,uint256,uint256,uint256)": TypedContractEvent<
+    "Abstained(address,address,uint256,uint256,uint256)": TypedContractEvent<
       AbstainedEvent.InputTuple,
       AbstainedEvent.OutputTuple,
       AbstainedEvent.OutputObject
@@ -972,7 +862,7 @@ export interface IVoter extends BaseContract {
       DistributeRewardEvent.OutputObject
     >;
 
-    "GaugeCreated(address,address,address,address,address,address,address)": TypedContractEvent<
+    "GaugeCreated(address,address,address,address,address)": TypedContractEvent<
       GaugeCreatedEvent.InputTuple,
       GaugeCreatedEvent.OutputTuple,
       GaugeCreatedEvent.OutputObject
@@ -1016,7 +906,7 @@ export interface IVoter extends BaseContract {
       NotifyRewardEvent.OutputObject
     >;
 
-    "Voted(address,address,uint256,uint256,uint256,uint256)": TypedContractEvent<
+    "Voted(address,address,uint256,uint256,uint256)": TypedContractEvent<
       VotedEvent.InputTuple,
       VotedEvent.OutputTuple,
       VotedEvent.OutputObject
@@ -1025,17 +915,6 @@ export interface IVoter extends BaseContract {
       VotedEvent.InputTuple,
       VotedEvent.OutputTuple,
       VotedEvent.OutputObject
-    >;
-
-    "WhitelistNFT(address,uint256,bool)": TypedContractEvent<
-      WhitelistNFTEvent.InputTuple,
-      WhitelistNFTEvent.OutputTuple,
-      WhitelistNFTEvent.OutputObject
-    >;
-    WhitelistNFT: TypedContractEvent<
-      WhitelistNFTEvent.InputTuple,
-      WhitelistNFTEvent.OutputTuple,
-      WhitelistNFTEvent.OutputObject
     >;
 
     "WhitelistToken(address,address,bool)": TypedContractEvent<

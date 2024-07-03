@@ -2,15 +2,14 @@
 pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IReward} from "../interfaces/IReward.sol";
 import {IGauge} from "../interfaces/IGauge.sol";
 import {IVoter} from "../interfaces/IVoter.sol";
-import {IVotingEscrow} from "../interfaces/IVotingEscrow.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {ProtocolTimeLibrary} from "../libraries/ProtocolTimeLibrary.sol";
+import {IStrategyManager} from "../interfaces/IStrategyManager.sol";
 
 /// @title Protocol Gauge
 /// @author veldorome.finance, @figs999, @pegahcarter
@@ -21,8 +20,6 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   address public immutable stakingToken;
   /// @inheritdoc IGauge
   address public immutable voter;
-  /// @inheritdoc IGauge
-  address public immutable ve;
 
   uint256 internal constant DURATION = 7 days; // rewards are released over 7 days
   uint256 internal constant PRECISION = 10 ** 18;
@@ -49,7 +46,6 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
-    ve = IVoter(voter).ve();
   }
 
   /// @inheritdoc IGauge
@@ -152,7 +148,7 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   function notifyRewardWithoutClaim() external payable nonReentrant {
     address sender = _msgSender();
     uint256 _amount = msg.value;
-    if (sender != IVotingEscrow(ve).team()) revert NotTeam();
+    if (sender != IVoter(voter).team()) revert NotTeam();
     if (_amount == 0) revert ZeroAmount();
     _notifyRewardAmount(sender, _amount);
   }

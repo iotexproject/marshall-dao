@@ -21,9 +21,6 @@ interface IGauge {
   /// @notice Address of Protocol Voter
   function voter() external view returns (address);
 
-  /// @notice Address of Protocol Voting Escrow
-  function ve() external view returns (address);
-
   /// @notice Timestamp end of current rewards period
   function periodFinish() external view returns (uint256);
 

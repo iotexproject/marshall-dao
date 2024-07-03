@@ -2,4 +2,3 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as proxy from "./proxy";
-export * as security from "./security";

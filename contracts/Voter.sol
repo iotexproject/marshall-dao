@@ -6,13 +6,12 @@ import {IVotingRewardsFactory} from "./interfaces/factories/IVotingRewardsFactor
 import {IGauge} from "./interfaces/IGauge.sol";
 import {IGaugeFactory} from "./interfaces/factories/IGaugeFactory.sol";
 import {IVault} from "./interfaces/IVault.sol";
-import {IReward} from "./interfaces/IReward.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
-import {IVotingEscrow} from "./interfaces/IVotingEscrow.sol";
 import {IFactoryRegistry} from "./interfaces/factories/IFactoryRegistry.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {ProtocolTimeLibrary} from "./libraries/ProtocolTimeLibrary.sol";
+import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 
 /// @title Protocol Voter
 /// @author velodrome.finance, @figs999, @pegahcarter
@@ -22,7 +21,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVoter
   address public immutable forwarder;
   /// @inheritdoc IVoter
-  address public immutable ve;
+  address public strategyManager;
+
   /// @inheritdoc IVoter
   address public immutable factoryRegistry;
   /// @notice Rewards are released over 7 days
@@ -33,6 +33,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   address public governor;
   /// @inheritdoc IVoter
   address public emergencyCouncil;
+  /// @inheritdoc IVoter
+  address public team;
 
   /// @inheritdoc IVoter
   uint256 public totalWeight;
@@ -47,23 +49,19 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVoter
   mapping(address => address) public poolForGauge;
   /// @inheritdoc IVoter
-  mapping(address => address) public gaugeToBribe;
-  /// @inheritdoc IVoter
   mapping(address => uint256) public weights;
   /// @inheritdoc IVoter
-  mapping(uint256 => mapping(address => uint256)) public votes;
-  /// @dev NFT => List of pools voted for by NFT
-  mapping(uint256 => address[]) public poolVote;
+  mapping(address => mapping(address => uint256)) public votes;
+  /// @dev NFT => List of pools voted for by address
+  mapping(address => address[]) public poolVote;
   /// @inheritdoc IVoter
-  mapping(uint256 => uint256) public usedWeights;
+  mapping(address => uint256) public usedWeights;
   /// @inheritdoc IVoter
-  mapping(uint256 => uint256) public lastVoted;
+  mapping(address => uint256) public lastVoted;
   /// @inheritdoc IVoter
   mapping(address => bool) public isGauge;
   /// @inheritdoc IVoter
   mapping(address => bool) public isWhitelistedToken;
-  /// @inheritdoc IVoter
-  mapping(uint256 => bool) public isWhitelistedNFT;
   /// @inheritdoc IVoter
   mapping(address => bool) public isAlive;
   /// @dev Accumulated distributions per vote
@@ -73,20 +71,21 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVoter
   mapping(address => uint256) public claimable;
 
-  constructor(address _forwarder, address _ve, address _factoryRegistry) ERC2771Context(_forwarder) {
+  constructor(address _forwarder, address _strategyManager, address _factoryRegistry) ERC2771Context(_forwarder) {
     forwarder = _forwarder;
-    ve = _ve;
+    strategyManager = _strategyManager;
     factoryRegistry = _factoryRegistry;
     address _sender = _msgSender();
     vault = _sender;
     governor = _sender;
+    team = _sender;
     emergencyCouncil = _sender;
     maxVotingNum = 30;
   }
 
-  modifier onlyNewEpoch(uint256 _tokenId) {
+  modifier onlyNewEpoch(address user) {
     // ensure new epoch since last vote
-    if (ProtocolTimeLibrary.epochStart(block.timestamp) <= lastVoted[_tokenId]) revert AlreadyVotedOrDeposited();
+    if (ProtocolTimeLibrary.epochStart(block.timestamp) <= lastVoted[user]) revert AlreadyVotedOrDeposited();
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
     _;
   }
@@ -140,55 +139,54 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function reset(uint256 _tokenId) external onlyNewEpoch(_tokenId) nonReentrant {
-    if (!IVotingEscrow(ve).isApprovedOrOwner(msg.sender, _tokenId)) revert NotApprovedOrOwner();
-    _reset(_tokenId);
+  function reset() external onlyNewEpoch(msg.sender) nonReentrant {
+    address _user = msg.sender;
+    _reset(_user);
   }
 
-  function _reset(uint256 _tokenId) internal {
-    address[] storage _poolVote = poolVote[_tokenId];
+  function _reset(address _user) internal {
+    address[] storage _poolVote = poolVote[_user];
     uint256 _poolVoteCnt = _poolVote.length;
     uint256 _totalWeight = 0;
 
     for (uint256 i = 0; i < _poolVoteCnt; i++) {
       address _pool = _poolVote[i];
-      uint256 _votes = votes[_tokenId][_pool];
+      uint256 _votes = votes[_user][_pool];
 
       if (_votes != 0) {
         _updateFor(gauges[_pool]);
         weights[_pool] -= _votes;
-        delete votes[_tokenId][_pool];
-        IReward(gaugeToBribe[gauges[_pool]])._withdraw(_votes, _tokenId);
+        delete votes[_user][_pool];
         _totalWeight += _votes;
-        emit Abstained(_msgSender(), _pool, _tokenId, _votes, weights[_pool], block.timestamp);
+        emit Abstained(_msgSender(), _pool, _votes, weights[_pool], block.timestamp);
       }
     }
-    IVotingEscrow(ve).voting(_tokenId, false);
     totalWeight -= _totalWeight;
-    usedWeights[_tokenId] = 0;
-    delete poolVote[_tokenId];
+    usedWeights[_user] = 0;
+    delete poolVote[_user];
   }
 
   /// @inheritdoc IVoter
-  function poke(uint256 _tokenId) external nonReentrant {
+  function poke() external nonReentrant {
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
-    uint256 _weight = IVotingEscrow(ve).balanceOfNFT(_tokenId);
-    _poke(_tokenId, _weight);
+    address _sender = msg.sender;
+    uint256 _weight = IStrategyManager(strategyManager).shares(_sender);
+    _poke(_sender, _weight);
   }
 
-  function _poke(uint256 _tokenId, uint256 _weight) internal {
-    address[] memory _poolVote = poolVote[_tokenId];
+  function _poke(address _voter, uint256 _weight) internal {
+    address[] memory _poolVote = poolVote[_voter];
     uint256 _poolCnt = _poolVote.length;
     uint256[] memory _weights = new uint256[](_poolCnt);
 
     for (uint256 i = 0; i < _poolCnt; i++) {
-      _weights[i] = votes[_tokenId][_poolVote[i]];
+      _weights[i] = votes[_voter][_poolVote[i]];
     }
-    _vote(_tokenId, _weight, _poolVote, _weights);
+    _vote(_voter, _weight, _poolVote, _weights);
   }
 
-  function _vote(uint256 _tokenId, uint256 _weight, address[] memory _poolVote, uint256[] memory _weights) internal {
-    _reset(_tokenId);
+  function _vote(address _voter, uint256 _weight, address[] memory _poolVote, uint256[] memory _weights) internal {
+    _reset(_voter);
     uint256 _poolCnt = _poolVote.length;
     uint256 _totalVoteWeight = 0;
     uint256 _totalWeight = 0;
@@ -206,41 +204,36 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
       if (isGauge[_gauge]) {
         uint256 _poolWeight = (_weights[i] * _weight) / _totalVoteWeight;
-        if (votes[_tokenId][_pool] != 0) revert NonZeroVotes();
+        if (votes[_voter][_pool] != 0) revert NonZeroVotes();
         if (_poolWeight == 0) revert ZeroBalance();
         _updateFor(_gauge);
 
-        poolVote[_tokenId].push(_pool);
+        poolVote[_voter].push(_pool);
 
         weights[_pool] += _poolWeight;
-        votes[_tokenId][_pool] += _poolWeight;
-        IReward(gaugeToBribe[_gauge])._deposit(_poolWeight, _tokenId);
+        votes[_voter][_pool] += _poolWeight;
         _usedWeight += _poolWeight;
         _totalWeight += _poolWeight;
-        emit Voted(_msgSender(), _pool, _tokenId, _poolWeight, weights[_pool], block.timestamp);
+        emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
       }
     }
-    if (_usedWeight > 0) IVotingEscrow(ve).voting(_tokenId, true);
     totalWeight += _totalWeight;
-    usedWeights[_tokenId] = _usedWeight;
+    usedWeights[_voter] = _usedWeight;
   }
 
   /// @inheritdoc IVoter
   function vote(
-    uint256 _tokenId,
     address[] calldata _poolVote,
     uint256[] calldata _weights
-  ) external onlyNewEpoch(_tokenId) nonReentrant {
-    address _sender = _msgSender();
-    if (!IVotingEscrow(ve).isApprovedOrOwner(_sender, _tokenId)) revert NotApprovedOrOwner();
+  ) external onlyNewEpoch(msg.sender) nonReentrant {
+    address _voter = msg.sender;
     if (_poolVote.length != _weights.length) revert UnequalLengths();
     if (_poolVote.length > maxVotingNum) revert TooManyPools();
     uint256 _timestamp = block.timestamp;
-    if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp)) && !isWhitelistedNFT[_tokenId])
-      revert NotWhitelistedNFT();
-    lastVoted[_tokenId] = _timestamp;
-    uint256 _weight = IVotingEscrow(ve).balanceOfNFT(_tokenId);
-    _vote(_tokenId, _weight, _poolVote, _weights);
+    if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp))) revert EpochVoteEnd();
+    lastVoted[_voter] = _timestamp;
+    uint256 _weight = IStrategyManager(strategyManager).shares(_voter);
+    _vote(_voter, _weight, _poolVote, _weights);
   }
 
   /// @inheritdoc IVoter
@@ -255,30 +248,17 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function whitelistNFT(uint256 _tokenId, bool _bool) external {
-    address _sender = _msgSender();
-    if (_sender != governor) revert NotGovernor();
-    isWhitelistedNFT[_tokenId] = _bool;
-    emit WhitelistNFT(_sender, _tokenId, _bool);
-  }
-
-  /// @inheritdoc IVoter
   function createGauge(address _poolFactory, address _pool) external nonReentrant returns (address) {
     address sender = _msgSender();
     if (gauges[_pool] != address(0)) revert GaugeExists();
 
-    (address votingRewardsFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
-      _poolFactory
-    );
+    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
     if (sender != governor) {
       if (!isWhitelistedToken[_pool]) revert NotWhitelistedToken();
     }
 
-    address _bribeVotingReward = IVotingRewardsFactory(votingRewardsFactory).createRewards(forwarder, _pool);
-
     address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
 
-    gaugeToBribe[_gauge] = _bribeVotingReward;
     gauges[_pool] = _gauge;
     poolForGauge[_gauge] = _pool;
     isGauge[_gauge] = true;
@@ -286,7 +266,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     _updateFor(_gauge);
     pools.push(_pool);
 
-    emit GaugeCreated(_poolFactory, votingRewardsFactory, gaugeFactory, _pool, _bribeVotingReward, _gauge, sender);
+    emit GaugeCreated(_poolFactory, gaugeFactory, _pool, _gauge, sender);
     return _gauge;
   }
 
@@ -375,15 +355,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
       IGauge(_gauges[i]).getReward(_msgSender());
-    }
-  }
-
-  /// @inheritdoc IVoter
-  function claimBribes(address[] memory _bribes, address[][] memory _tokens, uint256 _tokenId) external {
-    if (!IVotingEscrow(ve).isApprovedOrOwner(_msgSender(), _tokenId)) revert NotApprovedOrOwner();
-    uint256 _length = _bribes.length;
-    for (uint256 i = 0; i < _length; i++) {
-      IReward(_bribes[i]).getReward(_tokenId, _tokens[i]);
     }
   }
 
