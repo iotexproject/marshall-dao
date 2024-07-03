@@ -73,6 +73,7 @@ export interface IVoterInterface extends Interface {
       | "GaugeKilled"
       | "GaugeRevived"
       | "NotifyReward"
+      | "UpdateFor"
       | "Voted"
       | "WhitelistToken"
   ): EventFragment;
@@ -408,6 +409,24 @@ export namespace NotifyRewardEvent {
   export interface OutputObject {
     sender: string;
     amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace UpdateForEvent {
+  export type InputTuple = [
+    gauge: AddressLike,
+    share: BigNumberish,
+    delta: BigNumberish
+  ];
+  export type OutputTuple = [gauge: string, share: bigint, delta: bigint];
+  export interface OutputObject {
+    gauge: string;
+    share: bigint;
+    delta: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -825,6 +844,13 @@ export interface IVoter extends BaseContract {
     NotifyRewardEvent.OutputObject
   >;
   getEvent(
+    key: "UpdateFor"
+  ): TypedContractEvent<
+    UpdateForEvent.InputTuple,
+    UpdateForEvent.OutputTuple,
+    UpdateForEvent.OutputObject
+  >;
+  getEvent(
     key: "Voted"
   ): TypedContractEvent<
     VotedEvent.InputTuple,
@@ -904,6 +930,17 @@ export interface IVoter extends BaseContract {
       NotifyRewardEvent.InputTuple,
       NotifyRewardEvent.OutputTuple,
       NotifyRewardEvent.OutputObject
+    >;
+
+    "UpdateFor(address,uint256,uint256)": TypedContractEvent<
+      UpdateForEvent.InputTuple,
+      UpdateForEvent.OutputTuple,
+      UpdateForEvent.OutputObject
+    >;
+    UpdateFor: TypedContractEvent<
+      UpdateForEvent.InputTuple,
+      UpdateForEvent.OutputTuple,
+      UpdateForEvent.OutputObject
     >;
 
     "Voted(address,address,uint256,uint256,uint256)": TypedContractEvent<

@@ -315,6 +315,31 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
+        name: "gauge",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "share",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "delta",
+        type: "uint256",
+      },
+    ],
+    name: "UpdateFor",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
         name: "voter",
         type: "address",
       },

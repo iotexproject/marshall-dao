@@ -10,10 +10,8 @@ See [SPECIFICATION.md](./SPECIFICATION.md) for more detail.
 
 | Filename | Description |
 | --- | --- |
-| `VotingEscrow.sol` | Protocol ERC-721 (ve)NFT representing the protocol vote-escrow lock. Beyond standard ve-type functions, there is also the ability to merge and split nfts. And support $IOTX, $stIOTX and native staked buckets create ve. |
 | `Vault.sol` | Protocol token Vault. Distributes emissions to `Voter.sol` and distribute to `RewardsDistributor.sol`. The vault also can accept donate from other projects. |
 | `RewardsDistributor.sol` | Is used to handle the distribution for (ve)NFTs/lockers. |
-| `VeArtProxy.sol` | (ve)NFT art proxy contract, exists for upgradability purposes |
 
 #### Protocol mechanics contracts
 
@@ -21,52 +19,32 @@ See [SPECIFICATION.md](./SPECIFICATION.md) for more detail.
 | --- | --- |
 | `Voter.sol` | Handles votes for the current epoch, gauge and voting reward creation as well as emission distribution to `Gauge.sol` contracts. |
 | `Gauge.sol` | Gauges are attached to a Pool and based on the (ve)NFT votes it receives, it distributes proportional emissions in the form of protocol tokens. Deposits to the gauge take the form of LP tokens for the Pool. In exchange for receiving protocol emissions, claims on fees from the pool are relinquished to the gauge. Standard rewards contract. |
-| `rewards/` | |
-| `Reward.sol` | Base reward contract to be inherited for distribution of rewards to stakers.
-| `VotingReward.sol` | Rewards contracts used by `BribeVotingReward.sol` which inherits `Reward.sol`. Rewards are distributed in the following epoch proportionally based on the last checkpoint created by the user, and are earned through "voting" for a pool or gauge. |
-| `BribeVotingReward.sol` | Stores the users/externally provided rewards for the current voting epoch to it's voters. These are deposited externally every week. |
 
-#### Governance contracts
-
-| Filename | Description |
-| --- | --- |
-| `MarshallGovernor.sol` | OpenZeppelin's Governor contracts used in protocol-wide access control to whitelist tokens for gauges within Marshall DAO, and update minting emissions. |
 
 ### Deployment
 
 #### Testnet
 
 ```
-LST Token: 0x180dC617701A507239659215D19FA142eD3B91A7
-Forwarder deployed to 0xcaf680C79bc8375bF7B221710C3196848c4c7407
-BalanceLogicLibrary deployed to 0x97d27CC3d84c0a49Cc0289f9f0BA519dD6549641
-DelegationLogicLibrary deployed to 0x2c7862C0D2dE3deDaf324745A13a64733E80868a
-VotingEscrow deployed to 0x313A05E0CE2D559793350d6afa7b7e1d5D2Ec21e
-VeArtProxy deployed to 0x670A3F4875A1fD8176dEDA0b0227f7ff7Cb5e1EB
-MarshallGovernor deployed to 0x2aA69bdae4A8b68DC7782492ad4DbC4aB44eF6f6
-EmptyPoolFactory deployed to 0x3AD7F5C76499CEa84b3554bA9564F5EA14b4ab1A
-VotingRewardsFactory deployed to 0x23B0a499f782f1C5E66cc3C6faF7dFEf1cdB5a70
-GaugeFactory deployed to 0x8d69D02DA627F4386675E0DF7E6b3A6F85cB0cd7
-FactoryRegistry deployed to 0xAf4d71cd7947468ee1b383f5360ee8d391a0862a
-Voter deployed to 0x8f22A8fD3B525A827E57961b8981f4f463a17420
-RewardsDistributor deployed to 0x0ee041ed5d32C0d10E6B1abf6Ac5c4BF01e0a866
-Vault deployed to 0x58cCdd725EEb53efd4465a06354312D9fd9B3dbD
+StrategyManager deployed to 0xEa0e85eE83c176b166c83A0dC20abA59ef80f864
+Forwarder deployed to 0xbB75b4f49529e217C60B762Cc5bEd9e418142f98
+EmptyPoolFactory deployed to 0xA88958078085b1662FB4f5B7f992F76781917F13
+GaugeFactory deployed to 0x9F8e01ba4A996152bdd48cE4BF6e6fD3A79b9149
+FactoryRegistry deployed to 0x37adcCFc183030cFA8AC696c04711cC4a1401de1
+Voter deployed to 0x34c18bccE72C7FD891F6aBB54874F1a5067C86cc
+RewardsDistributor deployed to 0xCDBcBF82fE1534b54A2B55FA45Df0CD0C940fd8a
+Vault deployed to 0xC79Ceda1244Fc91472800E9e245C9c8014E95284
 ```
 
 #### Mainnet
 
 ```
-Forwarder deployed to 0x9E6789DBAD3BBAe804414bE53a35d47b95Ebd646
-BalanceLogicLibrary deployed to 0xc1524F19476496A3bFd62F6AC230C09C255F7dF8
-DelegationLogicLibrary deployed to 0x6FD19239d1018aCc89251060f9D1CEEa68ee0987
-VotingEscrow deployed to 0x0f502d9b38D2fDF687f411C6ADaE565F16c56Cb8
-VeArtProxy deployed to 0xe0c3416DcE876Fa04Ed9a2E332b3c420F8B5E9a3
-MarshallGovernor deployed to 0xc7761C75970C196CF888552DeAFd9128a3116bae
-EmptyPoolFactory deployed to 0x4eB49c8fB8b3A7771f924375111E890bef22E682
-VotingRewardsFactory deployed to 0xeB9927669a58FC22219a60bf13560b85cc842545
-GaugeFactory deployed to 0xF5e8142889a49b34505CF61a685090D7BCcF7384
-FactoryRegistry deployed to 0x149fcF5fb81E41a774F84d2d48996Bd5D9A422eA
-Voter deployed to 0xe29B18F7f1237Cf7A681c87B1c9D9A10a996176C
-RewardsDistributor deployed to 0x182ED2202b1F1024849C74ea4739Abc8adD1466B
-Vault deployed to 0x6382366Dd7A612e98663AF1e6826b272C815c8D9
+Forwarder deployed to 
+EmptyPoolFactory deployed to 
+VotingRewardsFactory deployed to 
+GaugeFactory deployed to 
+FactoryRegistry deployed to 
+Voter deployed to 
+RewardsDistributor deployed to 
+Vault deployed to 
 ```
