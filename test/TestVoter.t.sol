@@ -140,10 +140,7 @@ contract TestVoter is Test {
     // 3. distribute emission from vault to voter
     voter.distribute(0, 1);
 
-    // 4. update for special gauge
-    voter.updateFor(gauge);
-
-    // 5. user deposit lp to gauge
+    // 4. user deposit lp to gauge
     pool.approve(gauge, 3 ether);
     IGauge(gauge).deposit(1 ether);
 
