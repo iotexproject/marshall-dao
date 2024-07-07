@@ -29,6 +29,8 @@ async function main() {
     console.log("gaugeFactory in factoryRegistry is:", gauge);
     const factories = await factoryRegistry.poolFactories();
     console.log("factories in factoryRegistry is:", factories);
+    const deploy_gauge = await voter.gauges( process.env.LST_POOL1);
+    console.log("deploy gauge: ", deploy_gauge);
 
     try {
         console.log("Calling createGauge with parameters:", process.env.EMPTY_FACTORY, process.env.LST_POOL1);

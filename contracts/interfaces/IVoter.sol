@@ -120,6 +120,9 @@ interface IVoter {
   /// @notice Called by users to update voting balances in voting rewards contracts.
   function poke() external;
 
+  /// @notice Called to update voting balances in voting rewards contracts.
+  function poke(address _user) external;
+
   /// @notice Called by users to vote for pools. Votes distributed proportionally based on weights.
   ///         Can only vote or deposit into once per epoch.
   ///         Can only vote for gauges that have not been killed.

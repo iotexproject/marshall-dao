@@ -174,6 +174,12 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     _poke(_sender, _weight);
   }
 
+  function poke(address _user) external{
+    if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
+    uint256 _weight = IStrategyManager(strategyManager).shares(_user);
+    _poke(_user, _weight);
+  }
+
   function _poke(address _voter, uint256 _weight) internal {
     address[] memory _poolVote = poolVote[_voter];
     uint256 _poolCnt = _poolVote.length;
