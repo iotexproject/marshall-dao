@@ -100,6 +100,9 @@ interface IVoter {
   /// @dev Gauge => Amount claimable
   function claimable(address gauge) external view returns (uint256);
 
+  /// @dev Gauge ==> Ratio
+  function ratios(address gauge) external view returns (uint256);
+
   /// @notice Number of pools with a Gauge
   function length() external view returns (uint256);
 

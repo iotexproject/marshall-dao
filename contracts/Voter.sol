@@ -70,6 +70,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) internal supplyIndex;
   /// @inheritdoc IVoter
   mapping(address => uint256) public claimable;
+  /// @inheritdoc IVoter
+  mapping(address => uint256) public ratios;
 
   constructor(address _forwarder, address _strategyManager, address _factoryRegistry) ERC2771Context(_forwarder) {
     forwarder = _forwarder;
@@ -353,6 +355,21 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       }
     } else {
       supplyIndex[_gauge] = index; // new users are set to the default global state
+    }
+  }
+
+  function updateByRatio(address _gauge, uint256 _ratio) external {
+    if (_msgSender() != governor) revert NotGovernor();
+
+    _updateFor(_gauge);
+    uint256 oldRatio = ratios[_gauge];
+    if (oldRatio > 0){
+      address _pool = poolForGauge[_gauge];
+      uint256 _oldSupplied = weights[_pool];
+      uint256 _newSupplied = _oldSupplied * _ratio / oldRatio;
+      ratios[_gauge] = _newSupplied;
+    }else{
+      ratios[_gauge] = _ratio;
     }
   }
 
