@@ -151,5 +151,54 @@ contract TestVoter is Test {
     voter.claimRewards(gauges);
   }
 
+  function test_ratio() external {
+    // 1. create 2 gauge
+    TestToken pool_2 = new TestToken("test-pool-2", "pool_2");
+    voter.createGauge(poolFactory, address(pool));
+    voter.createGauge(poolFactory, address(pool_2));
+    address gauge_1 = voter.gauges(address(pool));
+    address gauge_2 = voter.gauges(address(pool_2));
+
+    // 2. set shares to strategyManager&vote gauges
+    strategyManager.setShare(address(this), 1000);
+    address[] memory poolvote = new address[](2);
+    uint256[] memory weights = new uint256[](2);
+    poolvote[0] = address(pool);
+    poolvote[1] = address(pool_2);
+    weights[0] = 40;
+    weights[1] = 60;
+    skip(8 days);
+    voter.vote(poolvote, weights);
+    assertEq(400, voter.weights(address(pool)));
+    assertEq(600, voter.weights(address(pool_2)));
+
+    // 3. update ratios of first
+    vm.prank(address(strategyManager));
+    voter.updateByRatio(gauge_1, 20);
+    assertEq(20, voter.ratios(gauge_1));
+    assertEq(400, voter.weights(address(pool)));
+
+    // 4. update ratios of second
+    vm.prank(address(strategyManager));
+    voter.updateByRatio(gauge_1, 40);
+    assertEq(40, voter.ratios(gauge_1));
+    assertEq(800, voter.weights(address(pool)));
+    assertEq(600, voter.weights(address(pool_2)));
+
+    // 5. update ratios of gauge_2
+    vm.prank(address(strategyManager));
+    voter.updateByRatio(gauge_2, 60);
+    assertEq(60, voter.ratios(gauge_2));
+    assertEq(600, voter.weights(address(pool_2)));
+
+    // 6. update ratios of gauge_2 again
+    vm.prank(address(strategyManager));
+    voter.updateByRatio(gauge_2, 30);
+    assertEq(30, voter.ratios(gauge_2));
+    assertEq(800, voter.weights(address(pool)));
+    assertEq(300, voter.weights(address(pool_2)));
+
+  }
+
   receive() external payable {}
 }

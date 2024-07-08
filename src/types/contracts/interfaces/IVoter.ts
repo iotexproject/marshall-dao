@@ -44,8 +44,10 @@ export interface IVoterInterface extends Interface {
       | "length"
       | "maxVotingNum"
       | "notifyRewardAmount"
-      | "poke"
+      | "poke()"
+      | "poke(address)"
       | "poolForGauge"
+      | "ratios"
       | "reset"
       | "reviveGauge"
       | "setEmergencyCouncil"
@@ -138,11 +140,16 @@ export interface IVoterInterface extends Interface {
     functionFragment: "notifyRewardAmount",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "poke", values?: undefined): string;
+  encodeFunctionData(functionFragment: "poke()", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "poke(address)",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "poolForGauge",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "ratios", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "reset", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "reviveGauge",
@@ -248,11 +255,16 @@ export interface IVoterInterface extends Interface {
     functionFragment: "notifyRewardAmount",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "poke", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "poke()", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "poke(address)",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "poolForGauge",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "ratios", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "reset", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "reviveGauge",
@@ -583,9 +595,17 @@ export interface IVoter extends BaseContract {
 
   notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
 
-  poke: TypedContractMethod<[], [void], "nonpayable">;
+  "poke()": TypedContractMethod<[], [void], "nonpayable">;
+
+  "poke(address)": TypedContractMethod<
+    [_user: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   poolForGauge: TypedContractMethod<[gauge: AddressLike], [string], "view">;
+
+  ratios: TypedContractMethod<[gauge: AddressLike], [bigint], "view">;
 
   reset: TypedContractMethod<[], [void], "nonpayable">;
 
@@ -724,11 +744,17 @@ export interface IVoter extends BaseContract {
     nameOrSignature: "notifyRewardAmount"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
-    nameOrSignature: "poke"
+    nameOrSignature: "poke()"
   ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "poke(address)"
+  ): TypedContractMethod<[_user: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "poolForGauge"
   ): TypedContractMethod<[gauge: AddressLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "ratios"
+  ): TypedContractMethod<[gauge: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "reset"
   ): TypedContractMethod<[], [void], "nonpayable">;

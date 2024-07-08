@@ -176,7 +176,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     _poke(_sender, _weight);
   }
 
-  function poke(address _user) external{
+  function poke(address _user) external {
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
     uint256 _weight = IStrategyManager(strategyManager).shares(_user);
     _poke(_user, _weight);
@@ -359,16 +359,17 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   function updateByRatio(address _gauge, uint256 _ratio) external {
-    if (_msgSender() != governor) revert NotGovernor();
+    if (_msgSender() != strategyManager) revert NotStrategyManager();
 
     _updateFor(_gauge);
     uint256 oldRatio = ratios[_gauge];
-    if (oldRatio > 0){
+    if (oldRatio > 0) {
       address _pool = poolForGauge[_gauge];
       uint256 _oldSupplied = weights[_pool];
-      uint256 _newSupplied = _oldSupplied * _ratio / oldRatio;
-      ratios[_gauge] = _newSupplied;
-    }else{
+      uint256 _newSupplied = (_oldSupplied * _ratio) / oldRatio;
+      ratios[_gauge] = _ratio;
+      weights[_pool] = _newSupplied;
+    } else {
       ratios[_gauge] = _ratio;
     }
   }

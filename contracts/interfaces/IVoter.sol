@@ -25,6 +25,7 @@ interface IVoter {
   error ZeroBalance();
   error ZeroAddress();
   error EpochVoteEnd();
+  error NotStrategyManager();
 
   event GaugeCreated(
     address indexed poolFactory,

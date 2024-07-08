@@ -50,10 +50,12 @@ export interface VoterInterface extends Interface {
       | "length"
       | "maxVotingNum"
       | "notifyRewardAmount"
-      | "poke"
+      | "poke()"
+      | "poke(address)"
       | "poolForGauge"
       | "poolVote"
       | "pools"
+      | "ratios"
       | "reset"
       | "reviveGauge"
       | "setEmergencyCouncil"
@@ -62,6 +64,7 @@ export interface VoterInterface extends Interface {
       | "strategyManager"
       | "team"
       | "totalWeight"
+      | "updateByRatio"
       | "updateFor(address)"
       | "updateFor(uint256,uint256)"
       | "updateFor(address[])"
@@ -170,7 +173,11 @@ export interface VoterInterface extends Interface {
     functionFragment: "notifyRewardAmount",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "poke", values?: undefined): string;
+  encodeFunctionData(functionFragment: "poke()", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "poke(address)",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "poolForGauge",
     values: [AddressLike]
@@ -180,6 +187,7 @@ export interface VoterInterface extends Interface {
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "pools", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "ratios", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "reset", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "reviveGauge",
@@ -205,6 +213,10 @@ export interface VoterInterface extends Interface {
   encodeFunctionData(
     functionFragment: "totalWeight",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updateByRatio",
+    values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "updateFor(address)",
@@ -300,13 +312,18 @@ export interface VoterInterface extends Interface {
     functionFragment: "notifyRewardAmount",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "poke", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "poke()", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "poke(address)",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "poolForGauge",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "poolVote", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pools", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ratios", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "reset", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "reviveGauge",
@@ -331,6 +348,10 @@ export interface VoterInterface extends Interface {
   decodeFunctionResult(functionFragment: "team", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalWeight",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updateByRatio",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -665,7 +686,13 @@ export interface Voter extends BaseContract {
 
   notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
 
-  poke: TypedContractMethod<[], [void], "nonpayable">;
+  "poke()": TypedContractMethod<[], [void], "nonpayable">;
+
+  "poke(address)": TypedContractMethod<
+    [_user: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   poolForGauge: TypedContractMethod<[arg0: AddressLike], [string], "view">;
 
@@ -676,6 +703,8 @@ export interface Voter extends BaseContract {
   >;
 
   pools: TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+
+  ratios: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
   reset: TypedContractMethod<[], [void], "nonpayable">;
 
@@ -704,6 +733,12 @@ export interface Voter extends BaseContract {
   team: TypedContractMethod<[], [string], "view">;
 
   totalWeight: TypedContractMethod<[], [bigint], "view">;
+
+  updateByRatio: TypedContractMethod<
+    [_gauge: AddressLike, _ratio: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   "updateFor(address)": TypedContractMethod<
     [_gauge: AddressLike],
@@ -836,8 +871,11 @@ export interface Voter extends BaseContract {
     nameOrSignature: "notifyRewardAmount"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
-    nameOrSignature: "poke"
+    nameOrSignature: "poke()"
   ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "poke(address)"
+  ): TypedContractMethod<[_user: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "poolForGauge"
   ): TypedContractMethod<[arg0: AddressLike], [string], "view">;
@@ -851,6 +889,9 @@ export interface Voter extends BaseContract {
   getFunction(
     nameOrSignature: "pools"
   ): TypedContractMethod<[arg0: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "ratios"
+  ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "reset"
   ): TypedContractMethod<[], [void], "nonpayable">;
@@ -875,6 +916,13 @@ export interface Voter extends BaseContract {
   getFunction(
     nameOrSignature: "totalWeight"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "updateByRatio"
+  ): TypedContractMethod<
+    [_gauge: AddressLike, _ratio: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "updateFor(address)"
   ): TypedContractMethod<[_gauge: AddressLike], [void], "nonpayable">;

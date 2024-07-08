@@ -98,6 +98,11 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "NotStrategyManager",
+    type: "error",
+  },
+  {
+    inputs: [],
     name: "NotVault",
     type: "error",
   },
@@ -658,6 +663,19 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
+        name: "_user",
+        type: "address",
+      },
+    ],
+    name: "poke",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "gauge",
         type: "address",
       },
@@ -668,6 +686,25 @@ const _abi = [
         internalType: "address",
         name: "",
         type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "gauge",
+        type: "address",
+      },
+    ],
+    name: "ratios",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
