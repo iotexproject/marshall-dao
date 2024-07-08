@@ -358,13 +358,14 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
   }
 
-  function updateByRatio(address _gauge, uint256 _ratio) external {
+  function updateRatio(address _pool, uint256 _ratio) external {
     if (_msgSender() != strategyManager) revert NotStrategyManager();
 
+    address _gauge = gauges[_pool];
+    if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
     _updateFor(_gauge);
     uint256 oldRatio = ratios[_gauge];
     if (oldRatio > 0) {
-      address _pool = poolForGauge[_gauge];
       uint256 _oldSupplied = weights[_pool];
       uint256 _newSupplied = (_oldSupplied * _ratio) / oldRatio;
       ratios[_gauge] = _ratio;

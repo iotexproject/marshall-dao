@@ -200,4 +200,9 @@ interface IVoter {
   /// @dev Update claims to emissions for single gauge
   /// @param _gauge .
   function updateFor(address _gauge) external;
+
+  /// @dev Update ratio of pool by StrategyManager
+  /// @param _pool Strategy of address
+  /// @param _ratio new ratio will be set to gauge of the _pool
+  function updateRatio(address _pool, uint256 _ratio) external;
 }

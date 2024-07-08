@@ -174,30 +174,35 @@ contract TestVoter is Test {
 
     // 3. update ratios of first
     vm.prank(address(strategyManager));
-    voter.updateByRatio(gauge_1, 20);
+    voter.updateRatio(address(pool), 20);
     assertEq(20, voter.ratios(gauge_1));
     assertEq(400, voter.weights(address(pool)));
 
     // 4. update ratios of second
     vm.prank(address(strategyManager));
-    voter.updateByRatio(gauge_1, 40);
+    voter.updateRatio(address(pool), 40);
     assertEq(40, voter.ratios(gauge_1));
     assertEq(800, voter.weights(address(pool)));
     assertEq(600, voter.weights(address(pool_2)));
 
     // 5. update ratios of gauge_2
     vm.prank(address(strategyManager));
-    voter.updateByRatio(gauge_2, 60);
+    voter.updateRatio(address(pool_2), 60);
     assertEq(60, voter.ratios(gauge_2));
     assertEq(600, voter.weights(address(pool_2)));
 
     // 6. update ratios of gauge_2 again
     vm.prank(address(strategyManager));
-    voter.updateByRatio(gauge_2, 30);
+    voter.updateRatio(address(pool_2), 30);
     assertEq(30, voter.ratios(gauge_2));
     assertEq(800, voter.weights(address(pool)));
     assertEq(300, voter.weights(address(pool_2)));
 
+    // 7. not gauge for pool_3
+    address pool_3 = address(3);
+    vm.expectRevert(abi.encodeWithSelector(IVoter.GaugeDoesNotExist.selector, pool_3));
+    vm.prank(address(strategyManager));
+    voter.updateRatio(pool_3, 30);
   }
 
   receive() external payable {}
