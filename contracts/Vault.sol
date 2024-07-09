@@ -24,13 +24,14 @@ contract Vault is IVault, Initializable {
   /// @inheritdoc IVault
   uint256 public constant WEEK = 1 weeks;
   /// @inheritdoc IVault
-  uint256 public veRate;
+  uint256 public shareRate;
   /// @inheritdoc IVault
   uint256 public weekly;
   /// @inheritdoc IVault
   uint256 public activePeriod;
   /// @inheritdoc IVault
   uint256 public epochCount;
+  address public constant IOTX_NATIVE_TOKEN = address(1);
 
   function initialize(
     address _voter, // the voting & distribution system
@@ -39,7 +40,7 @@ contract Vault is IVault, Initializable {
     voter = IVoter(_voter);
     governor = msg.sender;
     rewardsDistributor = IRewardsDistributor(_rewardsDistributor);
-    veRate = 1000;
+    shareRate = 1000;
     weekly = 100_000 * 1e18; // 10%
     activePeriod = ((block.timestamp) / WEEK) * WEEK; // allow emissions this coming epoch
   }
@@ -53,7 +54,7 @@ contract Vault is IVault, Initializable {
   }
 
   /// @inheritdoc IVault
-  function updatePeriod() external returns (uint256 _period) {
+  function emissionReward() external returns (uint256 _period) {
     _period = activePeriod;
     if (block.timestamp >= _period + WEEK) {
       epochCount++;
@@ -67,7 +68,7 @@ contract Vault is IVault, Initializable {
       if (_balanceOf < _emission) {
         revert InsufficientFund();
       }
-      uint256 _veEmission = (_emission * veRate) / 10000;
+      uint256 _veEmission = (_emission * shareRate) / 10000;
 
       rewardsDistributor.distributeRewards{value: _veEmission}();
       voter.notifyRewardAmount{value: _emission - _veEmission}();
@@ -85,20 +86,21 @@ contract Vault is IVault, Initializable {
   }
 
   /// @inheritdoc IVault
-  function changeVeRate(uint256 _rate) external {
+  function changeShareRate(uint256 _rate) external {
     if (msg.sender != governor) revert NotGovernor();
     if (_rate > 5000) revert InvalidRate();
 
-    veRate = _rate;
-    emit VeRateChanged(_rate);
+    shareRate = _rate;
+    emit ShareRateChanged(_rate);
   }
 
   /// @inheritdoc IVault
   function withdraw(address _token, address payable _recipcient, uint256 _amount) external {
     if (msg.sender != governor) revert NotGovernor();
 
-    if (_token == address(0)) {
-      _recipcient.transfer(_amount);
+    if (_token == IOTX_NATIVE_TOKEN) {
+      (bool success, ) = payable(_recipcient).call{value: _amount}("");
+      require(success, "withdraw token failed.");
     } else {
       IERC20(_token).safeTransfer(_recipcient, _amount);
     }
@@ -106,13 +108,12 @@ contract Vault is IVault, Initializable {
   }
 
   receive() external payable {
-    emit Donation(msg.sender, address(0), msg.value);
+    emit Donation(msg.sender, IOTX_NATIVE_TOKEN, msg.value);
   }
 
   /// @inheritdoc IVault
   function donate() external payable {
-    if (msg.value == 0) revert ZeroDonation();
-    emit Donation(msg.sender, address(0), msg.value);
+    emit Donation(msg.sender, IOTX_NATIVE_TOKEN, msg.value);
   }
 
   /// @inheritdoc IVault

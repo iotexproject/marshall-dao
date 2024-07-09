@@ -55,7 +55,7 @@ contract TestVault is Test {
     assertEq(2 ether, address(vault).balance);
 
     // 2. withdraw token
-    vault.withdraw(address(0), payable(address(2)), 1 ether);
+    vault.withdraw(address(1), payable(address(2)), 1 ether);
     assertEq(1 ether, address(2).balance);
     assertEq(1 ether, address(vault).balance);
 
@@ -63,13 +63,13 @@ contract TestVault is Test {
     skip(7 days);
     // 4. not enough balance to emission
     vm.expectRevert(IVault.InsufficientFund.selector);
-    uint256 _period = vault.updatePeriod();
+    uint256 _period = vault.emissionReward();
 
     // 5. updatePeriod success
     payable(address(vault)).transfer(vault.weekly() - 1 ether);
     rdb.setVault(address(vault));
     voter.initialize(new address[](0), address(vault));
-    _period = vault.updatePeriod();
+    _period = vault.emissionReward();
     assertEq(7 days, _period);
     assertEq(address(vault).balance, 0);
     assertEq(address(strategyManager).balance, vault.weekly() / 10);

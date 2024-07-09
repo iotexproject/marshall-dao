@@ -376,7 +376,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function distribute(uint256 _start, uint256 _finish) external nonReentrant {
-    IVault(vault).updatePeriod();
+    IVault(vault).emissionReward();
     for (uint256 x = _start; x < _finish; x++) {
       _distribute(gauges[pools[x]]);
     }
@@ -384,7 +384,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function distribute(address[] memory _gauges) external nonReentrant {
-    IVault(vault).updatePeriod();
+    IVault(vault).emissionReward();
     uint256 _length = _gauges.length;
     for (uint256 x = 0; x < _length; x++) {
       _distribute(_gauges[x]);
