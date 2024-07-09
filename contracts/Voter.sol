@@ -207,21 +207,18 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       address _gauge = gauges[_pool];
       if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
       if (!isAlive[_gauge]) revert GaugeNotAlive(_gauge);
+      if (votes[_voter][_pool] != 0) revert NonZeroVotes();
 
-      if (isGauge[_gauge]) {
-        uint256 _poolWeight = (_weights[i] * _weight) / _totalVoteWeight;
-        if (votes[_voter][_pool] != 0) revert NonZeroVotes();
-        if (_poolWeight == 0) revert ZeroBalance();
-        _updateFor(_gauge);
+      uint256 _poolWeight = (_weights[i] * _weight) / _totalVoteWeight;
+      if (_poolWeight == 0) revert ZeroBalance();
+      _updateFor(_gauge);
 
-        poolVote[_voter].push(_pool);
-
-        weights[_pool] += _poolWeight;
-        votes[_voter][_pool] += _poolWeight;
-        _usedWeight += _poolWeight;
-        _totalWeight += _poolWeight;
-        emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
-      }
+      poolVote[_voter].push(_pool);
+      weights[_pool] += _poolWeight;
+      votes[_voter][_pool] = _poolWeight;
+      _usedWeight += _poolWeight;
+      _totalWeight += _poolWeight;
+      emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
     }
     totalWeight += _totalWeight;
     usedWeights[_voter] = _usedWeight;
@@ -257,12 +254,11 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function createGauge(address _poolFactory, address _pool) external nonReentrant returns (address) {
     address sender = _msgSender();
     if (gauges[_pool] != address(0)) revert GaugeExists();
-
-    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
     if (sender != governor) {
       if (!isWhitelistedToken[_pool]) revert NotWhitelistedToken();
     }
 
+    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
     address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
 
     gauges[_pool] = _gauge;
