@@ -70,6 +70,10 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) internal supplyIndex;
   /// @inheritdoc IVoter
   mapping(address => uint256) public claimable;
+  /// @inheritdoc IVoter
+  mapping(address => uint256) public ratios;
+  /// @inheritdoc IVoter
+  mapping(address => mapping(address => uint256)) public gaugeToStrategies;
 
   constructor(address _forwarder, address _strategyManager, address _factoryRegistry) ERC2771Context(_forwarder) {
     forwarder = _forwarder;
@@ -170,17 +174,17 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function poke() external nonReentrant {
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
     address _sender = msg.sender;
-    uint256 _weight = IStrategyManager(strategyManager).shares(_sender);
-    _poke(_sender, _weight);
+    (, address[] memory _strategies, uint256[] memory _shares) = IStrategyManager(strategyManager).shares(_sender);
+    _poke(_sender, _strategies, _shares);
   }
 
   function poke(address _user) external {
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
-    uint256 _weight = IStrategyManager(strategyManager).shares(_user);
-    _poke(_user, _weight);
+    (, address[] memory _strategies, uint256[] memory _shares) = IStrategyManager(strategyManager).shares(_user);
+    _poke(_user, _strategies, _shares);
   }
 
-  function _poke(address _voter, uint256 _weight) internal {
+  function _poke(address _voter, address[] memory _strategies, uint256[] memory _shares) internal {
     address[] memory _poolVote = poolVote[_voter];
     uint256 _poolCnt = _poolVote.length;
     uint256[] memory _weights = new uint256[](_poolCnt);
@@ -188,10 +192,23 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     for (uint256 i = 0; i < _poolCnt; i++) {
       _weights[i] = votes[_voter][_poolVote[i]];
     }
-    _vote(_voter, _weight, _poolVote, _weights);
+    _vote(_voter, _poolVote, _weights, _strategies, _shares);
   }
 
-  function _vote(address _voter, uint256 _weight, address[] memory _poolVote, uint256[] memory _weights) internal {
+  function _vote(
+    address _voter,
+    address[] memory _poolVote,
+    uint256[] memory _weights,
+    address[] calldata _strategies,
+    uint256[] calldata _shares
+  ) internal {
+    uint256 _length = _shares.length;
+    require(_length == _strategies.length, "num of _strategies == _shares");
+    uint256 _userShare;
+    for (uint256 i = 0; i < _length; i++) {
+      _userShare += _shares[i];
+    }
+
     _reset(_voter);
     uint256 _poolCnt = _poolVote.length;
     uint256 _totalVoteWeight = 0;
@@ -209,7 +226,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       if (!isAlive[_gauge]) revert GaugeNotAlive(_gauge);
       if (votes[_voter][_pool] != 0) revert NonZeroVotes();
 
-      uint256 _poolWeight = (_weights[i] * _weight) / _totalVoteWeight;
+      uint256 _poolWeight = (_weights[i] * _userShare) / _totalVoteWeight;
       if (_poolWeight == 0) revert ZeroBalance();
       _updateFor(_gauge);
 
@@ -218,10 +235,41 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       votes[_voter][_pool] = _poolWeight;
       _usedWeight += _poolWeight;
       _totalWeight += _poolWeight;
+
+      for (uint256 j = 0; j < _length; j++){
+        uint256 _strategyShareToGauge = (_weights[i] * _shares[i]) / _totalVoteWeight;
+        gaugeToStrategies[_gauge][_strategies[i]] += _strategyShareToGauge;
+      }
       emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
     }
     totalWeight += _totalWeight;
     usedWeights[_voter] = _usedWeight;
+  }
+
+  // todo. DANGER：如果pool数量太多，会导致gas超出上限调用失败
+  function updateRatio(address _strategy, uint256 _ratio) external {
+    if (_msgSender() != strategyManager) revert NotStrategyManager();
+
+    uint256 _newSupplied;
+    uint256 oldRatio = ratios[_strategy];
+    ratios[_strategy] = _ratio;
+
+    for (uint256 i = 0; i < pools.length; i++){
+      address _pool = pools[i];
+      address _gauge = gauges[_pool];
+      if (!isAlive[_gauge]){
+        continue;
+      }
+      uint256 oldShare = gaugeToStrategies[_gauge][_strategy];
+      if (oldShare == 0){
+        continue;
+      }
+      _updateFor(_gauge);
+      _newSupplied = (oldShare * _ratio) / oldRatio;
+      gaugeToStrategies[_gauge][_strategy] = _newSupplied;
+      weights[_pool] = weights[_pool] - oldShare + _newSupplied;
+      totalWeight = totalWeight - oldShare + _newSupplied;
+    }
   }
 
   /// @inheritdoc IVoter
@@ -235,8 +283,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     uint256 _timestamp = block.timestamp;
     if ((_timestamp > ProtocolTimeLibrary.epochVoteEnd(_timestamp))) revert EpochVoteEnd();
     lastVoted[_voter] = _timestamp;
-    uint256 _weight = IStrategyManager(strategyManager).shares(_voter);
-    _vote(_voter, _weight, _poolVote, _weights);
+    (, address[] memory _strategies, uint256[] memory _shares) = IStrategyManager(strategyManager).shares(_voter);
+    _vote(_voter, _poolVote, _weights, _strategies, _shares);
   }
 
   /// @inheritdoc IVoter

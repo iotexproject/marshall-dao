@@ -8,8 +8,8 @@ contract TestStrategyManager is IStrategyManager {
   mapping(address => uint256) public recordShares;
   mapping(address => mapping(address => uint256)) public rewards;
 
-  function shares(address user) external view returns (uint256) {
-    return recordShares[user];
+  function shares(address user) external view returns (uint256, address[] memory, uint256[] memory) {
+    return (recordShares[user], new address[](0), new uint256[](0));
   }
 
   function distributeRewards(address token, uint256 amount) external payable returns (bool) {

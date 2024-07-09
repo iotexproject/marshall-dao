@@ -25,6 +25,7 @@ interface IVoter {
   error ZeroBalance();
   error ZeroAddress();
   error EpochVoteEnd();
+  error NotStrategyManager();
 
   event GaugeCreated(
     address indexed poolFactory,
@@ -65,6 +66,12 @@ interface IVoter {
 
   /// @dev Most number of pools one voter can vote for at once
   function maxVotingNum() external view returns (uint256);
+
+  /// @dev strategy => ratio
+  function ratios(address strategy) external view returns (uint256);
+
+  /// @dev gauge => strategy => share
+  function gaugeToStrategies(address gauge, address strategy) external view returns (uint256);
 
   // mappings
   /// @dev Pool => Gauge
