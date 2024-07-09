@@ -6,8 +6,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IVault} from "./interfaces/IVault.sol";
-import {IRewardsDistributor} from "./interfaces/IRewardsDistributor.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
+import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 
 /// @title Vault
 /// @notice Controls minting of emissions and rebases for the Protocol
@@ -19,7 +19,7 @@ contract Vault is IVault, Initializable {
   /// @inheritdoc IVault
   address public governor;
   /// @inheritdoc IVault
-  IRewardsDistributor public rewardsDistributor;
+  address public strategyManager;
 
   /// @inheritdoc IVault
   uint256 public constant WEEK = 1 weeks;
@@ -35,11 +35,11 @@ contract Vault is IVault, Initializable {
 
   function initialize(
     address _voter, // the voting & distribution system
-    address _rewardsDistributor // the distribution system that ensures users aren't diluted
+    address _manager // the distribution system that ensures users aren't diluted
   ) public initializer {
     voter = IVoter(_voter);
     governor = msg.sender;
-    rewardsDistributor = IRewardsDistributor(_rewardsDistributor);
+    strategyManager = _manager;
     shareRate = 1000;
     weekly = 100_000 * 1e18; // 10%
     activePeriod = ((block.timestamp) / WEEK) * WEEK; // allow emissions this coming epoch
@@ -69,8 +69,9 @@ contract Vault is IVault, Initializable {
         revert InsufficientFund();
       }
       uint256 _veEmission = (_emission * shareRate) / 10000;
-
-      rewardsDistributor.distributeRewards{value: _veEmission}();
+      if (_veEmission == 0) revert ZeroEmission();
+      IStrategyManager(strategyManager).distributeRewards{value: _veEmission}(IOTX_NATIVE_TOKEN, _veEmission);
+      emit Emission(msg.sender, _emission);
       voter.notifyRewardAmount{value: _emission - _veEmission}();
 
       emit Emission(msg.sender, _emission);

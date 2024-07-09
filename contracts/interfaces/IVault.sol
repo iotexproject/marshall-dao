@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import {IVoter} from "./IVoter.sol";
-import {IRewardsDistributor} from "./IRewardsDistributor.sol";
 
 interface IVault {
   error NotGovernor();
@@ -10,6 +9,7 @@ interface IVault {
   error ZeroDonation();
   error InvalidRate();
   error InsufficientFund();
+  error ZeroEmission();
 
   event Emission(address indexed sender, uint256 weekly);
   event WeeklyChanged(uint256 weekly);
@@ -24,8 +24,8 @@ interface IVault {
   /// @notice Standard OZ IGovernor using ve for vote weights.
   function governor() external view returns (address);
 
-  /// @notice Interface of RewardsDistributor.sol
-  function rewardsDistributor() external view returns (IRewardsDistributor);
+  /// @notice Interface of StrategyManager
+  function strategyManager() external view returns (address);
 
   /// @notice Duration of epoch in seconds
   function WEEK() external view returns (uint256);

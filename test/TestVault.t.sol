@@ -12,7 +12,6 @@ import {ProtocolTimeLibrary} from "../contracts/libraries/ProtocolTimeLibrary.so
 import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
-import {RewardsDistributor} from "../contracts/RewardsDistributor.sol";
 
 contract TestVault is Test {
   Vault public vault;
@@ -20,18 +19,16 @@ contract TestVault is Test {
   DAOForwarder public forwarder;
   GaugeFactory public gaugeFactory;
   FactoryRegistry public factoryRegistry;
-  RewardsDistributor public rdb;
   TestStrategyManager public strategyManager;
 
   function setUp() public {
     forwarder = new DAOForwarder();
     gaugeFactory = new GaugeFactory();
-    factoryRegistry = new FactoryRegistry(address(1), address(gaugeFactory));
     strategyManager = new TestStrategyManager();
-    rdb = new RewardsDistributor(address(strategyManager));
+    factoryRegistry = new FactoryRegistry(address(1), address(gaugeFactory));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
     vault = new Vault();
-    vault.initialize(address(voter), address(rdb));
+    vault.initialize(address(voter), address(strategyManager));
   }
 
   function test_setGovernor() public {
@@ -67,7 +64,6 @@ contract TestVault is Test {
 
     // 5. updatePeriod success
     payable(address(vault)).transfer(vault.weekly() - 1 ether);
-    rdb.setVault(address(vault));
     voter.initialize(new address[](0), address(vault));
     _period = vault.emissionReward();
     assertEq(7 days, _period);
