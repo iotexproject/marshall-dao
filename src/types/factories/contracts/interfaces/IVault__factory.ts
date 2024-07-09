@@ -35,6 +35,11 @@ const _abi = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "ZeroEmission",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -101,7 +106,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "VeRateChanged",
+    name: "ShareRateChanged",
     type: "event",
   },
   {
@@ -182,7 +187,7 @@ const _abi = [
         type: "uint256",
       },
     ],
-    name: "changeVeRate",
+    name: "changeShareRate",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -227,6 +232,19 @@ const _abi = [
   },
   {
     inputs: [],
+    name: "emissionReward",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "_period",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "epochCount",
     outputs: [
       {
@@ -252,19 +270,6 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "rewardsDistributor",
-    outputs: [
-      {
-        internalType: "contract IRewardsDistributor",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "address",
@@ -279,25 +284,25 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "updatePeriod",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "_period",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "veRate",
+    name: "shareRate",
     outputs: [
       {
         internalType: "uint256",
         name: "",
         type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "strategyManager",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
