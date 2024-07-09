@@ -63,7 +63,7 @@ interface IGauge {
   /// @notice Retrieve rewards for an address.
   /// @dev Throws if not called by same address or voter.
   /// @param _account .
-  function getReward(address _account) external;
+  function claimReward(address _account) external;
 
   /// @notice Deposit LP tokens into gauge for msg.sender
   /// @param _amount .

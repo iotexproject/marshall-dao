@@ -360,7 +360,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function claimRewards(address[] memory _gauges) external {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
-      IGauge(_gauges[i]).getReward(_msgSender());
+      IGauge(_gauges[i]).claimReward(_msgSender());
     }
   }
 

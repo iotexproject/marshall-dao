@@ -113,7 +113,7 @@ contract TestGauge is Test {
     // 6. getRewards
     uint256 before = address(this).balance;
     assertEq(0, gauge.rewards(address(this)));
-    gauge.getReward(address(this));
+    gauge.claimReward(address(this));
     uint256 after_ = address(this).balance;
     assertEq(before + thirdEarned, after_);
 
