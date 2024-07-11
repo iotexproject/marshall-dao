@@ -5,7 +5,7 @@ interface IStrategyManager {
   /**
    * @notice convenience function for fetching the total shares of `user`
    */
-  function shares(address user) external view returns (address[] memory, uint256[] memory);
+  function shares(address user) external view returns (uint256, address[] memory, uint256[] memory);
 
   /**
    * @notice Distribute rewards with erc20 or native iotx token to strategyManager.
