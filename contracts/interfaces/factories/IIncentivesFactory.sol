@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-interface IVotingRewardsFactory {
+interface IIncentivesFactory {
   /// @notice creates a BribeVotingReward contract for a gauge
   /// @param _forwarder            Address of trusted forwarder
   /// @param _pool                 Addresse of pool

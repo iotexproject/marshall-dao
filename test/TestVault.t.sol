@@ -13,12 +13,14 @@ import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
 import {RewardsDistributor} from "../contracts/RewardsDistributor.sol";
+import {IncentivesFactory} from "../contracts/factories/IncentivesFactory.sol";
 
 contract TestVault is Test {
   Vault public vault;
   Voter public voter;
   DAOForwarder public forwarder;
   GaugeFactory public gaugeFactory;
+  IncentivesFactory public incentiveFactory;
   FactoryRegistry public factoryRegistry;
   RewardsDistributor public rdb;
   TestStrategyManager public strategyManager;
@@ -26,7 +28,8 @@ contract TestVault is Test {
   function setUp() public {
     forwarder = new DAOForwarder();
     gaugeFactory = new GaugeFactory();
-    factoryRegistry = new FactoryRegistry(address(1), address(gaugeFactory));
+    incentiveFactory = new IncentivesFactory();
+    factoryRegistry = new FactoryRegistry(address(1), address(incentiveFactory), address(gaugeFactory));
     strategyManager = new TestStrategyManager();
     rdb = new RewardsDistributor(address(strategyManager));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));

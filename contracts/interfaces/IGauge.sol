@@ -78,6 +78,11 @@ interface IGauge {
   /// @param _amount .
   function withdraw(uint256 _amount) external;
 
+  /// @notice Withdraw LP tokens for user by voter
+  /// @param _amount .
+  /// @param receipt will receive amount of LP
+  function withdraw(address receipt, uint256 _amount) external;
+
   /// @dev Notifies gauge of gauge rewards. Assumes gauge reward tokens is 18 decimals.
   ///      If not 18 decimals, rewardRate may have rounding issues.
   function notifyRewardAmount() external payable;

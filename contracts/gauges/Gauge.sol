@@ -110,14 +110,23 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IGauge
   function withdraw(uint256 _amount) external nonReentrant {
     address sender = _msgSender();
+    _withdraw(sender, _amount);
+  }
 
-    _updateRewards(sender);
+  function withdraw(address receipt, uint256 _amount) external nonReentrant {
+    address _sender = msg.sender;
+    if (_sender != voter) revert NotVoter();
+    _withdraw(receipt, _amount);
+  }
+
+  function _withdraw(address receipt, uint256 _amount) internal {
+    _updateRewards(receipt);
 
     totalSupply -= _amount;
-    balanceOf[sender] -= _amount;
-    IERC20(stakingToken).safeTransfer(sender, _amount);
+    balanceOf[receipt] -= _amount;
+    IERC20(stakingToken).safeTransfer(receipt, _amount);
 
-    emit Withdraw(sender, _amount);
+    emit Withdraw(receipt, _amount);
   }
 
   function _updateRewards(address _account) internal {
