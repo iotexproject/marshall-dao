@@ -17,14 +17,10 @@ describe('Flow', function () {
       factoryRegistry.target,
     ]);
 
-    const rewardsDistributor = await ethers.deployContract('RewardsDistributor', [strategyManager.target]);
-    await rewardsDistributor.waitForDeployment();
-
     const vault = await ethers.deployContract('Vault');
-    await vault.initialize(voter.target, rewardsDistributor.target);
+    await vault.initialize(voter.target, strategyManager.target);
 
     await voter.initialize([], vault.target);
-    await rewardsDistributor.setVault(vault.target);
 
     const token = await ethers.deployContract('TestToken', ['Test Token', 'TEST']);
     await voter.createGauge(poolFactory.target, token.target);

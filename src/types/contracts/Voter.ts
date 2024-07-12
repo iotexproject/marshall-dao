@@ -50,7 +50,8 @@ export interface VoterInterface extends Interface {
       | "length"
       | "maxVotingNum"
       | "notifyRewardAmount"
-      | "poke"
+      | "poke()"
+      | "poke(address)"
       | "poolForGauge"
       | "poolVote"
       | "pools"
@@ -170,7 +171,11 @@ export interface VoterInterface extends Interface {
     functionFragment: "notifyRewardAmount",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "poke", values?: undefined): string;
+  encodeFunctionData(functionFragment: "poke()", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "poke(address)",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "poolForGauge",
     values: [AddressLike]
@@ -300,7 +305,11 @@ export interface VoterInterface extends Interface {
     functionFragment: "notifyRewardAmount",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "poke", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "poke()", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "poke(address)",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "poolForGauge",
     data: BytesLike
@@ -665,7 +674,13 @@ export interface Voter extends BaseContract {
 
   notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
 
-  poke: TypedContractMethod<[], [void], "nonpayable">;
+  "poke()": TypedContractMethod<[], [void], "nonpayable">;
+
+  "poke(address)": TypedContractMethod<
+    [_user: AddressLike],
+    [void],
+    "nonpayable"
+  >;
 
   poolForGauge: TypedContractMethod<[arg0: AddressLike], [string], "view">;
 
@@ -836,8 +851,11 @@ export interface Voter extends BaseContract {
     nameOrSignature: "notifyRewardAmount"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
-    nameOrSignature: "poke"
+    nameOrSignature: "poke()"
   ): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "poke(address)"
+  ): TypedContractMethod<[_user: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "poolForGauge"
   ): TypedContractMethod<[arg0: AddressLike], [string], "view">;

@@ -148,6 +148,19 @@ const _abi = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "_account",
+        type: "address",
+      },
+    ],
+    name: "claimReward",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "_amount",
         type: "uint256",
@@ -193,19 +206,6 @@ const _abi = [
       },
     ],
     stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_account",
-        type: "address",
-      },
-    ],
-    name: "getReward",
-    outputs: [],
-    stateMutability: "nonpayable",
     type: "function",
   },
   {
