@@ -54,7 +54,7 @@ contract Vault is IVault, Initializable {
   }
 
   /// @inheritdoc IVault
-  function emissionReward() external returns (uint256 _period) {
+  function emitReward() external returns (uint256 _period) {
     _period = activePeriod;
     if (block.timestamp >= _period + WEEK) {
       epochCount++;
@@ -68,11 +68,11 @@ contract Vault is IVault, Initializable {
       if (_balanceOf < _emission) {
         revert InsufficientFund();
       }
-      uint256 _veEmission = (_emission * shareRate) / 10000;
-      if (_veEmission == 0) revert ZeroEmission();
-      IStrategyManager(strategyManager).distributeRewards{value: _veEmission}(IOTX_NATIVE_TOKEN, _veEmission);
-      emit Emission(msg.sender, _emission);
-      voter.notifyRewardAmount{value: _emission - _veEmission}();
+      uint256 _shareEmission = (_emission * shareRate) / 10000;
+      if (_shareEmission > 0) {
+        IStrategyManager(strategyManager).distributeRewards{value: _shareEmission}(IOTX_NATIVE_TOKEN, _shareEmission);
+      }
+      voter.notifyRewardAmount{value: _emission - _shareEmission}();
 
       emit Emission(msg.sender, _emission);
     }

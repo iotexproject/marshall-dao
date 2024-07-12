@@ -44,7 +44,7 @@ interface IVault {
 
   /// @notice Processes emissions and rebases. Callable once per epoch (1 week).
   /// @return _period Start of current epoch.
-  function emissionReward() external returns (uint256 _period);
+  function emitReward() external returns (uint256 _period);
 
   /// @notice Change weekly emission.
   function changeWeekly(uint256 _weekly) external;

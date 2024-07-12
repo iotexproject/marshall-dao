@@ -60,12 +60,12 @@ contract TestVault is Test {
     skip(7 days);
     // 4. not enough balance to emission
     vm.expectRevert(IVault.InsufficientFund.selector);
-    uint256 _period = vault.emissionReward();
+    uint256 _period = vault.emitReward();
 
     // 5. updatePeriod success
     payable(address(vault)).transfer(vault.weekly() - 1 ether);
     voter.initialize(new address[](0), address(vault));
-    _period = vault.emissionReward();
+    _period = vault.emitReward();
     assertEq(7 days, _period);
     assertEq(address(vault).balance, 0);
     assertEq(address(strategyManager).balance, vault.weekly() / 10);
