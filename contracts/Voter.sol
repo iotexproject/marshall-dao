@@ -96,7 +96,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     _;
   }
 
-  modifier hasValidGauge(address _pool){
+  modifier hasValidGauge(address _pool) {
     address _gauge = gauges[_pool];
     if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
     if (!isAlive[_gauge]) revert GaugeNotAlive(_gauge);
@@ -266,7 +266,9 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVoter
   function createGauge(address _poolFactory, address _pool) external nonReentrant returns (address) {
     if (gauges[_pool] != address(0)) revert GaugeExists();
-    (address incentiveFactory, address gaugeFactory)= IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
+    (address incentiveFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
+      _poolFactory
+    );
 
     address sender = _msgSender();
     if (sender != governor) {

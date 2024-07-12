@@ -33,7 +33,7 @@ contract TestVoter is Test {
     incentiveFactory = new IncentivesFactory();
     poolFactory = address(1);
     strategyManager = new TestStrategyManager();
-    factoryRegistry = new FactoryRegistry(poolFactory, address (incentiveFactory), address(gaugeFactory));
+    factoryRegistry = new FactoryRegistry(poolFactory, address(incentiveFactory), address(gaugeFactory));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
     vault = new Vault();
     vault.initialize(address(voter), address(strategyManager));

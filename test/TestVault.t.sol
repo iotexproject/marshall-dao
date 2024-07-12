@@ -14,7 +14,6 @@ import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
 import {IncentivesFactory} from "../contracts/factories/IncentivesFactory.sol";
 
-
 contract TestVault is Test {
   Vault public vault;
   Voter public voter;

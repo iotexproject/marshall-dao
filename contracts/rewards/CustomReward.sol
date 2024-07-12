@@ -32,7 +32,6 @@ abstract contract CustomReward is Reward {
     _getReward(receiver, tokens);
   }
 
-
   /// @inheritdoc Reward
   function notifyRewardAmount(address token, uint256 amount) external virtual override {}
 }

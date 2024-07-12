@@ -36,7 +36,9 @@ interface IFactoryRegistry {
   /// @notice Get the factories correlated to a poolFactory.
   ///         Once set, this can never be modified.
   ///         Returns the correlated factories even after an approved poolFactory is unapproved.
-  function factoriesToPoolFactory(address poolFactory) external view returns (address incentiveFactory, address gaugeFactory);
+  function factoriesToPoolFactory(
+    address poolFactory
+  ) external view returns (address incentiveFactory, address gaugeFactory);
 
   /// @notice Get all PoolFactories approved by the registry
   /// @dev The same PoolFactory address cannot be used twice
