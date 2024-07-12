@@ -26,19 +26,20 @@ import type {
 export interface VaultInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "IOTX_NATIVE_TOKEN"
       | "WEEK"
       | "activePeriod"
-      | "changeVeRate"
+      | "changeShareRate"
       | "changeWeekly"
       | "donate(address,uint256)"
       | "donate()"
+      | "emissionReward"
       | "epochCount"
       | "governor"
       | "initialize"
-      | "rewardsDistributor"
       | "setGovernor"
-      | "updatePeriod"
-      | "veRate"
+      | "shareRate"
+      | "strategyManager"
       | "voter"
       | "weekly"
       | "withdraw"
@@ -50,18 +51,22 @@ export interface VaultInterface extends Interface {
       | "Emission"
       | "GovernorChanged"
       | "Initialized"
-      | "VeRateChanged"
+      | "ShareRateChanged"
       | "WeeklyChanged"
       | "Withdraw"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "IOTX_NATIVE_TOKEN",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "WEEK", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "activePeriod",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "changeVeRate",
+    functionFragment: "changeShareRate",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -74,6 +79,10 @@ export interface VaultInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "donate()", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "emissionReward",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "epochCount",
     values?: undefined
   ): string;
@@ -83,18 +92,14 @@ export interface VaultInterface extends Interface {
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "rewardsDistributor",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "setGovernor",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "shareRate", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "updatePeriod",
+    functionFragment: "strategyManager",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "veRate", values?: undefined): string;
   encodeFunctionData(functionFragment: "voter", values?: undefined): string;
   encodeFunctionData(functionFragment: "weekly", values?: undefined): string;
   encodeFunctionData(
@@ -102,13 +107,17 @@ export interface VaultInterface extends Interface {
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "IOTX_NATIVE_TOKEN",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "WEEK", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "activePeriod",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "changeVeRate",
+    functionFragment: "changeShareRate",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -120,22 +129,22 @@ export interface VaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "donate()", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "emissionReward",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "epochCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "governor", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "rewardsDistributor",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "setGovernor",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "shareRate", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "updatePeriod",
+    functionFragment: "strategyManager",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "veRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "voter", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weekly", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
@@ -196,7 +205,7 @@ export namespace InitializedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace VeRateChangedEvent {
+export namespace ShareRateChangedEvent {
   export type InputTuple = [rate: BigNumberish];
   export type OutputTuple = [rate: bigint];
   export interface OutputObject {
@@ -288,11 +297,13 @@ export interface Vault extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  IOTX_NATIVE_TOKEN: TypedContractMethod<[], [string], "view">;
+
   WEEK: TypedContractMethod<[], [bigint], "view">;
 
   activePeriod: TypedContractMethod<[], [bigint], "view">;
 
-  changeVeRate: TypedContractMethod<
+  changeShareRate: TypedContractMethod<
     [_rate: BigNumberish],
     [void],
     "nonpayable"
@@ -312,17 +323,17 @@ export interface Vault extends BaseContract {
 
   "donate()": TypedContractMethod<[], [void], "payable">;
 
+  emissionReward: TypedContractMethod<[], [bigint], "nonpayable">;
+
   epochCount: TypedContractMethod<[], [bigint], "view">;
 
   governor: TypedContractMethod<[], [string], "view">;
 
   initialize: TypedContractMethod<
-    [_voter: AddressLike, _rewardsDistributor: AddressLike],
+    [_voter: AddressLike, _manager: AddressLike],
     [void],
     "nonpayable"
   >;
-
-  rewardsDistributor: TypedContractMethod<[], [string], "view">;
 
   setGovernor: TypedContractMethod<
     [_governor: AddressLike],
@@ -330,9 +341,9 @@ export interface Vault extends BaseContract {
     "nonpayable"
   >;
 
-  updatePeriod: TypedContractMethod<[], [bigint], "nonpayable">;
+  shareRate: TypedContractMethod<[], [bigint], "view">;
 
-  veRate: TypedContractMethod<[], [bigint], "view">;
+  strategyManager: TypedContractMethod<[], [string], "view">;
 
   voter: TypedContractMethod<[], [string], "view">;
 
@@ -349,13 +360,16 @@ export interface Vault extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "IOTX_NATIVE_TOKEN"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
     nameOrSignature: "WEEK"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "activePeriod"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
-    nameOrSignature: "changeVeRate"
+    nameOrSignature: "changeShareRate"
   ): TypedContractMethod<[_rate: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "changeWeekly"
@@ -371,6 +385,9 @@ export interface Vault extends BaseContract {
     nameOrSignature: "donate()"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
+    nameOrSignature: "emissionReward"
+  ): TypedContractMethod<[], [bigint], "nonpayable">;
+  getFunction(
     nameOrSignature: "epochCount"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
@@ -379,22 +396,19 @@ export interface Vault extends BaseContract {
   getFunction(
     nameOrSignature: "initialize"
   ): TypedContractMethod<
-    [_voter: AddressLike, _rewardsDistributor: AddressLike],
+    [_voter: AddressLike, _manager: AddressLike],
     [void],
     "nonpayable"
   >;
   getFunction(
-    nameOrSignature: "rewardsDistributor"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
     nameOrSignature: "setGovernor"
   ): TypedContractMethod<[_governor: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "updatePeriod"
-  ): TypedContractMethod<[], [bigint], "nonpayable">;
-  getFunction(
-    nameOrSignature: "veRate"
+    nameOrSignature: "shareRate"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "strategyManager"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "voter"
   ): TypedContractMethod<[], [string], "view">;
@@ -438,11 +452,11 @@ export interface Vault extends BaseContract {
     InitializedEvent.OutputObject
   >;
   getEvent(
-    key: "VeRateChanged"
+    key: "ShareRateChanged"
   ): TypedContractEvent<
-    VeRateChangedEvent.InputTuple,
-    VeRateChangedEvent.OutputTuple,
-    VeRateChangedEvent.OutputObject
+    ShareRateChangedEvent.InputTuple,
+    ShareRateChangedEvent.OutputTuple,
+    ShareRateChangedEvent.OutputObject
   >;
   getEvent(
     key: "WeeklyChanged"
@@ -504,15 +518,15 @@ export interface Vault extends BaseContract {
       InitializedEvent.OutputObject
     >;
 
-    "VeRateChanged(uint256)": TypedContractEvent<
-      VeRateChangedEvent.InputTuple,
-      VeRateChangedEvent.OutputTuple,
-      VeRateChangedEvent.OutputObject
+    "ShareRateChanged(uint256)": TypedContractEvent<
+      ShareRateChangedEvent.InputTuple,
+      ShareRateChangedEvent.OutputTuple,
+      ShareRateChangedEvent.OutputObject
     >;
-    VeRateChanged: TypedContractEvent<
-      VeRateChangedEvent.InputTuple,
-      VeRateChangedEvent.OutputTuple,
-      VeRateChangedEvent.OutputObject
+    ShareRateChanged: TypedContractEvent<
+      ShareRateChangedEvent.InputTuple,
+      ShareRateChangedEvent.OutputTuple,
+      ShareRateChangedEvent.OutputObject
     >;
 
     "WeeklyChanged(uint256)": TypedContractEvent<

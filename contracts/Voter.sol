@@ -220,21 +220,18 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       address _gauge = gauges[_pool];
       if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
       if (!isAlive[_gauge]) revert GaugeNotAlive(_gauge);
+      if (votes[_voter][_pool] != 0) revert NonZeroVotes();
 
-      if (isGauge[_gauge]) {
-        uint256 _poolWeight = (_weights[i] * _weight) / _totalVoteWeight;
-        if (votes[_voter][_pool] != 0) revert NonZeroVotes();
-        if (_poolWeight == 0) revert ZeroBalance();
-        _updateFor(_gauge);
+      uint256 _poolWeight = (_weights[i] * _weight) / _totalVoteWeight;
+      if (_poolWeight == 0) revert ZeroBalance();
+      _updateFor(_gauge);
 
-        poolVote[_voter].push(_pool);
-
-        weights[_pool] += _poolWeight;
-        votes[_voter][_pool] += _poolWeight;
-        _usedWeight += _poolWeight;
-        _totalWeight += _poolWeight;
-        emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
-      }
+      poolVote[_voter].push(_pool);
+      weights[_pool] += _poolWeight;
+      votes[_voter][_pool] = _poolWeight;
+      _usedWeight += _poolWeight;
+      _totalWeight += _poolWeight;
+      emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
     }
     totalWeight += _totalWeight;
     usedWeights[_voter] = _usedWeight;
@@ -268,14 +265,15 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function createGauge(address _poolFactory, address _pool) external nonReentrant returns (address) {
-    address sender = _msgSender();
     if (gauges[_pool] != address(0)) revert GaugeExists();
-
     (address incentiveFactory, address gaugeFactory)= IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
+
+    address sender = _msgSender();
     if (sender != governor) {
       if (!isWhitelistedToken[_pool]) revert NotWhitelistedToken();
     }
 
+    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
     address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
 
@@ -375,7 +373,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function claimRewards(address[] memory _gauges) external {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
-      IGauge(_gauges[i]).getReward(_msgSender());
+      IGauge(_gauges[i]).claimReward(_msgSender());
     }
   }
 
@@ -400,7 +398,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function distribute(uint256 _start, uint256 _finish) external nonReentrant {
-    IVault(vault).updatePeriod();
+    IVault(vault).emitReward();
     for (uint256 x = _start; x < _finish; x++) {
       _distribute(gauges[pools[x]]);
     }
@@ -408,7 +406,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function distribute(address[] memory _gauges) external nonReentrant {
-    IVault(vault).updatePeriod();
+    IVault(vault).emitReward();
     uint256 _length = _gauges.length;
     for (uint256 x = 0; x < _length; x++) {
       _distribute(_gauges[x]);

@@ -27,10 +27,10 @@ export interface IGaugeInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "balanceOf"
+      | "claimReward"
       | "deposit(uint256,address)"
       | "deposit(uint256)"
       | "earned"
-      | "getReward"
       | "lastTimeRewardApplicable"
       | "lastUpdateTime"
       | "left"
@@ -62,6 +62,10 @@ export interface IGaugeInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "claimReward",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "deposit(uint256,address)",
     values: [BigNumberish, AddressLike]
   ): string;
@@ -70,10 +74,6 @@ export interface IGaugeInterface extends Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "earned", values: [AddressLike]): string;
-  encodeFunctionData(
-    functionFragment: "getReward",
-    values: [AddressLike]
-  ): string;
   encodeFunctionData(
     functionFragment: "lastTimeRewardApplicable",
     values?: undefined
@@ -135,6 +135,10 @@ export interface IGaugeInterface extends Interface {
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "claimReward",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "deposit(uint256,address)",
     data: BytesLike
   ): Result;
@@ -143,7 +147,6 @@ export interface IGaugeInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "earned", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getReward", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "lastTimeRewardApplicable",
     data: BytesLike
@@ -297,6 +300,12 @@ export interface IGauge extends BaseContract {
 
   balanceOf: TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
 
+  claimReward: TypedContractMethod<
+    [_account: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   "deposit(uint256,address)": TypedContractMethod<
     [_amount: BigNumberish, _recipient: AddressLike],
     [void],
@@ -310,8 +319,6 @@ export interface IGauge extends BaseContract {
   >;
 
   earned: TypedContractMethod<[_account: AddressLike], [bigint], "view">;
-
-  getReward: TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
 
   lastTimeRewardApplicable: TypedContractMethod<[], [bigint], "view">;
 
@@ -361,6 +368,9 @@ export interface IGauge extends BaseContract {
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[arg0: AddressLike], [bigint], "view">;
   getFunction(
+    nameOrSignature: "claimReward"
+  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "deposit(uint256,address)"
   ): TypedContractMethod<
     [_amount: BigNumberish, _recipient: AddressLike],
@@ -373,9 +383,6 @@ export interface IGauge extends BaseContract {
   getFunction(
     nameOrSignature: "earned"
   ): TypedContractMethod<[_account: AddressLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getReward"
-  ): TypedContractMethod<[_account: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "lastTimeRewardApplicable"
   ): TypedContractMethod<[], [bigint], "view">;

@@ -62,7 +62,7 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IGauge
-  function getReward(address _account) external nonReentrant {
+  function claimReward(address _account) external nonReentrant {
     address sender = _msgSender();
     if (sender != _account && sender != voter) revert NotAuthorized();
 
