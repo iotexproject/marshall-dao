@@ -231,6 +231,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       votes[_voter][_pool] = _poolWeight;
       _usedWeight += _poolWeight;
       _totalWeight += _poolWeight;
+      IGauge(_gauge).depositShare(_voter, _poolWeight);
       emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
     }
     totalWeight += _totalWeight;

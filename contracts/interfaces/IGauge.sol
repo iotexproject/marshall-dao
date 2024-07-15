@@ -91,4 +91,9 @@ interface IGauge {
   ///      Assumes gauge reward tokens is 18 decimals.
   ///      If not 18 decimals, rewardRate may have rounding issues.
   function notifyRewardWithoutClaim() external payable;
+
+  /// @dev deposit vote into gauge to gain user rewards.
+  /// @param _user which vote to gauge with share
+  /// @param _share amount of share to deposit in gauge
+  function depositShare(address _user, uint256 _share) external;
 }

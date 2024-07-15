@@ -41,6 +41,12 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) public rewards;
   /// @inheritdoc IGauge
   mapping(uint256 => uint256) public rewardRateByEpoch;
+  mapping(address => uint256) public shares;
+  uint256 public totalShare;
+
+  uint256 public wLP;
+  uint256 public wVote;
+  uint256 public Factor = 10;
 
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
@@ -54,6 +60,20 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     }
     return
       rewardPerTokenStored + ((lastTimeRewardApplicable() - lastUpdateTime) * rewardRate * PRECISION) / totalSupply;
+  }
+
+//  function rewardPerTokenWithShare(address _user) public view returns (uint256)  {
+//    uint256 _pertoken = rewardPerToken();
+//    uint256 _reward = 0;
+//
+//    return _reward;
+//  }
+
+  function depositShare(address _user, uint256 _share) external {
+    if (msg.sender != voter) revert NotVoter();
+    uint256 _oldShare = shares[_user];
+    shares[_user] = _share;
+    totalShare = totalShare - _oldShare + _share;
   }
 
   /// @inheritdoc IGauge
