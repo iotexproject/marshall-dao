@@ -84,6 +84,7 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     uint256 _oldShare = shares[_user];
     shares[_user] = _share;
     totalShare = totalShare - _oldShare + _share;
+    _updateRewards(_user);
     updateGainBalance(_user);
   }
 
