@@ -42,25 +42,25 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IGauge
   mapping(uint256 => uint256) public rewardRateByEpoch;
 
-  // shares record
+  /// @inheritdoc IGauge
   mapping(address => uint256) public shares;
+  /// @inheritdoc IGauge
   uint256 public totalShare;
-
-  // 1 of design for weight balance with vote
-  uint256 public gain;
+  /// @inheritdoc IGauge
   uint256 public gainTotalSupply;
+  /// @inheritdoc IGauge
   mapping(address => uint256) public gainBalanceOf;
-
-  // lp * gainFactor/10 + lp
-
-  // 2 of design for reward
-  uint256 public wLP;
-  uint256 public wVote;
-  uint256 public Factor = 10;
+  /// @inheritdoc IGauge
+  uint256 public factor = 10;
 
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
+  }
+
+  function setFactor(uint256 _factor) external {
+    if (msg.sender != voter) revert NotVoter();
+    factor = _factor;
   }
 
   /// @inheritdoc IGauge
@@ -72,14 +72,7 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
       rewardPerTokenStored + ((lastTimeRewardApplicable() - lastUpdateTime) * rewardRate * PRECISION) / gainTotalSupply;
   }
 
-//  function rewardPerTokenWithShare(address _user) public view returns (uint256)  {
-//    uint256 _pertoken = rewardPerToken();
-//    uint256 _reward = _pertoken * wLP / Factor + _pertoken * wVote / Factor;
-////    _pertoken *(wlp/factor + wVote/factor)
-//    return _reward;
-//  }
-
-  function depositShare(address _user, uint256 _share) external {
+  function updateShare(address _user, uint256 _share) external {
     if (msg.sender != voter) revert NotVoter();
     uint256 _oldShare = shares[_user];
     shares[_user] = _share;
@@ -89,13 +82,15 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   }
 
   function updateGainBalance(address _user) internal {
+    uint256 _share = shares[_user];
     uint256 _originBalance = balanceOf[_user];
-    if ( _originBalance > 0 ){
-      uint256 _share = shares[_user];
-      uint256 _gainBalance = _originBalance * gain / Factor * _share / gainTotalSupply + _originBalance;
+    if ( _originBalance > 0 && _share > 0 ){
+      uint256 _gainBalance = _originBalance * (factor * _share / totalShare + 1);
       uint256 _oldGainBalance = gainBalanceOf[_user];
       gainBalanceOf[_user] = _gainBalance;
       gainTotalSupply = gainTotalSupply - _oldGainBalance + _gainBalance;
+    } else {
+      gainTotalSupply = totalSupply;
     }
   }
 
