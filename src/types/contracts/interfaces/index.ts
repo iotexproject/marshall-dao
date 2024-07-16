@@ -3,8 +3,9 @@
 /* eslint-disable */
 import type * as factories from "./factories";
 export type { factories };
+export type { IDeviceNFT } from "./IDeviceNFT";
 export type { IGauge } from "./IGauge";
-export type { IRewardsDistributor } from "./IRewardsDistributor";
+export type { IRewardGauge } from "./IRewardGauge";
 export type { IStrategyManager } from "./IStrategyManager";
 export type { IVault } from "./IVault";
 export type { IVoter } from "./IVoter";

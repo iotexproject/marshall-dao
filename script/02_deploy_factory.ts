@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import fs from "fs";
+import fs from 'fs';
 
 async function main() {
   const poolFactory = await ethers.deployContract('EmptyPoolFactory', []);
@@ -10,10 +10,7 @@ async function main() {
   await gaugeFactory.waitForDeployment();
   console.log(`GaugeFactory deployed to ${gaugeFactory.target}`);
 
-  const factoryRegistry = await ethers.deployContract('FactoryRegistry', [
-    poolFactory.target,
-    gaugeFactory.target,
-  ]);
+  const factoryRegistry = await ethers.deployContract('FactoryRegistry', [poolFactory.target, gaugeFactory.target]);
   await factoryRegistry.waitForDeployment();
   console.log(`FactoryRegistry deployed to ${factoryRegistry.target}`);
 

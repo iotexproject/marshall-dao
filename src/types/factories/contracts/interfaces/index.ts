@@ -2,8 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as factories from "./factories";
+export { IDeviceNFT__factory } from "./IDeviceNFT__factory";
 export { IGauge__factory } from "./IGauge__factory";
-export { IRewardsDistributor__factory } from "./IRewardsDistributor__factory";
+export { IRewardGauge__factory } from "./IRewardGauge__factory";
 export { IStrategyManager__factory } from "./IStrategyManager__factory";
 export { IVault__factory } from "./IVault__factory";
 export { IVoter__factory } from "./IVoter__factory";

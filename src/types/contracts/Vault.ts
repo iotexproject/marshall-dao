@@ -33,7 +33,7 @@ export interface VaultInterface extends Interface {
       | "changeWeekly"
       | "donate(address,uint256)"
       | "donate()"
-      | "emissionReward"
+      | "emitReward"
       | "epochCount"
       | "governor"
       | "initialize"
@@ -79,7 +79,7 @@ export interface VaultInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "donate()", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "emissionReward",
+    functionFragment: "emitReward",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -129,10 +129,7 @@ export interface VaultInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "donate()", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "emissionReward",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "emitReward", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "epochCount", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "governor", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
@@ -323,7 +320,7 @@ export interface Vault extends BaseContract {
 
   "donate()": TypedContractMethod<[], [void], "payable">;
 
-  emissionReward: TypedContractMethod<[], [bigint], "nonpayable">;
+  emitReward: TypedContractMethod<[], [bigint], "nonpayable">;
 
   epochCount: TypedContractMethod<[], [bigint], "view">;
 
@@ -385,7 +382,7 @@ export interface Vault extends BaseContract {
     nameOrSignature: "donate()"
   ): TypedContractMethod<[], [void], "payable">;
   getFunction(
-    nameOrSignature: "emissionReward"
+    nameOrSignature: "emitReward"
   ): TypedContractMethod<[], [bigint], "nonpayable">;
   getFunction(
     nameOrSignature: "epochCount"

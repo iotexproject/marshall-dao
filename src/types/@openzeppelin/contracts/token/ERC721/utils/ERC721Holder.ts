@@ -3,10 +3,12 @@
 /* eslint-disable */
 import type {
   BaseContract,
+  BigNumberish,
   BytesLike,
   FunctionFragment,
   Result,
   Interface,
+  AddressLike,
   ContractRunner,
   ContractMethod,
   Listener,
@@ -17,39 +19,27 @@ import type {
   TypedEventLog,
   TypedListener,
   TypedContractMethod,
-} from "../../common";
+} from "../../../../../common";
 
-export interface IGaugeInterface extends Interface {
-  getFunction(
-    nameOrSignature: "left" | "notifyRewardAmount" | "notifyRewardWithoutClaim"
-  ): FunctionFragment;
+export interface ERC721HolderInterface extends Interface {
+  getFunction(nameOrSignature: "onERC721Received"): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "left", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "notifyRewardAmount",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "notifyRewardWithoutClaim",
-    values?: undefined
+    functionFragment: "onERC721Received",
+    values: [AddressLike, AddressLike, BigNumberish, BytesLike]
   ): string;
 
-  decodeFunctionResult(functionFragment: "left", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "notifyRewardAmount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "notifyRewardWithoutClaim",
+    functionFragment: "onERC721Received",
     data: BytesLike
   ): Result;
 }
 
-export interface IGauge extends BaseContract {
-  connect(runner?: ContractRunner | null): IGauge;
+export interface ERC721Holder extends BaseContract {
+  connect(runner?: ContractRunner | null): ERC721Holder;
   waitForDeployment(): Promise<this>;
 
-  interface: IGaugeInterface;
+  interface: ERC721HolderInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -88,25 +78,23 @@ export interface IGauge extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  left: TypedContractMethod<[], [bigint], "view">;
-
-  notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
-
-  notifyRewardWithoutClaim: TypedContractMethod<[], [void], "payable">;
+  onERC721Received: TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish, arg3: BytesLike],
+    [string],
+    "nonpayable"
+  >;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "left"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "notifyRewardAmount"
-  ): TypedContractMethod<[], [void], "payable">;
-  getFunction(
-    nameOrSignature: "notifyRewardWithoutClaim"
-  ): TypedContractMethod<[], [void], "payable">;
+    nameOrSignature: "onERC721Received"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: AddressLike, arg2: BigNumberish, arg3: BytesLike],
+    [string],
+    "nonpayable"
+  >;
 
   filters: {};
 }

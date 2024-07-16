@@ -14,7 +14,6 @@ export type { libraries };
 import type * as test from "./test";
 export type { test };
 export type { DAOForwarder } from "./DAOForwarder";
-export type { RewardsDistributor } from "./RewardsDistributor";
 export type { Vault } from "./Vault";
 export type { VestingMaster } from "./VestingMaster";
 export type { Voter } from "./Voter";

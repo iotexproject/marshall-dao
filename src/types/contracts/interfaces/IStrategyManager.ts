@@ -3,10 +3,12 @@
 /* eslint-disable */
 import type {
   BaseContract,
+  BigNumberish,
   BytesLike,
   FunctionFragment,
   Result,
   Interface,
+  AddressLike,
   ContractRunner,
   ContractMethod,
   Listener,
@@ -19,37 +21,29 @@ import type {
   TypedContractMethod,
 } from "../../common";
 
-export interface IGaugeInterface extends Interface {
+export interface IStrategyManagerInterface extends Interface {
   getFunction(
-    nameOrSignature: "left" | "notifyRewardAmount" | "notifyRewardWithoutClaim"
+    nameOrSignature: "distributeRewards" | "shares"
   ): FunctionFragment;
 
-  encodeFunctionData(functionFragment: "left", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "notifyRewardAmount",
-    values?: undefined
+    functionFragment: "distributeRewards",
+    values: [AddressLike, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "notifyRewardWithoutClaim",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "shares", values: [AddressLike]): string;
 
-  decodeFunctionResult(functionFragment: "left", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "notifyRewardAmount",
+    functionFragment: "distributeRewards",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "notifyRewardWithoutClaim",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "shares", data: BytesLike): Result;
 }
 
-export interface IGauge extends BaseContract {
-  connect(runner?: ContractRunner | null): IGauge;
+export interface IStrategyManager extends BaseContract {
+  connect(runner?: ContractRunner | null): IStrategyManager;
   waitForDeployment(): Promise<this>;
 
-  interface: IGaugeInterface;
+  interface: IStrategyManagerInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -88,25 +82,28 @@ export interface IGauge extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  left: TypedContractMethod<[], [bigint], "view">;
+  distributeRewards: TypedContractMethod<
+    [token: AddressLike, amount: BigNumberish],
+    [boolean],
+    "payable"
+  >;
 
-  notifyRewardAmount: TypedContractMethod<[], [void], "payable">;
-
-  notifyRewardWithoutClaim: TypedContractMethod<[], [void], "payable">;
+  shares: TypedContractMethod<[user: AddressLike], [bigint], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
 
   getFunction(
-    nameOrSignature: "left"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "distributeRewards"
+  ): TypedContractMethod<
+    [token: AddressLike, amount: BigNumberish],
+    [boolean],
+    "payable"
+  >;
   getFunction(
-    nameOrSignature: "notifyRewardAmount"
-  ): TypedContractMethod<[], [void], "payable">;
-  getFunction(
-    nameOrSignature: "notifyRewardWithoutClaim"
-  ): TypedContractMethod<[], [void], "payable">;
+    nameOrSignature: "shares"
+  ): TypedContractMethod<[user: AddressLike], [bigint], "view">;
 
   filters: {};
 }

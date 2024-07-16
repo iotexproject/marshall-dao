@@ -8,7 +8,6 @@ export * as interfaces from "./interfaces";
 export * as libraries from "./libraries";
 export * as test from "./test";
 export { DAOForwarder__factory } from "./DAOForwarder__factory";
-export { RewardsDistributor__factory } from "./RewardsDistributor__factory";
 export { Vault__factory } from "./Vault__factory";
 export { VestingMaster__factory } from "./VestingMaster__factory";
 export { Voter__factory } from "./Voter__factory";

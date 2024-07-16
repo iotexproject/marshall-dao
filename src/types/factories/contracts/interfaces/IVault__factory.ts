@@ -232,7 +232,7 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "emissionReward",
+    name: "emitReward",
     outputs: [
       {
         internalType: "uint256",
