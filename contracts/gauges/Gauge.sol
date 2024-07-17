@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IGauge} from "../interfaces/IGauge.sol";
 import {IVoter} from "../interfaces/IVoter.sol";
+import {IReward} from "../interfaces/IReward.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
@@ -41,10 +42,13 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) public rewards;
   /// @inheritdoc IGauge
   mapping(uint256 => uint256) public rewardRateByEpoch;
+  /// @inheritdoc IGauge
+  address public incentives;
 
-  constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
+  constructor(address _forwarder, address _stakingToken, address _voter, address _moreIncentives) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
+    incentives = _moreIncentives;
   }
 
   /// @inheritdoc IGauge
@@ -103,6 +107,7 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     IERC20(stakingToken).safeTransferFrom(sender, address(this), _amount);
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
+    IReward(incentives)._deposit(_amount, _recipient);
 
     emit Deposit(sender, _recipient, _amount);
   }
@@ -125,6 +130,7 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     totalSupply -= _amount;
     balanceOf[receipt] -= _amount;
     IERC20(stakingToken).safeTransfer(receipt, _amount);
+    IReward(incentives)._withdraw(_amount, receipt);
 
     emit Withdraw(receipt, _amount);
   }

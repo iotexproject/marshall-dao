@@ -2,12 +2,8 @@
 pragma solidity ^0.8.0;
 
 interface IReward {
-  error InvalidReward();
   error NotAuthorized();
   error NotGauge();
-  error NotEscrowToken();
-  error NotSingleToken();
-  error NotVotingEscrow();
   error NotWhitelisted();
   error ZeroAmount();
 
@@ -64,9 +60,13 @@ interface IReward {
   /// @notice The total number of checkpoints
   function supplyNumCheckpoints() external view returns (uint256);
 
-  /// @notice Deposit an amount into the rewards contract to earn future rewards associated to a veNFT
+  /// @notice set gauge when create incentive in Voter.
+  /// @param Address of the _gauge that will be associated with incentive.
+  function setGauge(address _gauge) external;
+
+  /// @notice Deposit an amount into the rewards contract to earn future rewards associated to the address.
   /// @dev Internal notation used as only callable internally by `authorized`.
-  /// @param amount   Amount deposited for the veNFT
+  /// @param amount Amount deposited for the user
   /// @param user  Which deposit LP
   function _deposit(uint256 amount, address user) external;
 
@@ -78,12 +78,7 @@ interface IReward {
 
   /// @notice Claim the rewards earned by Lp
   /// @param tokens   Array of tokens to claim rewards of
-  function getReward(address[] memory tokens) external;
-
-  /// @notice Claim the rewards earned by Lp
-  /// @param user  which get rewards from incentive
-  /// @param tokens   Array of tokens to claim rewards of
-  function getReward(address user, address[] memory tokens) external;
+  function claimReward(address[] memory tokens) external;
 
   /// @notice Add rewards for stakers to earn
   /// @param token    Address of token to reward
@@ -106,9 +101,16 @@ interface IReward {
   /// @notice Get number of rewards tokens
   function rewardsListLength() external view returns (uint256);
 
+  /// @notice Get the reward tokens
+  function rewardTokens() external view returns (address[] memory);
+
   /// @notice Calculate how much in rewards are earned for a specific token and veNFT
   /// @param token Address of token to fetch rewards of
   /// @param _user will receive reward
   /// @return Amount of token earned in rewards
   function earned(address token, address _user) external view returns (uint256);
+
+  /// @notice add new reward token to incentive.
+  /// @param address of the new reward token
+  function addRewardToken(address token) external;
 }

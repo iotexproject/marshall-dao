@@ -46,8 +46,18 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IReward
   uint256 public supplyNumCheckpoints;
 
+  /// @inheritdoc IReward
+  address public gauge;
+
   constructor(address _forwarder, address _voter) ERC2771Context(_forwarder) {
     voter = _voter;
+  }
+
+  function setGauge(address _gauge) external {
+    require(gauge == address (0), "gauge has been set");
+    if (msg.sender != authorized) revert NotAuthorized();
+
+    gauge = _gauge;
   }
 
   /// @inheritdoc IReward
@@ -153,6 +163,10 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
     return rewards.length;
   }
 
+  function rewardTokens() external view returns (address[] memory) {
+    return rewards;
+  }
+
   /// @inheritdoc IReward
   function earned(address token, address receiver) public view returns (uint256) {
     if (numCheckpoints[receiver] == 0) {
@@ -190,7 +204,7 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IReward
   function _deposit(uint256 amount, address receiver) external {
     address sender = _msgSender();
-    if (sender != authorized) revert NotAuthorized();
+    if (sender != gauge) revert NotGauge();
 
     totalSupply += amount;
     balanceOf[receiver] += amount;
@@ -204,7 +218,7 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IReward
   function _withdraw(uint256 amount, address receiver) external {
     address sender = _msgSender();
-    if (sender != authorized) revert NotAuthorized();
+    if (sender != gauge) revert NotGauge();
 
     totalSupply -= amount;
     balanceOf[receiver] -= amount;
@@ -216,13 +230,10 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IReward
-  function getReward(address[] memory tokens) external virtual nonReentrant {}
-
-  /// @inheritdoc IReward
-  function getReward(address user, address[] memory tokens) external virtual nonReentrant {}
+  function claimReward(address[] memory tokens) external virtual nonReentrant {}
 
   /// @dev used with all getReward implementations
-  function _getReward(address recipient, address[] memory tokens) internal {
+  function _claimReward(address recipient, address[] memory tokens) internal {
     uint256 _length = tokens.length;
     for (uint256 i = 0; i < _length; i++) {
       uint256 _reward = earned(tokens[i], recipient);
@@ -245,5 +256,14 @@ abstract contract Reward is IReward, ERC2771Context, ReentrancyGuard {
     tokenRewardsPerEpoch[token][epochStart] += amount;
 
     emit NotifyReward(sender, token, epochStart, amount);
+  }
+
+  /// @dev add new reward token to incentive.
+  function addRewardToken(address token) external {
+    if (!isReward[token]) {
+      if (!IVoter(voter).isWhitelistedToken(token)) revert NotWhitelisted();
+      isReward[token] = true;
+      rewards.push(token);
+    }
   }
 }

@@ -95,9 +95,6 @@ interface IVoter {
   /// @dev Token => Whitelisted status
   function isWhitelistedToken(address token) external view returns (bool);
 
-  /// @dev gauge ==> incentive
-  function gaugeToIncentives(address gauge) external view returns (address);
-
   /// @dev Gauge => Liveness status
   function isAlive(address gauge) external view returns (bool);
 
@@ -154,11 +151,6 @@ interface IVoter {
   /// @notice Claim emissions from gauges.
   /// @param _gauges Array of gauges to collect emissions from.
   function claimRewards(address[] memory _gauges) external;
-
-  /// @notice Claim incentives with another reward for LP in gauge
-  /// @param _incentives which store reward
-  /// @param _tokens Array of reward token for LP in gauge
-  function claimIncentive(address[] memory _incentives, address[][] memory _tokens) external;
 
   /// @notice Set new governor.
   /// @dev Throws if not called by governor.

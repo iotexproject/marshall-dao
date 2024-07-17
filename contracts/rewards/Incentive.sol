@@ -15,13 +15,6 @@ contract Incentive is CustomReward {
   /// @inheritdoc CustomReward
   function notifyRewardAmount(address token, uint256 amount) external override nonReentrant {
     address sender = _msgSender();
-
-    if (!isReward[token]) {
-      if (!IVoter(voter).isWhitelistedToken(token)) revert NotWhitelisted();
-      isReward[token] = true;
-      rewards.push(token);
-    }
-
     _notifyRewardAmount(sender, token, amount);
   }
 }

@@ -51,8 +51,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IVoter
   mapping(address => address) public gauges;
   /// @inheritdoc IVoter
-  mapping(address => address) public gaugeToIncentives;
-  /// @inheritdoc IVoter
   mapping(address => address) public poolForGauge;
   /// @inheritdoc IVoter
   mapping(address => uint256) public weights;
@@ -276,10 +274,10 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
 
     address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
-    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
+    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, _incentiveReward);
+    IReward(_incentiveReward).setGauge(_gauge);
 
-    gaugeToIncentives[_gauge] = _incentiveReward;
     gauges[_pool] = _gauge;
     poolForGauge[_gauge] = _pool;
     isGauge[_gauge] = true;
@@ -379,15 +377,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
   }
 
-  /// @inheritdoc IVoter
-  function claimIncentive(address[] memory _incentives, address[][] memory _tokens) external {
-    address _sender = msg.sender;
-    uint256 _length = _incentives.length;
-    for (uint256 i = 0; i < _length; i++) {
-      IReward(_incentives[i]).getReward(_sender, _tokens[i]);
-    }
-  }
-
   function _distribute(address _gauge) internal {
     _updateFor(_gauge); // should set claimable to 0 if killed
     uint256 _claimable = claimable[_gauge];
@@ -413,24 +402,5 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     for (uint256 x = 0; x < _length; x++) {
       _distribute(_gauges[x]);
     }
-  }
-
-  function depositLP(address _pool, uint256 _amount) external hasValidGauge(_pool) nonReentrant {
-    if (_amount == 0) revert ZeroAmount();
-    address _sender = msg.sender;
-    address _gauge = gauges[_pool];
-    IERC20(_pool).safeTransferFrom(_sender, address(this), _amount);
-    IERC20(_pool).approve(_gauge, _amount);
-    IGauge(_gauge).deposit(_amount, _sender);
-    IReward(gaugeToIncentives[_gauge])._deposit(_amount, _sender);
-  }
-
-  function withdrawLP(address _pool, uint256 _amount) external nonReentrant {
-    if (_amount == 0) revert ZeroAmount();
-    address _gauge = gauges[_pool];
-    if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
-    address _sender = msg.sender;
-    IGauge(_gauge).withdraw(_sender, _amount);
-    IReward(gaugeToIncentives[_gauge])._withdraw(_amount, _sender);
   }
 }

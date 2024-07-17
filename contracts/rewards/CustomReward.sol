@@ -19,17 +19,9 @@ abstract contract CustomReward is Reward {
   }
 
   /// @inheritdoc Reward
-  function getReward(address[] memory tokens) external override nonReentrant {
+  function claimReward(address[] memory tokens) external override nonReentrant {
     address sender = _msgSender();
-    _getReward(sender, tokens);
-  }
-
-  /// @inheritdoc Reward
-  function getReward(address receiver, address[] memory tokens) external override nonReentrant {
-    address sender = _msgSender();
-    if (sender != voter) revert NotAuthorized();
-
-    _getReward(receiver, tokens);
+    _claimReward(sender, tokens);
   }
 
   /// @inheritdoc Reward
