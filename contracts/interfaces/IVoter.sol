@@ -118,16 +118,6 @@ interface IVoter {
   /// @param _gauges Array of gauges to distribute to.
   function distribute(address[] memory _gauges) external;
 
-  /// @dev Deposit gauge of pool by users.
-  /// @param _pool lp of the deposit
-  /// @param _amount of the lp
-  function depositLP(address _pool, uint256 _amount) external;
-
-  /// @dev Deposit gauge of pool by users.
-  /// @param _pool lp of the deposit
-  /// @param _amount of the lp
-  function withdrawLP(address _pool, uint256 _amount) external;
-
   /// @notice Called by users to update voting balances in voting rewards contracts.
   function poke() external;
 
