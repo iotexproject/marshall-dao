@@ -6,6 +6,7 @@ interface IReward {
   error NotGauge();
   error NotWhitelisted();
   error ZeroAmount();
+  error NotRewardToken();
 
   event Deposit(address indexed from, address indexed receiver, uint256 amount);
   event Withdraw(address indexed from, address indexed receiver, uint256 amount);

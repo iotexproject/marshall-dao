@@ -15,6 +15,7 @@ contract Incentive is CustomReward {
   /// @inheritdoc CustomReward
   function notifyRewardAmount(address token, uint256 amount) external override nonReentrant {
     address sender = _msgSender();
+    if (!isReward[token]) revert NotRewardToken();
     _notifyRewardAmount(sender, token, amount);
   }
 }
