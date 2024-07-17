@@ -51,16 +51,17 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IGauge
   mapping(address => uint256) public gainBalanceOf;
   /// @inheritdoc IGauge
-  uint256 public factor = 10;
+  uint256 public shareFactor;
 
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
+    shareFactor = 10;
   }
 
   function setFactor(uint256 _factor) external {
     if (msg.sender != voter) revert NotVoter();
-    factor = _factor;
+    shareFactor = _factor;
   }
 
   /// @inheritdoc IGauge
@@ -85,7 +86,7 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     uint256 _share = shares[_user];
     uint256 _originBalance = balanceOf[_user];
     if ( _originBalance > 0 && _share > 0 ){
-      uint256 _gainBalance = _originBalance * (factor * _share / totalShare + 1);
+      uint256 _gainBalance = _originBalance * (shareFactor * _share / totalShare + 1);
       uint256 _oldGainBalance = gainBalanceOf[_user];
       gainBalanceOf[_user] = _gainBalance;
       gainTotalSupply = gainTotalSupply - _oldGainBalance + _gainBalance;

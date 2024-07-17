@@ -21,6 +21,21 @@ interface IGauge {
   /// @notice Address of Protocol Voter
   function voter() external view returns (address);
 
+  /// @notice Address of share
+  function shares(address) external view returns (uint256);
+
+  /// @notice total share
+  function totalShare() external view returns (uint256);
+
+  /// @notice gain total supply
+  function gainTotalSupply() external view returns (uint256);
+
+  /// @notice Address of gain balance
+  function gainBalanceOf(address) external view returns (uint256);
+
+  /// @notice factor for share
+  function shareFactor() external view returns (uint256);
+
   /// @notice Timestamp end of current rewards period
   function periodFinish() external view returns (uint256);
 
@@ -96,4 +111,8 @@ interface IGauge {
   /// @param _user which vote to gauge with share
   /// @param _share amount of share to deposit in gauge
   function updateShare(address _user, uint256 _share) external;
+
+  /// @dev update the factor of share
+  /// @param new factor
+  function setFactor(uint256 _factor) external;
 }
