@@ -47,10 +47,6 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IGauge
   uint256 public totalShare;
   /// @inheritdoc IGauge
-  uint256 public gainTotalSupply;
-  /// @inheritdoc IGauge
-  mapping(address => uint256) public gainBalanceOf;
-  /// @inheritdoc IGauge
   uint256 public shareFactor;
 
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
@@ -69,8 +65,14 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     if (totalSupply == 0) {
       return rewardPerTokenStored;
     }
-    return
-      rewardPerTokenStored + ((lastTimeRewardApplicable() - lastUpdateTime) * rewardRate * PRECISION) / gainTotalSupply;
+    uint256 _escape = lastTimeRewardApplicable() - lastUpdateTime;
+    if (_escape == 0){
+      return rewardPerTokenStored;
+    }
+    if (totalShare == 0){
+      return rewardPerTokenStored + _escape * rewardRate * PRECISION / totalSupply;
+    }
+    return rewardPerTokenStored + _escape * rewardRate * PRECISION / (totalSupply * (1 + shareFactor));
   }
 
   function updateShare(address _user, uint256 _share) external {
@@ -79,20 +81,6 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     shares[_user] = _share;
     totalShare = totalShare - _oldShare + _share;
     _updateRewards(_user);
-    updateGainBalance(_user);
-  }
-
-  function updateGainBalance(address _user) internal {
-    uint256 _share = shares[_user];
-    uint256 _originBalance = balanceOf[_user];
-    if ( _originBalance > 0 && _share > 0 ){
-      uint256 _gainBalance = _originBalance * (shareFactor * _share / totalShare + 1);
-      uint256 _oldGainBalance = gainBalanceOf[_user];
-      gainBalanceOf[_user] = _gainBalance;
-      gainTotalSupply = gainTotalSupply - _oldGainBalance + _gainBalance;
-    } else {
-      gainTotalSupply = totalSupply;
-    }
   }
 
   /// @inheritdoc IGauge
@@ -119,7 +107,16 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IGauge
   function earned(address _account) public view returns (uint256) {
     return
-      (gainBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
+      (gainBalance(_account) * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
+  }
+
+  function gainBalance(address _account) public view returns (uint256) {
+    uint256 _share = shares[_account];
+    uint256 _originBalance = balanceOf[_account];
+    if ( _originBalance > 0 && _share > 0 ){
+      return _originBalance * (shareFactor * _share / totalShare + 1);
+    }
+     return _originBalance;
   }
 
   /// @inheritdoc IGauge
@@ -142,7 +139,6 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     IERC20(stakingToken).safeTransferFrom(sender, address(this), _amount);
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
-    updateGainBalance(_recipient);
 
     emit Deposit(sender, _recipient, _amount);
   }
@@ -165,7 +161,6 @@ contract Gauge is IGauge, ERC2771Context, ReentrancyGuard {
     totalSupply -= _amount;
     balanceOf[receipt] -= _amount;
     IERC20(stakingToken).safeTransfer(receipt, _amount);
-    updateGainBalance(receipt);
 
     emit Withdraw(receipt, _amount);
   }

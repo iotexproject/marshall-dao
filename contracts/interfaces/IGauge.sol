@@ -27,12 +27,6 @@ interface IGauge {
   /// @notice total share
   function totalShare() external view returns (uint256);
 
-  /// @notice gain total supply
-  function gainTotalSupply() external view returns (uint256);
-
-  /// @notice Address of gain balance
-  function gainBalanceOf(address) external view returns (uint256);
-
   /// @notice factor for share
   function shareFactor() external view returns (uint256);
 
