@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IIncentivesFactory} from "./interfaces/factories/IIncentivesFactory.sol";
-import {IGauge} from "./interfaces/IGauge.sol";
+import {IGauge, IRewardGauge} from "./interfaces/IRewardGauge.sol";
 import {IGaugeFactory} from "./interfaces/factories/IGaugeFactory.sol";
 import {IVault} from "./interfaces/IVault.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
@@ -231,7 +231,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       votes[_voter][_pool] = _poolWeight;
       _usedWeight += _poolWeight;
       _totalWeight += _poolWeight;
-      IGauge(_gauge).updateShare(_voter, _poolWeight);
+      IRewardGauge(_gauge).updateShare(_voter, _poolWeight);
       emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
     }
     totalWeight += _totalWeight;
@@ -277,7 +277,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
 
     address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
-    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
+    address _gauge = IGaugeFactory(gaugeFactory).createERC20Gauge(forwarder, _pool);
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
 
     gaugeToIncentives[_gauge] = _incentiveReward;
@@ -376,7 +376,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function claimRewards(address[] memory _gauges) external {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
-      IGauge(_gauges[i]).claimReward(_msgSender());
+      IRewardGauge(_gauges[i]).claimReward(_msgSender());
     }
   }
 
@@ -414,24 +414,5 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     for (uint256 x = 0; x < _length; x++) {
       _distribute(_gauges[x]);
     }
-  }
-
-  function depositLP(address _pool, uint256 _amount) external hasValidGauge(_pool) nonReentrant {
-    if (_amount == 0) revert ZeroAmount();
-    address _sender = msg.sender;
-    address _gauge = gauges[_pool];
-    IERC20(_pool).safeTransferFrom(_sender, address(this), _amount);
-    IERC20(_pool).approve(_gauge, _amount);
-    IGauge(_gauge).deposit(_amount, _sender);
-    IReward(gaugeToIncentives[_gauge])._deposit(_amount, _sender);
-  }
-
-  function withdrawLP(address _pool, uint256 _amount) external nonReentrant {
-    if (_amount == 0) revert ZeroAmount();
-    address _gauge = gauges[_pool];
-    if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
-    address _sender = msg.sender;
-    IGauge(_gauge).withdraw(_sender, _amount);
-    IReward(gaugeToIncentives[_gauge])._withdraw(_amount, _sender);
   }
 }

@@ -1,7 +1,6 @@
 import { ethers, upgrades } from 'hardhat';
 const fs = require('fs');
 
-
 async function main() {
   const forwarder = await ethers.deployContract('Forwarder');
   await forwarder.waitForDeployment();
