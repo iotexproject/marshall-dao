@@ -45,6 +45,12 @@ interface IGauge {
   /// @notice Amount of stakingToken deposited for rewards
   function totalSupply() external view returns (uint256);
 
+  /// @notice Amount of the gainBalance
+  function gainBalanceOf(address) external view returns (uint256);
+
+  /// @notic Amount of totalGainBalance
+  function totalGainBalance() external view returns (uint256);
+
   /// @notice Get the amount of stakingToken deposited by an account
   function balanceOf(address) external view returns (uint256);
 
