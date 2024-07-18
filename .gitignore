@@ -16,4 +16,6 @@ docs/
 .env
 node_modules
 
+/src/types
+
 .idea

@@ -9,6 +9,9 @@ import {IRewardGauge, RewardGauge} from "./RewardGauge.sol";
 contract ERC20Gauge is RewardGauge {
   using SafeERC20 for IERC20;
 
+  event Deposit(address indexed from, address indexed to, uint256 amount);
+  event Withdraw(address indexed from, uint256 amount);
+
   constructor(
     address _forwarder,
     address _stakingToken,

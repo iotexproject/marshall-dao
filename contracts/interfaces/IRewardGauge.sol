@@ -12,10 +12,6 @@ interface IRewardGauge is IGauge {
   error ZeroAmount();
   error ZeroRewardRate();
 
-  event Deposit(address indexed from, address indexed to, uint256 amount);
-  event DepositDevice(address indexed from, address indexed to, uint256 amount, uint256 tokenId);
-  event Withdraw(address indexed from, uint256 amount);
-  event WithdrawDevice(address indexed from, uint256 amount, uint256 tokenId);
   event NotifyReward(address indexed from, uint256 amount);
   event ClaimRewards(address indexed from, uint256 amount);
 

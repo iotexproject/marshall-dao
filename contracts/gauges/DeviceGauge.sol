@@ -8,6 +8,9 @@ import {IDeviceNFT} from "../interfaces/IDeviceNFT.sol";
 import {RewardGauge} from "./RewardGauge.sol";
 
 contract DeviceGauge is RewardGauge, ERC721Holder {
+  event DepositDevice(address indexed from, address indexed to, uint256 amount, uint256 tokenId);
+  event WithdrawDevice(address indexed from, uint256 amount, uint256 tokenId);
+
   mapping(uint256 => address) public tokenStaker;
   mapping(uint256 => uint256) public tokenWeight;
 
@@ -36,6 +39,7 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
 
   function withdraw(uint256 _tokenId) external override nonReentrant {
     address sender = _msgSender();
+    require(sender == tokenStaker[_tokenId], "invalid staker");
 
     _updateRewards(sender);
 
@@ -43,6 +47,8 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     totalSupply -= _amount;
     balanceOf[sender] -= _amount;
     IDeviceNFT(stakingToken).safeTransferFrom(address(this), sender, _tokenId);
+    delete tokenStaker[_tokenId];
+    delete tokenWeight[_tokenId];
 
     emit WithdrawDevice(sender, _amount, _tokenId);
   }
