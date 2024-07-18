@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IVotingRewardsFactory} from "./interfaces/factories/IVotingRewardsFactory.sol";
-import {IGauge} from "./interfaces/IGauge.sol";
+import {IGauge, IRewardGauge} from "./interfaces/IRewardGauge.sol";
 import {IGaugeFactory} from "./interfaces/factories/IGaugeFactory.sol";
 import {IVault} from "./interfaces/IVault.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
@@ -259,7 +259,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
 
     address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
-    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool);
+    address _gauge = IGaugeFactory(gaugeFactory).createERC20Gauge(forwarder, _pool);
 
     gauges[_pool] = _gauge;
     poolForGauge[_gauge] = _pool;
@@ -356,7 +356,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   function claimRewards(address[] memory _gauges) external {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
-      IGauge(_gauges[i]).claimReward(_msgSender());
+      IRewardGauge(_gauges[i]).claimReward(_msgSender());
     }
   }
 
