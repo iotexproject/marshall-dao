@@ -47,9 +47,9 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   uint256 public totalShare;
 
   /// @inheritdoc IRewardGauge
-  mapping(address => uint256) public gainBalanceOf;
+  mapping(address => uint256) public weightedBalanceOf;
   /// @inheritdoc IRewardGauge
-  uint256 public totalGainBalance;
+  uint256 public totalWeightedBalance;
 
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
@@ -65,16 +65,17 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
     if (_escape == 0){
       return rewardPerTokenStored;
     }
-    return rewardPerTokenStored + _escape * rewardRate * PRECISION / totalGainBalance;
+    return rewardPerTokenStored + _escape * rewardRate * PRECISION / totalWeightedBalance;
   }
 
   function updateShare(address _user, uint256 _share) external {
     if (msg.sender != voter) revert NotVoter();
+    _updateRewards(_user);
+
     uint256 _oldShare = shares[_user];
     shares[_user] = _share;
     totalShare = totalShare - _oldShare + _share;
-    _updateRewards(_user);
-    updateGainBalance(_user);
+    updateWeightBalance(_user);
   }
 
   /// @inheritdoc IRewardGauge
@@ -101,20 +102,20 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IRewardGauge
   function earned(address _account) public view returns (uint256) {
     return
-      (gainBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
+      (weightedBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
   }
 
-  function updateGainBalance(address _account) internal {
+  function updateWeightBalance(address _account) internal {
     uint256 _share = shares[_account];
     uint256 _originBalance = balanceOf[_account];
     uint256 _gainBalance = _originBalance * TOKENLESS_PRODUCTION / BASE;
     if ( _share > 0 ){
-      _gainBalance += totalSupply * _share / totalShare * (BASE - TOKENLESS_PRODUCTION) / BASE;
+      _gainBalance += totalSupply * _share * (BASE - TOKENLESS_PRODUCTION) / totalShare / BASE;
     }
     _gainBalance = Math.min(_gainBalance, _originBalance);
-    uint256 _oldGainbalance = gainBalanceOf[_account];
-    gainBalanceOf[_account] = _gainBalance;
-    totalGainBalance = totalGainBalance + _gainBalance - _oldGainbalance;
+    uint256 _oldGainbalance = weightedBalanceOf[_account];
+    weightedBalanceOf[_account] = _gainBalance;
+    totalWeightedBalance = totalWeightedBalance + _gainBalance - _oldGainbalance;
   }
 
   /// @inheritdoc IRewardGauge

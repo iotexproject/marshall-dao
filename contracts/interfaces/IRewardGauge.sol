@@ -39,6 +39,18 @@ interface IRewardGauge is IGauge {
   /// @notice Get the amount of stakingToken deposited by an account
   function balanceOf(address) external view returns (uint256);
 
+  /// @notice The weighted balance is obtained and used in the calculation of rewards.
+  function weightedBalanceOf(address) external view returns (uint256);
+
+  /// @notice The weighted amount for the gauge
+  function totalWeightedBalance() external view returns (uint256);
+
+  /// @notice Total shares which has been voted to the gauge
+  function totalShare() external view returns (uint256);
+
+  /// @notice Amount of share which user voted to the gauge
+  function shares(address) external view returns (uint256);
+
   /// @notice Cached rewardPerTokenStored for an account based on their most recent action
   function userRewardPerTokenPaid(address) external view returns (uint256);
 
