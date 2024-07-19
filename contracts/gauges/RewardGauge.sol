@@ -108,7 +108,7 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
     uint256 _share = shares[_account];
     uint256 _originBalance = balanceOf[_account];
     uint256 _gainBalance = _originBalance * TOKENLESS_PRODUCTION / BASE;
-    if ( _originBalance > 0 && _share > 0 ){
+    if ( _share > 0 ){
       _gainBalance += totalSupply * _share / totalShare * (BASE - TOKENLESS_PRODUCTION) / BASE;
     }
     _gainBalance = Math.min(_gainBalance, _originBalance);
