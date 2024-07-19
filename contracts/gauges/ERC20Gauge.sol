@@ -28,18 +28,21 @@ contract ERC20Gauge is RewardGauge {
     IERC20(stakingToken).safeTransferFrom(sender, address(this), _amount);
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
+    updateGainBalance(sender);
 
     emit Deposit(sender, _recipient, _amount);
   }
 
   function withdraw(uint256 _amount) external override nonReentrant {
     address sender = _msgSender();
+    require(balanceOf[sender] >= _amount, "not enough amount to withdraw");
 
     _updateRewards(sender);
 
     totalSupply -= _amount;
     balanceOf[sender] -= _amount;
     IERC20(stakingToken).safeTransfer(sender, _amount);
+    updateGainBalance(sender);
 
     emit Withdraw(sender, _amount);
   }

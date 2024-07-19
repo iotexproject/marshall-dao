@@ -74,4 +74,9 @@ interface IRewardGauge is IGauge {
   /// @notice Withdraw LP tokens for user
   /// @param _amount .
   function withdraw(uint256 _amount) external;
+
+  /// @dev deposit vote into gauge to gain user rewards.
+  /// @param _user which vote to gauge with share
+  /// @param _share amount of share to deposit in gauge
+  function updateShare(address _user, uint256 _share) external;
 }

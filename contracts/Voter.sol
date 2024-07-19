@@ -2,22 +2,26 @@
 pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IVotingRewardsFactory} from "./interfaces/factories/IVotingRewardsFactory.sol";
+import {IIncentivesFactory} from "./interfaces/factories/IIncentivesFactory.sol";
 import {IGauge, IRewardGauge} from "./interfaces/IRewardGauge.sol";
 import {IGaugeFactory} from "./interfaces/factories/IGaugeFactory.sol";
 import {IVault} from "./interfaces/IVault.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
+import {IReward} from "./interfaces/IReward.sol";
 import {IFactoryRegistry} from "./interfaces/factories/IFactoryRegistry.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {ProtocolTimeLibrary} from "./libraries/ProtocolTimeLibrary.sol";
 import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @title Protocol Voter
 /// @author velodrome.finance, @figs999, @pegahcarter
 /// @notice Manage votes, emission distribution, and gauge creation within the Protocol's ecosystem.
 ///         Also provides support for depositing and withdrawing from managed veNFTs.
 contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
+  using SafeERC20 for IERC20;
   /// @inheritdoc IVoter
   address public immutable forwarder;
   /// @inheritdoc IVoter
@@ -46,6 +50,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   address[] public pools;
   /// @inheritdoc IVoter
   mapping(address => address) public gauges;
+  /// @inheritdoc IVoter
+  mapping(address => address) public gaugeToIncentives;
   /// @inheritdoc IVoter
   mapping(address => address) public poolForGauge;
   /// @inheritdoc IVoter
@@ -87,6 +93,13 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     // ensure new epoch since last vote
     if (ProtocolTimeLibrary.epochStart(block.timestamp) <= lastVoted[user]) revert AlreadyVotedOrDeposited();
     if (block.timestamp <= ProtocolTimeLibrary.epochVoteStart(block.timestamp)) revert DistributeWindow();
+    _;
+  }
+
+  modifier hasValidGauge(address _pool) {
+    address _gauge = gauges[_pool];
+    if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
+    if (!isAlive[_gauge]) revert GaugeNotAlive(_gauge);
     _;
   }
 
@@ -218,6 +231,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       votes[_voter][_pool] = _poolWeight;
       _usedWeight += _poolWeight;
       _totalWeight += _poolWeight;
+      IRewardGauge(_gauge).updateShare(_voter, _poolWeight);
       emit Voted(_voter, _pool, _poolWeight, weights[_pool], block.timestamp);
     }
     totalWeight += _totalWeight;
@@ -252,15 +266,21 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IVoter
   function createGauge(address _poolFactory, address _pool) external nonReentrant returns (address) {
-    address sender = _msgSender();
     if (gauges[_pool] != address(0)) revert GaugeExists();
+    (address incentiveFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
+      _poolFactory
+    );
+
+    address sender = _msgSender();
     if (sender != governor) {
       if (!isWhitelistedToken[_pool]) revert NotWhitelistedToken();
     }
 
     address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
     address _gauge = IGaugeFactory(gaugeFactory).createERC20Gauge(forwarder, _pool);
+    address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
 
+    gaugeToIncentives[_gauge] = _incentiveReward;
     gauges[_pool] = _gauge;
     poolForGauge[_gauge] = _pool;
     isGauge[_gauge] = true;
@@ -357,6 +377,15 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
       IRewardGauge(_gauges[i]).claimReward(_msgSender());
+    }
+  }
+
+  /// @inheritdoc IVoter
+  function claimIncentive(address[] memory _incentives, address[][] memory _tokens) external {
+    address _sender = msg.sender;
+    uint256 _length = _incentives.length;
+    for (uint256 i = 0; i < _length; i++) {
+      IReward(_incentives[i]).getReward(_sender, _tokens[i]);
     }
   }
 

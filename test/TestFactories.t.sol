@@ -11,7 +11,7 @@ contract TestFactories is Test {
 
   function setUp() public {
     // 1xxx ==> fallbackFatories
-    registry = new FactoryRegistry(address(1), address(11));
+    registry = new FactoryRegistry(address(1), address(11), address(111));
   }
 
   function test_setup_success() external {
@@ -23,16 +23,16 @@ contract TestFactories is Test {
   function test_approve() external {
     //1. has Approved address(1) in setUp()
     vm.expectRevert(IFactoryRegistry.PathAlreadyApproved.selector);
-    registry.approve(address(1), address(1111));
+    registry.approve(address(1), address(1111), address(11111));
 
     //2. approve 0 address
     vm.expectRevert(IFactoryRegistry.ZeroAddress.selector);
-    registry.approve(address(0), address(1111));
+    registry.approve(address(0), address(1111), address(11111));
     vm.expectRevert(IFactoryRegistry.ZeroAddress.selector);
-    registry.approve(address(2), address(0));
+    registry.approve(address(2), address(0), address(11111));
 
     //3. add 2 pool and guage
-    registry.approve(address(2), address(22));
+    registry.approve(address(2), address(22), address(222));
     assertEq(2, registry.poolFactories().length);
     assertEq(2, registry.poolFactoriesLength());
     assertEq(address(2), registry.poolFactories()[1]);
@@ -40,14 +40,14 @@ contract TestFactories is Test {
     //4. update guageFactoty for 2 pool should failed
     registry.unapprove(address(2));
     vm.expectRevert(IFactoryRegistry.InvalidFactoriesToPoolFactory.selector);
-    registry.approve(address(2), address(2222));
+    registry.approve(address(2), address(2222), address(22222));
     assertEq(1, registry.poolFactories().length);
     assertEq(1, registry.poolFactoriesLength());
     assertEq(address(1), registry.poolFactories()[0]);
   }
 
   function test_unapprove() public {
-    registry.approve(address(2), address(22));
+    registry.approve(address(2), address(22), address(222));
 
     vm.expectRevert(IFactoryRegistry.FallbackFactory.selector);
     registry.unapprove(address(1));

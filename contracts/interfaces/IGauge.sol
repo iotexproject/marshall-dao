@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 interface IGauge {
+
   /// @notice Total amount of rewardToken to distribute for the current rewards period
   function left() external view returns (uint256 _left);
 

@@ -19,6 +19,8 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
 
   uint256 internal constant DURATION = 7 days; // rewards are released over 7 days
   uint256 internal constant PRECISION = 10 ** 18;
+  uint256 public constant TOKENLESS_PRODUCTION = 40;
+  uint256 public constant BASE = 100;
 
   /// @inheritdoc IRewardGauge
   uint256 public periodFinish;
@@ -39,6 +41,16 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IRewardGauge
   mapping(uint256 => uint256) public rewardRateByEpoch;
 
+  /// @inheritdoc IRewardGauge
+  mapping(address => uint256) public shares;
+  /// @inheritdoc IRewardGauge
+  uint256 public totalShare;
+
+  /// @inheritdoc IRewardGauge
+  mapping(address => uint256) public gainBalanceOf;
+  /// @inheritdoc IRewardGauge
+  uint256 public totalGainBalance;
+
   constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
@@ -49,8 +61,20 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
     if (totalSupply == 0) {
       return rewardPerTokenStored;
     }
-    return
-      rewardPerTokenStored + ((lastTimeRewardApplicable() - lastUpdateTime) * rewardRate * PRECISION) / totalSupply;
+    uint256 _escape = lastTimeRewardApplicable() - lastUpdateTime;
+    if (_escape == 0){
+      return rewardPerTokenStored;
+    }
+    return rewardPerTokenStored + _escape * rewardRate * PRECISION / totalGainBalance;
+  }
+
+  function updateShare(address _user, uint256 _share) external {
+    if (msg.sender != voter) revert NotVoter();
+    uint256 _oldShare = shares[_user];
+    shares[_user] = _share;
+    totalShare = totalShare - _oldShare + _share;
+    _updateRewards(_user);
+    updateGainBalance(_user);
   }
 
   /// @inheritdoc IRewardGauge
@@ -77,7 +101,20 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IRewardGauge
   function earned(address _account) public view returns (uint256) {
     return
-      (balanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
+      (gainBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
+  }
+
+  function updateGainBalance(address _account) internal {
+    uint256 _share = shares[_account];
+    uint256 _originBalance = balanceOf[_account];
+    uint256 _gainBalance = _originBalance * TOKENLESS_PRODUCTION / BASE;
+    if ( _originBalance > 0 && _share > 0 ){
+      _gainBalance += totalSupply * _share / totalShare * (BASE - TOKENLESS_PRODUCTION) / BASE;
+    }
+    _gainBalance = Math.min(_gainBalance, _originBalance);
+    uint256 _oldGainbalance = gainBalanceOf[_account];
+    gainBalanceOf[_account] = _gainBalance;
+    totalGainBalance = totalGainBalance + _gainBalance - _oldGainbalance;
   }
 
   /// @inheritdoc IRewardGauge
@@ -94,11 +131,11 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
 
   function _depositFor(uint256 _amount, address _recipient) internal virtual;
 
-  function _updateRewards(address _account) internal {
+  function _updateRewards(address _user) internal {
     rewardPerTokenStored = rewardPerToken();
     lastUpdateTime = lastTimeRewardApplicable();
-    rewards[_account] = earned(_account);
-    userRewardPerTokenPaid[_account] = rewardPerTokenStored;
+    rewards[_user] = earned(_user);
+    userRewardPerTokenPaid[_user] = rewardPerTokenStored;
   }
 
   /// @inheritdoc IGauge

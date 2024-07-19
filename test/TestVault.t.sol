@@ -12,20 +12,23 @@ import {ProtocolTimeLibrary} from "../contracts/libraries/ProtocolTimeLibrary.so
 import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
+import {IncentivesFactory} from "../contracts/factories/IncentivesFactory.sol";
 
 contract TestVault is Test {
   Vault public vault;
   Voter public voter;
   DAOForwarder public forwarder;
   GaugeFactory public gaugeFactory;
+  IncentivesFactory public incentiveFactory;
   FactoryRegistry public factoryRegistry;
   TestStrategyManager public strategyManager;
 
   function setUp() public {
     forwarder = new DAOForwarder();
     gaugeFactory = new GaugeFactory();
+    incentiveFactory = new IncentivesFactory();
     strategyManager = new TestStrategyManager();
-    factoryRegistry = new FactoryRegistry(address(1), address(gaugeFactory));
+    factoryRegistry = new FactoryRegistry(address(1), address(incentiveFactory), address(gaugeFactory));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
     vault = new Vault();
     vault.initialize(address(voter), address(strategyManager));

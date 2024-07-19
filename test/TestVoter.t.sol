@@ -13,6 +13,7 @@ import {DAOForwarder} from "../contracts/DAOForwarder.sol";
 import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
+import {IncentivesFactory} from "../contracts/factories/IncentivesFactory.sol";
 
 contract TestVoter is Test {
   Voter public voter;
@@ -21,6 +22,7 @@ contract TestVoter is Test {
   address public poolFactory;
   DAOForwarder public forwarder;
   GaugeFactory public gaugeFactory;
+  IncentivesFactory public incentiveFactory;
   FactoryRegistry public factoryRegistry;
   TestStrategyManager public strategyManager;
 
@@ -28,9 +30,10 @@ contract TestVoter is Test {
     forwarder = new DAOForwarder();
     pool = new TestToken("test-pool", "pool");
     gaugeFactory = new GaugeFactory();
+    incentiveFactory = new IncentivesFactory();
     poolFactory = address(1);
     strategyManager = new TestStrategyManager();
-    factoryRegistry = new FactoryRegistry(poolFactory, address(gaugeFactory));
+    factoryRegistry = new FactoryRegistry(poolFactory, address(incentiveFactory), address(gaugeFactory));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
     vault = new Vault();
     vault.initialize(address(voter), address(strategyManager));

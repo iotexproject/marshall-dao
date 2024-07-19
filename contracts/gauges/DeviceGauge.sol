@@ -33,6 +33,7 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     balanceOf[_recipient] += _amount;
     tokenStaker[_tokenId] = _recipient;
     tokenWeight[_tokenId] = _amount;
+    updateGainBalance(_recipient);
 
     emit DepositDevice(sender, _recipient, _amount, _tokenId);
   }
@@ -49,6 +50,7 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     IDeviceNFT(stakingToken).safeTransferFrom(address(this), sender, _tokenId);
     delete tokenStaker[_tokenId];
     delete tokenWeight[_tokenId];
+    updateGainBalance(sender);
 
     emit WithdrawDevice(sender, _amount, _tokenId);
   }
