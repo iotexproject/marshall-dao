@@ -5,6 +5,7 @@ import {IVoter} from "../interfaces/IVoter.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IRewardGauge, RewardGauge} from "./RewardGauge.sol";
+import {IIncentive} from "../interfaces/IIncentive.sol";
 
 contract ERC20Gauge is RewardGauge {
   using SafeERC20 for IERC20;
@@ -15,8 +16,9 @@ contract ERC20Gauge is RewardGauge {
   constructor(
     address _forwarder,
     address _stakingToken,
-    address _voter
-  ) RewardGauge(_forwarder, _stakingToken, _voter) {}
+    address _voter,
+    address _incentives
+  ) RewardGauge(_forwarder, _stakingToken, _voter, _incentives) {}
 
   function _depositFor(uint256 _amount, address _recipient) internal override nonReentrant {
     if (_amount == 0) revert ZeroAmount();
@@ -28,7 +30,8 @@ contract ERC20Gauge is RewardGauge {
     IERC20(stakingToken).safeTransferFrom(sender, address(this), _amount);
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
-    updateGainBalance(sender);
+    updateWeightBalance(sender);
+    IIncentive(incentive).deposit(_amount, _recipient);
 
     emit Deposit(sender, _recipient, _amount);
   }
@@ -42,7 +45,8 @@ contract ERC20Gauge is RewardGauge {
     totalSupply -= _amount;
     balanceOf[sender] -= _amount;
     IERC20(stakingToken).safeTransfer(sender, _amount);
-    updateGainBalance(sender);
+    updateWeightBalance(sender);
+    IIncentive(incentive).withdraw(_amount, sender);
 
     emit Withdraw(sender, _amount);
   }

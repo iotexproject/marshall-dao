@@ -7,7 +7,7 @@ import {IGauge, IRewardGauge} from "./interfaces/IRewardGauge.sol";
 import {IGaugeFactory} from "./interfaces/factories/IGaugeFactory.sol";
 import {IVault} from "./interfaces/IVault.sol";
 import {IVoter} from "./interfaces/IVoter.sol";
-import {IReward} from "./interfaces/IReward.sol";
+import {IIncentive} from "./interfaces/IIncentive.sol";
 import {IFactoryRegistry} from "./interfaces/factories/IFactoryRegistry.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -277,10 +277,10 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
 
     address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
-    address _gauge = IGaugeFactory(gaugeFactory).createERC20Gauge(forwarder, _pool);
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
+    address _gauge = IGaugeFactory(gaugeFactory).createERC20Gauge(forwarder, _pool, _incentiveReward);
+    IIncentive(_incentiveReward).setGauge(_gauge);
 
-    gaugeToIncentives[_gauge] = _incentiveReward;
     gauges[_pool] = _gauge;
     poolForGauge[_gauge] = _pool;
     isGauge[_gauge] = true;
@@ -385,7 +385,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     address _sender = msg.sender;
     uint256 _length = _incentives.length;
     for (uint256 i = 0; i < _length; i++) {
-      IReward(_incentives[i]).getReward(_sender, _tokens[i]);
+      IIncentive(_incentives[i]).getReward(_sender, _tokens[i]);
     }
   }
 

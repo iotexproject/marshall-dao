@@ -50,10 +50,12 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) public weightedBalanceOf;
   /// @inheritdoc IRewardGauge
   uint256 public totalWeightedBalance;
+  address public incentive;
 
-  constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
+  constructor(address _forwarder, address _stakingToken, address _voter, address _incentives) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
+    incentive = _incentives;
   }
 
   /// @inheritdoc IRewardGauge
