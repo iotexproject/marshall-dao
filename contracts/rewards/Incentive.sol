@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IGauge, IIncentive} from "../interfaces/IIncentive.sol";
 import {IVoter} from "../interfaces/IVoter.sol";
 import {ERC2771Context} from "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -43,6 +42,7 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
     /// address => token => reward
     mapping(address => mapping(address => uint256)) public rewards;
     /// @inheritdoc IIncentive
+    /// epochId ==> token ==> rewardRate
     mapping(uint256 => mapping(address => uint256)) public rewardRateByEpoch;
 
     /// @inheritdoc IIncentive
@@ -78,10 +78,10 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
     function addRewardToken(address token) external {
         if (isReward[token]) revert RewardTokenExist();
         if (!IVoter(voter).isWhitelistedToken(token)) revert NotWhitelisted();
+        require(rewardTokens.length < limitTokenNum, "number of reward token over limit");
 
         isReward[token] = true;
         rewardTokens.push(token);
-        require(rewardTokens.length <= limitTokenNum, "number of reward token over limit");
     }
 
     function setGauge(address _gauge) external {
@@ -150,6 +150,12 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
     }
 
     /// @inheritdoc IIncentive
+    function earned(address _account, address _token) public view returns (uint256) {
+        return
+            (balanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account][_token])) / PRECISION + rewards[_account][_token];
+    }
+
+    /// @inheritdoc IIncentive
     function claimReward(address[] memory tokens) external nonReentrant {
         address sender = _msgSender();
         uint256 _length = tokens.length;
@@ -159,19 +165,13 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
     }
 
     function _claimReward(address _token, address _receipt) internal {
-        _updateRewards(_token, _receipt);
+        _updateTokenReward(_token, _receipt);
         uint256 _reward = rewards[_receipt][_token];
         if (_reward > 0) {
             rewards[_receipt][_token] = 0;
             IERC20(_token).safeTransfer(_receipt, _reward);
             emit ClaimRewards(_receipt, _token, _reward);
         }
-    }
-
-    /// @inheritdoc IIncentive
-    function earned(address _account, address _token) public view returns (uint256) {
-        return
-            (balanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account][_token])) / PRECISION + rewards[_account][_token];
     }
 
     /// @inheritdoc IGauge
@@ -182,7 +182,7 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
     }
 
     /// @inheritdoc IGauge
-    function notifyRewardAmount(address _token, uint256 _amount) external payable nonReentrant {
+    function notifyRewardAmount(address _token, uint256 _amount) external nonReentrant {
         address sender = _msgSender();
         if (_amount == 0) revert ZeroAmount();
         if (!isReward[_token]) revert NotRewardToken();
@@ -205,6 +205,7 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
         }
         if (_rewardRate == 0) revert ZeroRewardRate();
         uint256 epochStart = ProtocolTimeLibrary.epochStart(timestamp);
+        rewardRate[_token] = _rewardRate;
         rewardRateByEpoch[epochStart][_token] = _rewardRate;
 
         // Ensure the provided reward amount is not more than the balance in the contract.
