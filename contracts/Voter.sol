@@ -276,7 +276,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       if (!isWhitelistedToken[_pool]) revert NotWhitelistedToken();
     }
 
-    address gaugeFactory = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(_poolFactory);
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
     address _gauge = IGaugeFactory(gaugeFactory).createERC20Gauge(forwarder, _pool, _incentiveReward);
     IIncentive(_incentiveReward).setGauge(_gauge);
@@ -377,15 +376,6 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     uint256 _length = _gauges.length;
     for (uint256 i = 0; i < _length; i++) {
       IRewardGauge(_gauges[i]).claimReward(_msgSender());
-    }
-  }
-
-  /// @inheritdoc IVoter
-  function claimIncentive(address[] memory _incentives, address[][] memory _tokens) external {
-    address _sender = msg.sender;
-    uint256 _length = _incentives.length;
-    for (uint256 i = 0; i < _length; i++) {
-      IIncentive(_incentives[i]).getReward(_sender, _tokens[i]);
     }
   }
 

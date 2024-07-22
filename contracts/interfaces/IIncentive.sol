@@ -16,9 +16,6 @@ interface IIncentive {
   event NotifyReward(address indexed from, address indexed reward, uint256 indexed epoch, uint256 amount);
   event ClaimRewards(address indexed receipt, address indexed token, uint256 amount);
 
-  /// @notice Epoch duration constant (7 days)
-  function DURATION() external view returns (uint256);
-
   /// @notice Address of Voter.sol
   function voter() external view returns (address);
 
@@ -29,8 +26,8 @@ interface IIncentive {
   function balanceOf(address _user) external view returns (uint256);
 
   /// @notice Amount of tokens to reward depositors for a given epoch
-  /// @param token Address of token to reward
   /// @param epochStart Startime of rewards epoch
+  /// @param token Address of token to reward
   /// @return Amount of token
   function rewardRateByEpoch(uint256 epochStart, address token) external view returns (uint256);
 
@@ -41,13 +38,28 @@ interface IIncentive {
   function rewardsListLength() external view returns (uint256);
 
   /// @notice Get reward tokens
-  function rewardTokens() external view returns (address[] memory);
+  function rewardAllTokens() external view returns (address[] memory);
+
+  /// @notice Timestamp end of current rewards period
+  function periodFinish(address token) external view returns (uint256);
+
+  /// @notice Current reward rate of rewardToken to distribute per second
+  function rewardRate(address token) external view returns (uint256);
+
+  /// @notice Most recent timestamp contract has updated state
+  function lastUpdateTime(address token) external view returns (uint256);
 
   /// @notice Gauge associated with the incentive contract
   function gauge() external view returns (address);
 
   /// @notice limit num of reward tokens
   function limitTokenNum() external view returns (uint256);
+
+  /// @notice Get the current reward rate per unit of lp(in the Gauge) deposited
+  function rewardPerToken(address token) external view returns (uint256);
+
+  /// @notice Returns the last time the reward was modified or periodFinish if the reward has ended
+  function lastTimeRewardApplicable(address token) external view returns (uint256);
 
   /// @notice Reward rate of the rewardToken for LP
   function rewardPerTokenStored(address rewardToken) external view returns (uint256);
@@ -56,6 +68,11 @@ interface IIncentive {
   /// @param _user Which will be query
   /// @param _token Will get the reward of the token
   function rewards(address _user, address _token) external view returns (uint256);
+
+  /// @notice Cached rewardPerTokenStored for an account based on their most recent action
+  /// @param _user Which will be query
+  /// @param _token The reward token
+  function userRewardPerTokenPaid(address _user, address _token) external view returns (uint256);
 
   ///
   function setGauge(address _gauge) external;

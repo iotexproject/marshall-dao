@@ -54,7 +54,7 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     delete tokenStaker[_tokenId];
     delete tokenWeight[_tokenId];
     updateWeightBalance(sender);
-    IIncentive.withdraw(_amount, sender);
+    IIncentive(incentive).withdraw(_amount, sender);
 
     emit WithdrawDevice(sender, _amount, _tokenId);
   }

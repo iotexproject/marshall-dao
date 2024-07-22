@@ -36,20 +36,16 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
     /// @inheritdoc IIncentive
     mapping(address => uint256) public balanceOf;
     /// @inheritdoc IIncentive
-    /// address => token => reward
     mapping(address => mapping(address => uint256)) public userRewardPerTokenPaid;
     /// @inheritdoc IIncentive
-    /// address => token => reward
     mapping(address => mapping(address => uint256)) public rewards;
     /// @inheritdoc IIncentive
-    /// epochId ==> token ==> rewardRate
     mapping(uint256 => mapping(address => uint256)) public rewardRateByEpoch;
 
     /// @inheritdoc IIncentive
     address public gauge;
     /// @inheritdoc IIncentive
     uint256 public limitTokenNum;
-    /// @inheritdoc IIncentive
     address[] public rewardTokens;
     /// @inheritdoc IIncentive
     mapping(address => bool) public isReward;
@@ -93,6 +89,10 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
 
     function rewardsListLength() external view returns (uint256){
         return rewardTokens.length;
+    }
+
+    function rewardAllTokens() external view returns (address[] memory) {
+        return rewardTokens;
     }
 
     /// @inheritdoc IIncentive
@@ -152,7 +152,7 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
     /// @inheritdoc IIncentive
     function earned(address _account, address _token) public view returns (uint256) {
         return
-            (balanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account][_token])) / PRECISION + rewards[_account][_token];
+            (balanceOf[_account] * (rewardPerToken(_token) - userRewardPerTokenPaid[_account][_token])) / PRECISION + rewards[_account][_token];
     }
 
     /// @inheritdoc IIncentive
@@ -174,14 +174,14 @@ contract Incentives is IIncentive, ERC2771Context, ReentrancyGuard {
         }
     }
 
-    /// @inheritdoc IGauge
+    /// @inheritdoc IIncentive
     function left(address token) external view returns (uint256) {
         if (block.timestamp >= periodFinish[token]) return 0;
         uint256 _remaining = periodFinish[token] - block.timestamp;
         return _remaining * rewardRate[token];
     }
 
-    /// @inheritdoc IGauge
+    /// @inheritdoc IIncentive
     function notifyRewardAmount(address _token, uint256 _amount) external nonReentrant {
         address sender = _msgSender();
         if (_amount == 0) revert ZeroAmount();
