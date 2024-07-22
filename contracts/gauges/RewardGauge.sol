@@ -52,7 +52,12 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   uint256 public totalWeightedBalance;
   address public incentive;
 
-  constructor(address _forwarder, address _stakingToken, address _voter, address _incentives) ERC2771Context(_forwarder) {
+  constructor(
+    address _forwarder,
+    address _stakingToken,
+    address _voter,
+    address _incentives
+  ) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
     incentive = _incentives;
@@ -64,10 +69,10 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
       return rewardPerTokenStored;
     }
     uint256 _escape = lastTimeRewardApplicable() - lastUpdateTime;
-    if (_escape == 0){
+    if (_escape == 0) {
       return rewardPerTokenStored;
     }
-    return rewardPerTokenStored + _escape * rewardRate * PRECISION / totalWeightedBalance;
+    return rewardPerTokenStored + (_escape * rewardRate * PRECISION) / totalWeightedBalance;
   }
 
   function updateShare(address _user, uint256 _share) external {
@@ -104,15 +109,17 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IRewardGauge
   function earned(address _account) public view returns (uint256) {
     return
-      (weightedBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
+      (weightedBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) /
+      PRECISION +
+      rewards[_account];
   }
 
   function updateWeightBalance(address _account) internal {
     uint256 _share = shares[_account];
     uint256 _originBalance = balanceOf[_account];
-    uint256 _gainBalance = _originBalance * TOKENLESS_PRODUCTION / BASE;
-    if ( _share > 0 ){
-      _gainBalance += totalSupply * _share * (BASE - TOKENLESS_PRODUCTION) / totalShare / BASE;
+    uint256 _gainBalance = (_originBalance * TOKENLESS_PRODUCTION) / BASE;
+    if (_share > 0) {
+      _gainBalance += (totalSupply * _share * (BASE - TOKENLESS_PRODUCTION)) / totalShare / BASE;
     }
     _gainBalance = Math.min(_gainBalance, _originBalance);
     uint256 _oldGainbalance = weightedBalanceOf[_account];

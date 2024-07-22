@@ -10,7 +10,11 @@ contract GaugeFactory is IGaugeFactory {
     gauge = address(new ERC20Gauge(_forwarder, _pool, msg.sender, _incentives));
   }
 
-  function createDeviceGauge(address _forwarder, address _deviceNFT, address _incentives) external override returns (address gauge) {
+  function createDeviceGauge(
+    address _forwarder,
+    address _deviceNFT,
+    address _incentives
+  ) external override returns (address gauge) {
     gauge = address(new DeviceGauge(_forwarder, _deviceNFT, msg.sender, _incentives));
   }
 

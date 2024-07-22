@@ -2,7 +2,6 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Gauge} from "../contracts/gauges/Gauge.sol";
 import {Vault} from "../contracts/Vault.sol";
 import {Voter} from "../contracts/Voter.sol";
 import {IVault} from "../contracts/interfaces/IVault.sol";
