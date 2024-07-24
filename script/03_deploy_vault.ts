@@ -1,6 +1,8 @@
 import { ethers, upgrades } from 'hardhat';
 require('dotenv').config();
+import fs from 'fs';
 
+// npx hardhat run script/03_deploy_vault.ts --network  testnet
 async function main() {
   if (!process.env.FORWARDER) {
     console.log(`Please provide FORWARDER address`);
@@ -23,12 +25,8 @@ async function main() {
   await voter.waitForDeployment();
   console.log(`Voter deployed to ${voter.target}`);
 
-  const rewardsDistributor = await ethers.deployContract('RewardsDistributor', [process.env.MSP]);
-  await rewardsDistributor.waitForDeployment();
-  console.log(`RewardsDistributor deployed to ${rewardsDistributor.target}`);
-
   const Vault = await ethers.getContractFactory('Vault');
-  const vault = await upgrades.deployProxy(Vault, [voter.target, rewardsDistributor.target], {
+  const vault = await upgrades.deployProxy(Vault, [voter.target, process.env.MSP], {
     initializer: 'initialize',
   });
   await vault.waitForDeployment();
@@ -37,8 +35,8 @@ async function main() {
   let tx = await voter.initialize([], vault.target);
   await tx.wait();
 
-  tx = await rewardsDistributor.setVault(vault.target);
-  await tx.wait();
+  fs.appendFileSync('.env', `VOTER=${voter.target}\n`);
+  fs.appendFileSync('.env', `VAULT=${voter.target}\n`);
 }
 
 main().catch(err => {

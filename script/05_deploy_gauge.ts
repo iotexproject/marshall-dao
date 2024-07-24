@@ -1,6 +1,8 @@
 import { ethers } from 'hardhat';
+import fs from "fs";
 require('dotenv').config();
 
+// npx hardhat run script/05_deploy_gauge.ts --network  testnet
 async function main() {
   if (!process.env.VOTER) {
     console.log(`Please provide VOTER address`);
@@ -38,6 +40,13 @@ async function main() {
     console.log('Transaction hash:', tx.hash);
     // 等待交易确认
     const receipt = await tx.wait();
+
+    const deploy_gauge = await voter.gauges(process.env.LST_POOL1);
+    console.log('deploy gauge: ', deploy_gauge);
+    fs.appendFileSync('.env', `LST_GAUGE=${deploy_gauge}\n`)
+    const lst_gauge = await ethers.getContractAt('IRewardGauge', deploy_gauge, deployer);
+    const incentive = await lst_gauge.incentive();
+    fs.appendFileSync('.env', `LST_Incentive=${incentive}\n`);
   } catch (error) {
     console.error('Error calling createGauge:', error);
   }

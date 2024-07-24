@@ -39,6 +39,9 @@ interface IRewardGauge is IGauge {
   /// @notice Get the amount of stakingToken deposited by an account
   function balanceOf(address) external view returns (uint256);
 
+  /// @notice Get the address of incentive
+  function incentive() external view returns (address);
+
   /// @notice The weighted balance is obtained and used in the calculation of rewards.
   function weightedBalanceOf(address) external view returns (uint256);
 
