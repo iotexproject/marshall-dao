@@ -173,7 +173,8 @@ interface IVoter {
   /// @dev V1 gauges can only be created by governor.
   /// @param _poolFactory .
   /// @param _pool .
-  function createGauge(address _poolFactory, address _pool) external returns (address);
+  /// @param _gaugeType
+  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType) external returns (address);
 
   /// @notice Kills a gauge. The gauge will not receive any new emissions and cannot be deposited into.
   ///         Can still withdraw from gauge.

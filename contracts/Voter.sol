@@ -265,7 +265,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function createGauge(address _poolFactory, address _pool) external nonReentrant returns (address) {
+  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType) external nonReentrant returns (address) {
     if (gauges[_pool] != address(0)) revert GaugeExists();
     (address incentiveFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
       _poolFactory
@@ -277,7 +277,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
 
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
-    address _gauge = IGaugeFactory(gaugeFactory).createERC20Gauge(forwarder, _pool, _incentiveReward);
+    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, _incentiveReward, _gaugeType);
     IIncentive(_incentiveReward).setGauge(_gauge);
 
     gauges[_pool] = _gauge;
