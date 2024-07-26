@@ -13,6 +13,7 @@ import {DAOForwarder} from "../contracts/DAOForwarder.sol";
 import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
+import {IGaugeFactory} from "../contracts/interfaces/factories/IGaugeFactory.sol";
 import {IncentivesFactory} from "../contracts/factories/IncentivesFactory.sol";
 
 contract TestVoter is Test {
@@ -148,6 +149,34 @@ contract TestVoter is Test {
     address[] memory gauges = new address[](1);
     gauges[0] = gauge;
     voter.claimRewards(gauges);
+  }
+
+  function test_create_gauge() external {
+    // 1. first create ERC20Gauge
+    voter.createGauge(poolFactory, address(pool), 0);
+    address gauge = voter.gauges(address(pool));
+    assertTrue(gauge != address(0));
+
+    // 2. again create ERC20Gauge should failed for same pool
+    vm.expectRevert(IVoter.GaugeExists.selector);
+    voter.createGauge(poolFactory, address(pool), 0);
+
+    // 3. create NFT gauge
+    address deviceNFT = address(10);
+    voter.createGauge(poolFactory, deviceNFT, 1);
+    gauge = voter.gauges(address(deviceNFT));
+    assertTrue(gauge != address(0));
+
+    // 4. create withdraw gauge
+    address onlyWithdrawGauge = address(11);
+    voter.createGauge(poolFactory, onlyWithdrawGauge, 2);
+    gauge = voter.gauges(address(onlyWithdrawGauge));
+    assertTrue(gauge != address(0));
+
+    // 5. incorrect gaugeType
+    vm.expectRevert(IGaugeFactory.IncorrectnessGaugeType.selector);
+    address nextPool = address(12);
+    voter.createGauge(poolFactory, nextPool, 3);
   }
 
   receive() external payable {}

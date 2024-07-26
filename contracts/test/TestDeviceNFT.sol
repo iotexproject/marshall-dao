@@ -22,4 +22,8 @@ contract TestDeviceNFT is IDeviceNFT, ERC721 {
   function setWeight(uint256 _tokenId, uint256 _weight) public {
     weightOf[_tokenId] = _weight;
   }
+
+  function mint(address to, uint tokenId) external {
+    _mint(to, tokenId);
+  }
 }

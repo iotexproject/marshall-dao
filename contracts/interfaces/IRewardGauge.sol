@@ -78,8 +78,8 @@ interface IRewardGauge is IGauge {
   function claimReward(address _account) external;
 
   /// @notice Deposit LP tokens into gauge for msg.sender
-  /// @param _amount .
-  function deposit(uint256 _amount) external;
+  /// @param _amountOrNFTID .
+  function deposit(uint256 _amountOrNFTID) external;
 
   /// @notice Deposit LP tokens into gauge for any user
   /// @param _amount .

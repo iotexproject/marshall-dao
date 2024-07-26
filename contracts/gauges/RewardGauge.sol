@@ -128,18 +128,18 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IRewardGauge
-  function deposit(uint256 _amount) external {
-    _depositFor(_amount, _msgSender());
+  function deposit(uint256 _amountOrNFTID) external {
+    _depositFor(_amountOrNFTID, _msgSender());
   }
 
   /// @inheritdoc IRewardGauge
-  function deposit(uint256 _amount, address _recipient) external {
-    _depositFor(_amount, _recipient);
+  function deposit(uint256 _amountOrNFTID, address _recipient) external {
+    _depositFor(_amountOrNFTID, _recipient);
   }
 
   function withdraw(uint256 _amount) external virtual;
 
-  function _depositFor(uint256 _amount, address _recipient) internal virtual;
+  function _depositFor(uint256 _amountOrNFTID, address _recipient) internal virtual;
 
   function _updateRewards(address _user) internal {
     rewardPerTokenStored = rewardPerToken();

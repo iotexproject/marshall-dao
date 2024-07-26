@@ -173,7 +173,7 @@ interface IVoter {
   /// @dev V1 gauges can only be created by governor.
   /// @param _poolFactory .
   /// @param _pool .
-  /// @param _gaugeType
+  /// @param _gaugeType 0: ERC20Gauge, 1: DeviceNFTGauge, 2: WithdrawGauge
   function createGauge(address _poolFactory, address _pool, uint8 _gaugeType) external returns (address);
 
   /// @notice Kills a gauge. The gauge will not receive any new emissions and cannot be deposited into.

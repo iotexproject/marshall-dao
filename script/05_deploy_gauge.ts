@@ -16,30 +16,22 @@ async function main() {
     console.log(`Please provide LST address`);
     return;
   }
+  if (!process.env.DeviceNFT) {
+    console.log(`Please provide DeviceNFT address`);
+    return;
+  }
 
   const [deployer] = await ethers.getSigners();
   console.log('Deployer address:', deployer.address);
-
   const voter = await ethers.getContractAt('IVoter', process.env.VOTER, deployer);
 
-  const result = await voter.governor();
-  console.log('governor in voter contract is:', result);
-  const registry = await voter.factoryRegistry();
-  console.log('factoryRegistry in voter contract is:', registry);
-  const factoryRegistry = await ethers.getContractAt('IFactoryRegistry', registry, deployer);
-  const gauge = await factoryRegistry.factoriesToPoolFactory(process.env.EMPTY_FACTORY);
-  console.log('gaugeFactory in factoryRegistry is:', gauge);
-  const factories = await factoryRegistry.poolFactories();
-  console.log('factories in factoryRegistry is:', factories);
-  const deploy_gauge = await voter.gauges(process.env.LST_POOL1);
-  console.log('deploy gauge: ', deploy_gauge);
-
+  // 1. create erc20 gauge
   try {
     console.log('Calling createGauge with parameters:', process.env.EMPTY_FACTORY, process.env.LST_POOL1);
-    const tx = await voter.createGauge(process.env.EMPTY_FACTORY, process.env.LST_POOL1);
+    const tx = await voter.createGauge(process.env.EMPTY_FACTORY, process.env.LST_POOL1, 0);
     console.log('Transaction hash:', tx.hash);
     // 等待交易确认
-    const receipt = await tx.wait();
+    await tx.wait();
 
     const deploy_gauge = await voter.gauges(process.env.LST_POOL1);
     console.log('deploy gauge: ', deploy_gauge);
@@ -47,6 +39,23 @@ async function main() {
     const lst_gauge = await ethers.getContractAt('IRewardGauge', deploy_gauge, deployer);
     const incentive = await lst_gauge.incentive();
     fs.appendFileSync('.env', `LST_Incentive=${incentive}\n`);
+  } catch (error) {
+    console.error('Error calling createGauge:', error);
+  }
+
+  // 2. create nft gauge
+  try {
+    const tx = await voter.createGauge(process.env.EMPTY_FACTORY, process.env.DeviceNFT, 1);
+    console.log('Transaction hash:', tx.hash);
+    // 等待交易确认
+    await tx.wait();
+
+    const deploy_gauge = await voter.gauges(process.env.DeviceNFT);
+    console.log('deploy DeviceNFTGauge: ', deploy_gauge);
+    fs.appendFileSync('.env', `DeviceNFT_GAUGE=${deploy_gauge}\n`)
+    const device_gauge = await ethers.getContractAt('IRewardGauge', deploy_gauge, deployer);
+    const incentive = await device_gauge.incentive();
+    fs.appendFileSync('.env', `DeviceNFT_Incentive=${incentive}\n`);
   } catch (error) {
     console.error('Error calling createGauge:', error);
   }

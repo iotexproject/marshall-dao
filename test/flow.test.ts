@@ -28,7 +28,7 @@ describe('Flow', function () {
     await voter.initialize([], vault.target);
 
     const token = await ethers.deployContract('TestToken', ['Test Token', 'TEST']);
-    await voter.createGauge(poolFactory.target, token.target);
+    await voter.createGauge(poolFactory.target, token.target, 0);
 
     await voter.vote([token.target], [5000]);
   });
