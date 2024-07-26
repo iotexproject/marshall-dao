@@ -7,8 +7,13 @@ describe('Flow', function () {
     const [deployer] = await ethers.getSigners();
     const forwarder = await ethers.deployContract('Forwarder');
     const poolFactory = await ethers.deployContract('EmptyPoolFactory', []);
+    const incentiveFactory = await ethers.deployContract('IncentivesFactory', []);
     const gaugeFactory = await ethers.deployContract('GaugeFactory', []);
-    const factoryRegistry = await ethers.deployContract('FactoryRegistry', [poolFactory.target, gaugeFactory.target]);
+    const factoryRegistry = await ethers.deployContract('FactoryRegistry', [
+      poolFactory.target,
+      incentiveFactory.target,
+      gaugeFactory.target,
+    ]);
     const strategyManager = await ethers.deployContract('TestStrategyManager');
     await strategyManager.setShare(deployer.address, 100);
     const voter = await ethers.deployContract('Voter', [
@@ -23,7 +28,7 @@ describe('Flow', function () {
     await voter.initialize([], vault.target);
 
     const token = await ethers.deployContract('TestToken', ['Test Token', 'TEST']);
-    await voter.createGauge(poolFactory.target, token.target);
+    await voter.createGauge(poolFactory.target, token.target, 0);
 
     await voter.vote([token.target], [5000]);
   });

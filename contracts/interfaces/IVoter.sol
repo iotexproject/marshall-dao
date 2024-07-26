@@ -121,16 +121,6 @@ interface IVoter {
   /// @param _gauges Array of gauges to distribute to.
   function distribute(address[] memory _gauges) external;
 
-  /// @dev Deposit gauge of pool by users.
-  /// @param _pool lp of the deposit
-  /// @param _amount of the lp
-  function depositLP(address _pool, uint256 _amount) external;
-
-  /// @dev Deposit gauge of pool by users.
-  /// @param _pool lp of the deposit
-  /// @param _amount of the lp
-  function withdrawLP(address _pool, uint256 _amount) external;
-
   /// @notice Called by users to update voting balances in voting rewards contracts.
   function poke() external;
 
@@ -154,11 +144,6 @@ interface IVoter {
   /// @notice Claim emissions from gauges.
   /// @param _gauges Array of gauges to collect emissions from.
   function claimRewards(address[] memory _gauges) external;
-
-  /// @notice Claim incentives with another reward for LP in gauge
-  /// @param _incentives which store reward
-  /// @param _tokens Array of reward token for LP in gauge
-  function claimIncentive(address[] memory _incentives, address[][] memory _tokens) external;
 
   /// @notice Set new governor.
   /// @dev Throws if not called by governor.
@@ -188,7 +173,8 @@ interface IVoter {
   /// @dev V1 gauges can only be created by governor.
   /// @param _poolFactory .
   /// @param _pool .
-  function createGauge(address _poolFactory, address _pool) external returns (address);
+  /// @param _gaugeType 0: ERC20Gauge, 1: DeviceNFTGauge, 2: WithdrawGauge
+  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType) external returns (address);
 
   /// @notice Kills a gauge. The gauge will not receive any new emissions and cannot be deposited into.
   ///         Can still withdraw from gauge.

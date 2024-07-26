@@ -2,15 +2,16 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Gauge} from "../contracts/gauges/Gauge.sol";
+import {ERC20Gauge} from "../contracts/gauges/ERC20Gauge.sol";
 import {Voter} from "../contracts/Voter.sol";
-import {IGauge} from "../contracts/interfaces/IGauge.sol";
+import {IRewardGauge} from "../contracts/interfaces/IRewardGauge.sol";
 import {DAOForwarder} from "../contracts/DAOForwarder.sol";
 import {TestToken} from "../contracts/test/TestToken.sol";
 import {ProtocolTimeLibrary} from "../contracts/libraries/ProtocolTimeLibrary.sol";
+import {Incentives} from "../contracts/rewards/Incentive.sol";
 
-contract TestGauge is Test {
-  Gauge public gauge;
+contract TestERC20Gauge is Test {
+  ERC20Gauge public gauge;
   DAOForwarder public forwarder;
   TestToken public pool;
   Voter public voter;
@@ -22,16 +23,19 @@ contract TestGauge is Test {
     forwarder = new DAOForwarder();
     // manager & _factoryRegistry not used in gauge
     voter = new Voter(address(forwarder), address(this), address(this));
-    gauge = new Gauge(address(forwarder), address(pool), address(voter));
+    Incentives inti = new Incentives(address(forwarder), address(voter), new address[](0));
+    gauge = new ERC20Gauge(address(forwarder), address(pool), address(voter), address(inti));
+    vm.prank(address(voter));
+    inti.setGauge(address(gauge));
   }
 
   function test_deposit() external {
     //1. deposit 0 failed;
-    vm.expectRevert(IGauge.ZeroAmount.selector);
+    vm.expectRevert(IRewardGauge.ZeroAmount.selector);
     gauge.deposit(0);
 
     //2. gauge is not alive in voter so failed
-    vm.expectRevert(IGauge.NotAlive.selector);
+    vm.expectRevert(IRewardGauge.NotAlive.selector);
     gauge.deposit(1);
 
     //3. set alive with gauge in voter;
@@ -61,7 +65,7 @@ contract TestGauge is Test {
     gauge.deposit(1 ether);
 
     // 1. rewardAmount sender not voter failed
-    vm.expectRevert(IGauge.NotVoter.selector);
+    vm.expectRevert(IRewardGauge.NotVoter.selector);
     gauge.notifyRewardAmount{value: 1 ether}();
 
     // 2. success rewards-1

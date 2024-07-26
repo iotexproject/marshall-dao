@@ -6,6 +6,7 @@ import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Hol
 import {IVoter} from "../interfaces/IVoter.sol";
 import {IDeviceNFT} from "../interfaces/IDeviceNFT.sol";
 import {RewardGauge} from "./RewardGauge.sol";
+import {IIncentive} from "../interfaces/IIncentive.sol";
 
 contract DeviceGauge is RewardGauge, ERC721Holder {
   event DepositDevice(address indexed from, address indexed to, uint256 amount, uint256 tokenId);
@@ -17,8 +18,9 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
   constructor(
     address _forwarder,
     address _stakingToken,
-    address _voter
-  ) RewardGauge(_forwarder, _stakingToken, _voter) {}
+    address _voter,
+    address _incentives
+  ) RewardGauge(_forwarder, _stakingToken, _voter, _incentives) {}
 
   function _depositFor(uint256 _tokenId, address _recipient) internal override nonReentrant {
     if (_tokenId == 0) revert ZeroAmount();
@@ -33,7 +35,8 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     balanceOf[_recipient] += _amount;
     tokenStaker[_tokenId] = _recipient;
     tokenWeight[_tokenId] = _amount;
-    updateGainBalance(_recipient);
+    updateWeightBalance(_recipient);
+    IIncentive(incentive).deposit(_amount, _recipient);
 
     emit DepositDevice(sender, _recipient, _amount, _tokenId);
   }
@@ -50,7 +53,8 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     IDeviceNFT(stakingToken).safeTransferFrom(address(this), sender, _tokenId);
     delete tokenStaker[_tokenId];
     delete tokenWeight[_tokenId];
-    updateGainBalance(sender);
+    updateWeightBalance(sender);
+    IIncentive(incentive).withdraw(_amount, sender);
 
     emit WithdrawDevice(sender, _amount, _tokenId);
   }

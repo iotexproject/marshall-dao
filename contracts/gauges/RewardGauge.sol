@@ -47,13 +47,20 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   uint256 public totalShare;
 
   /// @inheritdoc IRewardGauge
-  mapping(address => uint256) public gainBalanceOf;
+  mapping(address => uint256) public weightedBalanceOf;
   /// @inheritdoc IRewardGauge
-  uint256 public totalGainBalance;
+  uint256 public totalWeightedBalance;
+  address public incentive;
 
-  constructor(address _forwarder, address _stakingToken, address _voter) ERC2771Context(_forwarder) {
+  constructor(
+    address _forwarder,
+    address _stakingToken,
+    address _voter,
+    address _incentives
+  ) ERC2771Context(_forwarder) {
     stakingToken = _stakingToken;
     voter = _voter;
+    incentive = _incentives;
   }
 
   /// @inheritdoc IRewardGauge
@@ -62,19 +69,20 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
       return rewardPerTokenStored;
     }
     uint256 _escape = lastTimeRewardApplicable() - lastUpdateTime;
-    if (_escape == 0){
+    if (_escape == 0) {
       return rewardPerTokenStored;
     }
-    return rewardPerTokenStored + _escape * rewardRate * PRECISION / totalGainBalance;
+    return rewardPerTokenStored + (_escape * rewardRate * PRECISION) / totalWeightedBalance;
   }
 
   function updateShare(address _user, uint256 _share) external {
     if (msg.sender != voter) revert NotVoter();
+    _updateRewards(_user);
+
     uint256 _oldShare = shares[_user];
     shares[_user] = _share;
     totalShare = totalShare - _oldShare + _share;
-    _updateRewards(_user);
-    updateGainBalance(_user);
+    updateWeightBalance(_user);
   }
 
   /// @inheritdoc IRewardGauge
@@ -101,35 +109,37 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IRewardGauge
   function earned(address _account) public view returns (uint256) {
     return
-      (gainBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) / PRECISION + rewards[_account];
+      (weightedBalanceOf[_account] * (rewardPerToken() - userRewardPerTokenPaid[_account])) /
+      PRECISION +
+      rewards[_account];
   }
 
-  function updateGainBalance(address _account) internal {
+  function updateWeightBalance(address _account) internal {
     uint256 _share = shares[_account];
     uint256 _originBalance = balanceOf[_account];
-    uint256 _gainBalance = _originBalance * TOKENLESS_PRODUCTION / BASE;
-    if ( _originBalance > 0 && _share > 0 ){
-      _gainBalance += totalSupply * _share / totalShare * (BASE - TOKENLESS_PRODUCTION) / BASE;
+    uint256 _gainBalance = (_originBalance * TOKENLESS_PRODUCTION) / BASE;
+    if (_share > 0) {
+      _gainBalance += (totalSupply * _share * (BASE - TOKENLESS_PRODUCTION)) / totalShare / BASE;
     }
     _gainBalance = Math.min(_gainBalance, _originBalance);
-    uint256 _oldGainbalance = gainBalanceOf[_account];
-    gainBalanceOf[_account] = _gainBalance;
-    totalGainBalance = totalGainBalance + _gainBalance - _oldGainbalance;
+    uint256 _oldGainbalance = weightedBalanceOf[_account];
+    weightedBalanceOf[_account] = _gainBalance;
+    totalWeightedBalance = totalWeightedBalance + _gainBalance - _oldGainbalance;
   }
 
   /// @inheritdoc IRewardGauge
-  function deposit(uint256 _amount) external {
-    _depositFor(_amount, _msgSender());
+  function deposit(uint256 _amountOrNFTID) external {
+    _depositFor(_amountOrNFTID, _msgSender());
   }
 
   /// @inheritdoc IRewardGauge
-  function deposit(uint256 _amount, address _recipient) external {
-    _depositFor(_amount, _recipient);
+  function deposit(uint256 _amountOrNFTID, address _recipient) external {
+    _depositFor(_amountOrNFTID, _recipient);
   }
 
   function withdraw(uint256 _amount) external virtual;
 
-  function _depositFor(uint256 _amount, address _recipient) internal virtual;
+  function _depositFor(uint256 _amountOrNFTID, address _recipient) internal virtual;
 
   function _updateRewards(address _user) internal {
     rewardPerTokenStored = rewardPerToken();

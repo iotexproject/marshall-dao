@@ -7,12 +7,13 @@ import {TestToken} from "../contracts/test/TestToken.sol";
 import {Vault} from "../contracts/Vault.sol";
 import {Voter} from "../contracts/Voter.sol";
 import {IVoter} from "../contracts/interfaces/IVoter.sol";
-import {IGauge} from "../contracts/interfaces/IGauge.sol";
+import {IRewardGauge} from "../contracts/interfaces/IRewardGauge.sol";
 import {IVault} from "../contracts/interfaces/IVault.sol";
 import {DAOForwarder} from "../contracts/DAOForwarder.sol";
 import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
+import {IGaugeFactory} from "../contracts/interfaces/factories/IGaugeFactory.sol";
 import {IncentivesFactory} from "../contracts/factories/IncentivesFactory.sol";
 
 contract TestVoter is Test {
@@ -42,25 +43,25 @@ contract TestVoter is Test {
 
   function test_gauge_actions() external {
     //1. createGauge success
-    voter.createGauge(poolFactory, address(pool));
+    voter.createGauge(poolFactory, address(pool), 0);
     assertEq(1, voter.length());
     assertNotEq(address(0), voter.gauges(address(pool)));
 
     //1.1 repeat add same pool so failed
     vm.expectRevert(IVoter.GaugeExists.selector);
-    voter.createGauge(poolFactory, address(pool));
+    voter.createGauge(poolFactory, address(pool), 0);
     assertEq(1, voter.length());
 
     //1.2 caller not governor & pool is not whitelistedToken
     address pool2 = address(22);
     vm.prank(address(2));
     vm.expectRevert(IVoter.NotWhitelistedToken.selector);
-    voter.createGauge(poolFactory, pool2);
+    voter.createGauge(poolFactory, pool2, 0);
     assertEq(1, voter.length());
 
     //1.3 set whitelistedToken
     voter.whitelistToken(pool2, true);
-    voter.createGauge(poolFactory, pool2);
+    voter.createGauge(poolFactory, pool2, 0);
     assertEq(2, voter.length());
 
     //2. kill gauge
@@ -76,7 +77,7 @@ contract TestVoter is Test {
 
   function test_vote_actions() external {
     skip(10 days);
-    voter.createGauge(poolFactory, address(pool));
+    voter.createGauge(poolFactory, address(pool), 0);
     strategyManager.setShare(address(this), 500);
 
     //1. vote failed due to UnequalLengths
@@ -121,7 +122,7 @@ contract TestVoter is Test {
 
   function test_notifyReward_updateFor_distribute_claimRewards() external {
     // 0. setup to create gauge and vote for the gauge
-    voter.createGauge(poolFactory, address(pool));
+    voter.createGauge(poolFactory, address(pool), 0);
     address gauge = voter.gauges(address(pool));
     strategyManager.setShare(address(this), 1000);
     address[] memory poolvote = new address[](1);
@@ -141,13 +142,41 @@ contract TestVoter is Test {
 
     // 4. user deposit lp to gauge
     pool.approve(gauge, 3 ether);
-    IGauge(gauge).deposit(1 ether);
+    IRewardGauge(gauge).deposit(1 ether);
 
     // 5. claim rewards by user
     skip(3 days);
     address[] memory gauges = new address[](1);
     gauges[0] = gauge;
     voter.claimRewards(gauges);
+  }
+
+  function test_create_gauge() external {
+    // 1. first create ERC20Gauge
+    voter.createGauge(poolFactory, address(pool), 0);
+    address gauge = voter.gauges(address(pool));
+    assertTrue(gauge != address(0));
+
+    // 2. again create ERC20Gauge should failed for same pool
+    vm.expectRevert(IVoter.GaugeExists.selector);
+    voter.createGauge(poolFactory, address(pool), 0);
+
+    // 3. create NFT gauge
+    address deviceNFT = address(10);
+    voter.createGauge(poolFactory, deviceNFT, 1);
+    gauge = voter.gauges(address(deviceNFT));
+    assertTrue(gauge != address(0));
+
+    // 4. create withdraw gauge
+    address onlyWithdrawGauge = address(11);
+    voter.createGauge(poolFactory, onlyWithdrawGauge, 2);
+    gauge = voter.gauges(address(onlyWithdrawGauge));
+    assertTrue(gauge != address(0));
+
+    // 5. incorrect gaugeType
+    vm.expectRevert(IGaugeFactory.IncorrectnessGaugeType.selector);
+    address nextPool = address(12);
+    voter.createGauge(poolFactory, nextPool, 3);
   }
 
   receive() external payable {}
