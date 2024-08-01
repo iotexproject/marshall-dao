@@ -7,8 +7,6 @@ import {Incentives} from "../rewards/Incentive.sol";
 contract IncentivesFactory is IIncentivesFactory {
   /// @inheritdoc IIncentivesFactory
   function createRewards(address _forwarder, address _pool) external returns (address incentiveReward) {
-    address[] memory rewards = new address[](1);
-    rewards[0] = _pool;
-    incentiveReward = address(new Incentives(_forwarder, msg.sender, rewards));
+    incentiveReward = address(new Incentives(_forwarder, msg.sender, new address[](0)));
   }
 }
