@@ -22,7 +22,7 @@ contract Vault is IVault, Initializable {
   address public strategyManager;
 
   /// @inheritdoc IVault
-  uint256 public constant WEEK = 1 weeks;
+  uint256 public constant WEEK = 3 minutes;
   /// @inheritdoc IVault
   uint256 public shareRate;
   /// @inheritdoc IVault
@@ -41,7 +41,7 @@ contract Vault is IVault, Initializable {
     governor = msg.sender;
     strategyManager = _manager;
     shareRate = 1000;
-    weekly = 100_000 * 1e18; // 10%
+    weekly = 1000; // 10%
     activePeriod = ((block.timestamp) / WEEK) * WEEK; // allow emissions this coming epoch
   }
 
