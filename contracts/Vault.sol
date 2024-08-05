@@ -41,7 +41,7 @@ contract Vault is IVault, Initializable {
     governor = msg.sender;
     strategyManager = _manager;
     shareRate = 1000;
-    weekly = 1000; // 10%
+    weekly = 1000000; // 10%
     activePeriod = ((block.timestamp) / WEEK) * WEEK; // allow emissions this coming epoch
   }
 
