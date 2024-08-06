@@ -76,6 +76,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) internal supplyIndex;
   /// @inheritdoc IVoter
   mapping(address => uint256) public claimable;
+  mapping(address => uint256) public triggerThreshold;
 
   constructor(address _forwarder, address _strategyManager, address _factoryRegistry) ERC2771Context(_forwarder) {
     forwarder = _forwarder;
@@ -221,6 +222,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
       if (!isAlive[_gauge]) revert GaugeNotAlive(_gauge);
       if (votes[_voter][_pool] != 0) revert NonZeroVotes();
+      require(IRewardGauge(_gauge).depositUserNum() >= triggerThreshold[_gauge], "gauge don't meet condition for receive vote");
 
       uint256 _poolWeight = (_weights[i] * _weight) / _totalVoteWeight;
       if (_poolWeight == 0) revert ZeroBalance();
@@ -265,7 +267,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType) external nonReentrant returns (address) {
+  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType, uint256 threshold) external nonReentrant returns (address) {
     if (gauges[_pool] != address(0)) revert GaugeExists();
     (address incentiveFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
       _poolFactory
@@ -277,7 +279,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
 
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
-    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, _incentiveReward, _gaugeType);
+    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, _incentiveReward, _gaugeType, threshold);
     IIncentive(_incentiveReward).setGauge(_gauge);
 
     gauges[_pool] = _gauge;
@@ -286,6 +288,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     isAlive[_gauge] = true;
     _updateFor(_gauge);
     pools.push(_pool);
+    triggerThreshold[_gauge] = triggerThreshold;
 
     emit GaugeCreated(_poolFactory, gaugeFactory, _pool, _gauge, sender);
     return _gauge;

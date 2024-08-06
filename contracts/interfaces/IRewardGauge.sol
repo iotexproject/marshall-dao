@@ -94,4 +94,6 @@ interface IRewardGauge is IGauge {
   /// @param _user which vote to gauge with share
   /// @param _share amount of share to deposit in gauge
   function updateShare(address _user, uint256 _share) external;
+
+  function depositUserNum() external returns (uint256);
 }
