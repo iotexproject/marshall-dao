@@ -10,6 +10,9 @@ import {TestToken} from "../contracts/test/TestToken.sol";
 import {ProtocolTimeLibrary} from "../contracts/libraries/ProtocolTimeLibrary.sol";
 import {Incentives} from "../contracts/rewards/Incentive.sol";
 import "../contracts/test/TestStrategyManager.sol";
+import "../contracts/factories/GaugeFactory.sol";
+import "../contracts/factories/FactoryRegistry.sol";
+import "../contracts/factories/IncentivesFactory.sol";
 
 contract TestERC20Gauge is Test {
   ERC20Gauge public gauge;
@@ -26,11 +29,14 @@ contract TestERC20Gauge is Test {
     // manager & _factoryRegistry not used in gauge
     strategyManager = new TestStrategyManager();
     strategyManager.setShare(address (this), 100);
-    voter = new Voter(address(forwarder), address(strategyManager), address(this));
-    Incentives inti = new Incentives(address(forwarder), address(voter), new address[](0));
-    gauge = new ERC20Gauge(address(forwarder), address(pool), address(voter), address(inti));
-    vm.prank(address(voter));
-    inti.setGauge(address(gauge));
+    GaugeFactory gaugeFactory = new GaugeFactory();
+    IncentivesFactory incentiveFactory = new IncentivesFactory();
+    address poolFactory = address(1);
+    FactoryRegistry factoryRegistry = new FactoryRegistry(poolFactory, address(incentiveFactory), address(gaugeFactory));
+    voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
+    address _gauge = voter.createGauge(poolFactory, address(pool), 0, 0);
+    gauge = ERC20Gauge(_gauge);
+    voter.killGauge(_gauge);
   }
 
   function test_deposit() external {
@@ -84,26 +90,26 @@ contract TestERC20Gauge is Test {
     // 2.2 simulate notify rewards by voter
     vm.prank(address(voter));
     gauge.notifyRewardAmount{value: 1 ether}();
-    assertEq(1, gauge.lastUpdateTime());
+    assertEq(8 days + 1, gauge.lastUpdateTime());
     assertEq(ProtocolTimeLibrary.epochNext(block.timestamp), gauge.periodFinish());
     uint256 firstRate = gauge.rewardRate();
     uint256 firstPeriod = gauge.periodFinish();
     uint256 firstRewardPerToken = gauge.rewardPerToken();
     console.log("firstRewardPerToken: ", firstRewardPerToken);
     skip(3000); // blockTime will set after 3000s
-    assertEq(3001, block.timestamp);
+    assertEq(8 days + 3000 + 1, block.timestamp);
 
     // 3. success reward-2 in same epoch
     vm.prank(address(voter));
     gauge.notifyRewardAmount{value: 1 ether}();
-    assertEq(3001, gauge.lastUpdateTime());
+    assertEq(8 days + 3000 + 1, gauge.lastUpdateTime());
     assertGt(gauge.rewardRate(), firstRate);
     assertEq(firstPeriod, gauge.periodFinish());
     assertEq(2 ether, address(gauge).balance);
     uint256 secondRewardPerToken = gauge.rewardPerToken();
 
     // 4. view earned in first epoch
-    skip(7 days - block.timestamp);
+    skip(14 days - block.timestamp);
     assertEq(block.timestamp, firstPeriod);
     uint256 firstEarned = gauge.earned(address(this));
     console.log("firstPeriod: ", firstPeriod, "; blocktime: ", block.timestamp);
