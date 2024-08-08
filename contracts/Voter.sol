@@ -76,6 +76,8 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   mapping(address => uint256) internal supplyIndex;
   /// @inheritdoc IVoter
   mapping(address => uint256) public claimable;
+  /// @inheritdoc IVoter
+  mapping(address => uint256) public triggerThreshold;
 
   constructor(address _forwarder, address _strategyManager, address _factoryRegistry) ERC2771Context(_forwarder) {
     forwarder = _forwarder;
@@ -149,6 +151,15 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     if (_maxVotingNum < MIN_MAXVOTINGNUM) revert MaximumVotingNumberTooLow();
     if (_maxVotingNum == maxVotingNum) revert SameValue();
     maxVotingNum = _maxVotingNum;
+  }
+
+  /// @inheritdoc IVoter
+  function setThreshold(address _pool, uint256 _threshold) external {
+    if (_msgSender() != governor) revert NotGovernor();
+    address _gauge = gauges[_pool];
+    if (_gauge == address(0)) revert GaugeDoesNotExist(_pool);
+
+    triggerThreshold[_gauge] = _threshold;
   }
 
   /// @inheritdoc IVoter
@@ -265,7 +276,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType) external nonReentrant returns (address) {
+  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType, uint256 threshold) external nonReentrant returns (address) {
     if (gauges[_pool] != address(0)) revert GaugeExists();
     (address incentiveFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
       _poolFactory
@@ -277,7 +288,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     }
 
     address _incentiveReward = IIncentivesFactory(incentiveFactory).createRewards(forwarder, _pool);
-    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, _incentiveReward, _gaugeType);
+    address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, _incentiveReward, _gaugeType, threshold);
     IIncentive(_incentiveReward).setGauge(_gauge);
 
     gauges[_pool] = _gauge;
@@ -286,6 +297,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     isAlive[_gauge] = true;
     _updateFor(_gauge);
     pools.push(_pool);
+    triggerThreshold[_gauge] = threshold;
 
     emit GaugeCreated(_poolFactory, gaugeFactory, _pool, _gauge, sender);
     return _gauge;
@@ -323,6 +335,10 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     address sender = _msgSender();
     if (sender != vault) revert NotVault();
     uint256 _amount = msg.value;
+    if (totalWeight == 0) {
+      payable(vault).transfer(_amount);
+      return;
+    }
     uint256 _ratio = (_amount * 1e18) / Math.max(totalWeight, 1); // 1e18 adjustment is removed during claim
     if (_ratio > 0) {
       index += _ratio;
@@ -360,7 +376,7 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
       uint256 _delta = _index - _supplyIndex; // see if there is any difference that need to be accrued
       if (_delta > 0) {
         uint256 _share = (_supplied * _delta) / 1e18; // add accrued difference for each supplied token
-        if (isAlive[_gauge]) {
+        if (isAlive[_gauge] && IRewardGauge(_gauge).depositUserNum() >= triggerThreshold[_gauge]) {
           claimable[_gauge] += _share;
         } else {
           payable(vault).transfer(_share); // send rewards back to Vault so they're not stuck in Voter

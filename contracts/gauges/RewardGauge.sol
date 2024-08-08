@@ -52,6 +52,8 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   uint256 public totalWeightedBalance;
   address public incentive;
 
+  uint256 public depositUserNum;
+
   constructor(
     address _forwarder,
     address _stakingToken,
@@ -129,11 +131,18 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
 
   /// @inheritdoc IRewardGauge
   function deposit(uint256 _amountOrNFTID) external {
-    _depositFor(_amountOrNFTID, _msgSender());
+    address sender = _msgSender();
+    if (balanceOf[sender] == 0){
+      depositUserNum++;
+    }
+    _depositFor(_amountOrNFTID, sender);
   }
 
   /// @inheritdoc IRewardGauge
   function deposit(uint256 _amountOrNFTID, address _recipient) external {
+    if (balanceOf[_recipient] == 0){
+      depositUserNum++;
+    }
     _depositFor(_amountOrNFTID, _recipient);
   }
 
