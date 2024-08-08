@@ -150,6 +150,11 @@ interface IVoter {
   /// @param _governor .
   function setGovernor(address _governor) external;
 
+  /// @notice Set threshold for gauge with the pool
+  /// @param _pool .
+  /// @param _threshold .
+  function setThreshold(address _pool, uint256 _threshold) external;
+
   /// @notice Set new emergency council.
   /// @dev Throws if not called by emergency council.
   /// @param _emergencyCouncil .
@@ -161,6 +166,10 @@ interface IVoter {
   ///      Throws if the values are the same.
   /// @param _maxVotingNum .
   function setMaxVotingNum(uint256 _maxVotingNum) external;
+
+  /// @notice get the threshold for the gauge
+  /// @param _gauge .
+  function triggerThreshold(address _gauge) external returns (uint256);
 
   /// @notice Whitelist (or unwhitelist) token for use in bribes.
   /// @dev Throws if not called by governor.
@@ -174,7 +183,8 @@ interface IVoter {
   /// @param _poolFactory .
   /// @param _pool .
   /// @param _gaugeType 0: ERC20Gauge, 1: DeviceNFTGauge, 2: WithdrawGauge
-  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType) external returns (address);
+  /// @param threshold only >0 for deviceNFTGauge
+  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType, uint256 threshold) external returns (address);
 
   /// @notice Kills a gauge. The gauge will not receive any new emissions and cannot be deposited into.
   ///         Can still withdraw from gauge.

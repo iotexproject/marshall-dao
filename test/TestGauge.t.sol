@@ -9,12 +9,14 @@ import {DAOForwarder} from "../contracts/DAOForwarder.sol";
 import {TestToken} from "../contracts/test/TestToken.sol";
 import {ProtocolTimeLibrary} from "../contracts/libraries/ProtocolTimeLibrary.sol";
 import {Incentives} from "../contracts/rewards/Incentive.sol";
+import "../contracts/test/TestStrategyManager.sol";
 
 contract TestERC20Gauge is Test {
   ERC20Gauge public gauge;
   DAOForwarder public forwarder;
   TestToken public pool;
   Voter public voter;
+  TestStrategyManager public strategyManager;
 
   fallback() external payable {}
 
@@ -22,7 +24,9 @@ contract TestERC20Gauge is Test {
     pool = new TestToken("lp_pool", "pool");
     forwarder = new DAOForwarder();
     // manager & _factoryRegistry not used in gauge
-    voter = new Voter(address(forwarder), address(this), address(this));
+    strategyManager = new TestStrategyManager();
+    strategyManager.setShare(address (this), 100);
+    voter = new Voter(address(forwarder), address(strategyManager), address(this));
     Incentives inti = new Incentives(address(forwarder), address(voter), new address[](0));
     gauge = new ERC20Gauge(address(forwarder), address(pool), address(voter), address(inti));
     vm.prank(address(voter));
@@ -70,6 +74,12 @@ contract TestERC20Gauge is Test {
 
     // 2. success rewards-1
     // 2.1 deposit rewards to voter
+    skip(8 days);
+    address[] memory poolvote = new address[](1);
+    uint256[] memory weights = new uint256[](1);
+    poolvote[0] = address(pool);
+    weights[0] = 5000;
+    voter.vote(poolvote, weights);
     voter.notifyRewardAmount{value: 90 ether}();
     // 2.2 simulate notify rewards by voter
     vm.prank(address(voter));
