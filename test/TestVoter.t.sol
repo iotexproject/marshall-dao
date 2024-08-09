@@ -10,6 +10,7 @@ import {IVoter} from "../contracts/interfaces/IVoter.sol";
 import {IRewardGauge} from "../contracts/interfaces/IRewardGauge.sol";
 import {IVault} from "../contracts/interfaces/IVault.sol";
 import {DAOForwarder} from "../contracts/DAOForwarder.sol";
+import {TestDeviceNFT} from "../contracts/test/TestDeviceNFT.sol";
 import {TestStrategyManager} from "../contracts/test/TestStrategyManager.sol";
 import {FactoryRegistry} from "../contracts/factories/FactoryRegistry.sol";
 import {GaugeFactory} from "../contracts/factories/GaugeFactory.sol";
@@ -162,7 +163,7 @@ contract TestVoter is Test {
     voter.createGauge(poolFactory, address(pool), 0);
 
     // 3. create NFT gauge
-    address deviceNFT = address(10);
+    address deviceNFT = address(new TestDeviceNFT("name", "symbol"));
     voter.createGauge(poolFactory, deviceNFT, 1);
     gauge = voter.gauges(address(deviceNFT));
     assertTrue(gauge != address(0));

@@ -2,9 +2,10 @@
 pragma solidity ^0.8.0;
 
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import {IVoter} from "../interfaces/IVoter.sol";
-import {IDeviceNFT} from "../interfaces/IDeviceNFT.sol";
+import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
 import {RewardGauge} from "./RewardGauge.sol";
 import {IIncentive} from "../interfaces/IIncentive.sol";
 
@@ -15,12 +16,16 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
   mapping(uint256 => address) public tokenStaker;
   mapping(uint256 => uint256) public tokenWeight;
 
+  address public immutable weightedNFT;
+
   constructor(
     address _forwarder,
-    address _stakingToken,
+    address _weightedNFT,
     address _voter,
     address _incentives
-  ) RewardGauge(_forwarder, _stakingToken, _voter, _incentives) {}
+  ) RewardGauge(_forwarder, IWeightedNFT(_weightedNFT).nft(), _voter, _incentives) {
+    weightedNFT = _weightedNFT;
+  }
 
   function _depositFor(uint256 _tokenId, address _recipient) internal override nonReentrant {
     if (_tokenId == 0) revert ZeroAmount();
@@ -29,8 +34,8 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     address sender = _msgSender();
     _updateRewards(_recipient);
 
-    IDeviceNFT(stakingToken).safeTransferFrom(sender, address(this), _tokenId);
-    uint256 _amount = IDeviceNFT(stakingToken).weight(_tokenId);
+    IERC721(stakingToken).safeTransferFrom(sender, address(this), _tokenId);
+    uint256 _amount = IWeightedNFT(weightedNFT).weight(_tokenId);
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
     tokenStaker[_tokenId] = _recipient;
@@ -50,7 +55,7 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     uint256 _amount = tokenWeight[_tokenId];
     totalSupply -= _amount;
     balanceOf[sender] -= _amount;
-    IDeviceNFT(stakingToken).safeTransferFrom(address(this), sender, _tokenId);
+    IERC721(stakingToken).safeTransferFrom(address(this), sender, _tokenId);
     delete tokenStaker[_tokenId];
     delete tokenWeight[_tokenId];
     updateWeightBalance(sender);
