@@ -280,15 +280,29 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
     address _gauge = IGaugeFactory(gaugeFactory).createGauge(forwarder, _pool, _incentiveReward, _gaugeType);
     IIncentive(_incentiveReward).setGauge(_gauge);
 
+    _addGauge(_pool, _gauge);
+
+    emit GaugeCreated(_poolFactory, gaugeFactory, _pool, _gauge, sender);
+    return _gauge;
+  }
+
+  function addGauge(address _pool, address _gauge) external nonReentrant {
+    address sender = _msgSender();
+    if (sender != governor) revert NotGovernor();
+    if (gauges[_pool] != address(0)) revert GaugeExists();
+    
+    _addGauge(_pool, _gauge);
+
+    emit GaugeCreated(address(0), address(0), _pool, _gauge, sender);
+  }
+
+  function _addGauge(address _pool, address _gauge) internal {
     gauges[_pool] = _gauge;
     poolForGauge[_gauge] = _pool;
     isGauge[_gauge] = true;
     isAlive[_gauge] = true;
     _updateFor(_gauge);
     pools.push(_pool);
-
-    emit GaugeCreated(_poolFactory, gaugeFactory, _pool, _gauge, sender);
-    return _gauge;
   }
 
   /// @inheritdoc IVoter
