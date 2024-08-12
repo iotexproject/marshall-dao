@@ -17,6 +17,7 @@ contract TestVault is Test {
   Vault public vault;
   Voter public voter;
   DAOForwarder public forwarder;
+  address public poolFactory;
   GaugeFactory public gaugeFactory;
   IncentivesFactory public incentiveFactory;
   FactoryRegistry public factoryRegistry;
@@ -27,7 +28,9 @@ contract TestVault is Test {
     gaugeFactory = new GaugeFactory();
     incentiveFactory = new IncentivesFactory();
     strategyManager = new TestStrategyManager();
-    factoryRegistry = new FactoryRegistry(address(1), address(incentiveFactory), address(gaugeFactory));
+    strategyManager.setShare(address (this), 100);
+    poolFactory = address(1);
+    factoryRegistry = new FactoryRegistry(poolFactory, address(incentiveFactory), address(gaugeFactory));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
     vault = new Vault();
     vault.initialize(address(voter), address(strategyManager));
@@ -65,8 +68,16 @@ contract TestVault is Test {
     uint256 _period = vault.emitReward();
 
     // 5. updatePeriod success
+    skip(2 hours);
     payable(address(vault)).transfer(vault.weekly() - 1 ether);
     voter.initialize(new address[](0), address(vault));
+    address pool = address (111);
+    voter.createGauge(poolFactory, address(pool), 0, 0);
+    address[] memory poolvote = new address[](1);
+    uint256[] memory weights = new uint256[](1);
+    poolvote[0] = address(pool);
+    weights[0] = 5000;
+    voter.vote(poolvote, weights);
     _period = vault.emitReward();
     assertEq(7 days, _period);
     assertEq(address(vault).balance, 0);
