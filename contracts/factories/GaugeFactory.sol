@@ -14,14 +14,17 @@ contract GaugeFactory is IGaugeFactory {
     address _forwarder,
     address _poolOrDeviceNFTOrGauge,
     address _incentives,
-    uint8 _gaugeType
+    uint8 _gaugeType,
+    uint256 threshold
   ) external returns (address gauge) {
     address _gauge;
     if (_gaugeType == Erc20Gauge) {
+      require(threshold == 0, "threshold in erc20 gauge should be 0");
       _gauge = createERC20Gauge(_forwarder, _poolOrDeviceNFTOrGauge, _incentives);
     } else if (_gaugeType == DeviceNFTGauge) {
       _gauge = createDeviceGauge(_forwarder, _poolOrDeviceNFTOrGauge, _incentives);
     } else if (_gaugeType == WithdrawGauge) {
+      require(threshold == 0, "threshold in withdraw gauge should be 0");
       _gauge = createWithdrawalGauge(_poolOrDeviceNFTOrGauge);
     } else {
       revert IncorrectnessGaugeType();

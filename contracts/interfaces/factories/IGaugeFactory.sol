@@ -8,6 +8,7 @@ interface IGaugeFactory {
     address _forwarder,
     address _poolOrDeviceNFTOrGauge,
     address _incentives,
-    uint8 _gaugeType
+    uint8 _gaugeType,
+    uint256 _threshold
   ) external returns (address gauge);
 }

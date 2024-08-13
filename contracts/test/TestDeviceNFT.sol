@@ -29,5 +29,6 @@ contract TestDeviceNFT is IWeightedNFT, ERC721 {
 
   function mint(address to, uint tokenId) external {
     _mint(to, tokenId);
+    weightOf[tokenId] = 1 ether;
   }
 }
