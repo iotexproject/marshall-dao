@@ -1,9 +1,9 @@
 pragma solidity ^0.8.0;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {IDeviceNFT} from "../interfaces/IDeviceNFT.sol";
+import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
 
-contract TestDeviceNFT is IDeviceNFT, ERC721 {
+contract TestDeviceNFT is IWeightedNFT, ERC721 {
   mapping(uint256 => uint256) public weightOf;
 
   constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) {
@@ -19,11 +19,16 @@ contract TestDeviceNFT is IDeviceNFT, ERC721 {
     return weightOf[tokenId];
   }
 
+  function nft() external view override returns (address) {
+    return address(this);
+  }
+
   function setWeight(uint256 _tokenId, uint256 _weight) public {
     weightOf[_tokenId] = _weight;
   }
 
   function mint(address to, uint tokenId) external {
     _mint(to, tokenId);
+    weightOf[tokenId] = 1 ether;
   }
 }
