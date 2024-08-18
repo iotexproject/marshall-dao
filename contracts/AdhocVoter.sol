@@ -17,16 +17,11 @@ contract AdhocVoter is IAdhocVoter, Initializable {
   using SafeERC20 for IERC20;
   using EnumerableSet for EnumerableSet.AddressSet;
 
-  /// @inheritdoc IVault
   address public governor;
 
-  /// @inheritdoc IVault
   uint256 public constant WEEK = 1 weeks;
-  /// @inheritdoc IVault
   uint256 public weekly;
-  /// @inheritdoc IVault
   uint256 public activePeriod;
-  /// @inheritdoc IVault
   uint256 public epochCount;
   address public constant IOTX_NATIVE_TOKEN = address(1);
   EnumerableSet.AddressSet gauges;
@@ -39,7 +34,6 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     weekly = 100_000 * 1e18;
   }
 
-  /// @inheritdoc IVault
   function setGovernor(address _governor) public {
     require(msg.sender == governor, "Not Governor");
     require (_governor != address(0), "ZeroAddress");
@@ -47,7 +41,6 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     emit GovernorChanged(_governor);
   }
 
-  /// @inheritdoc IVault
   function emitReward() external returns (uint256 _period) {
     _period = activePeriod;
     if (block.timestamp >= _period + WEEK) {
@@ -72,7 +65,6 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     }
   }
 
-  /// @inheritdoc IVault
   function changeWeekly(uint256 _weekly) external {
     require(msg.sender == governor, "Not Governor");
 
@@ -90,7 +82,6 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     emit WeightChanged(_gauge, _weight);
   }
 
-  /// @inheritdoc IVault
   function changeWeight(address _gauge, uint256 _weight) external {
     require(_weight >= 10 && _weight <= 100, "invalid weight");
     require(msg.sender == governor, "Not Governor");
@@ -102,7 +93,6 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     emit WeightChanged(_gauge, _weight);
   }
 
-  /// @inheritdoc IVault
   function withdraw(address _token, address payable _recipcient, uint256 _amount) external {
     require(msg.sender == governor, "Not Governor");
 
@@ -119,7 +109,6 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     emit Donation(msg.sender, IOTX_NATIVE_TOKEN, msg.value);
   }
 
-  /// @inheritdoc IVault
   function donate() external payable {
     emit Donation(msg.sender, IOTX_NATIVE_TOKEN, msg.value);
   }

@@ -165,7 +165,7 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IGauge
-  function notifyRewardAmount() external override payable nonReentrant {
+  function notifyRewardAmount() external override payable virtual nonReentrant {
     address sender = _msgSender();
     uint256 _amount = msg.value;
     if (sender != voter) revert NotVoter();
