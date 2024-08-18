@@ -15,7 +15,7 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IRewardGauge
   address public immutable stakingToken;
   /// @inheritdoc IRewardGauge
-  address public immutable voter;
+  address public  voter;
 
   uint256 internal constant DURATION = 7 days; // rewards are released over 7 days
   uint256 internal constant PRECISION = 10 ** 18;
@@ -165,7 +165,7 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IGauge
-  function notifyRewardAmount() external payable nonReentrant {
+  function notifyRewardAmount() external override payable nonReentrant {
     address sender = _msgSender();
     uint256 _amount = msg.value;
     if (sender != voter) revert NotVoter();
