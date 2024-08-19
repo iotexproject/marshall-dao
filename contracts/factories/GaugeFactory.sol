@@ -44,7 +44,7 @@ contract GaugeFactory is IGaugeFactory {
     gauge = address(new DeviceGauge(_forwarder, _deviceNFT, msg.sender, _incentives));
   }
 
-  function createWithdrawalGauge(address _guage) internal returns (address gauge) {
+  function createWithdrawalGauge(address _guage) internal pure returns (address gauge) {
     gauge = _guage;
   }
 }

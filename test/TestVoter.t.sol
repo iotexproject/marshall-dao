@@ -6,6 +6,7 @@ import {stdError} from "forge-std/StdError.sol";
 import {TestToken} from "../contracts/test/TestToken.sol";
 import {Vault} from "../contracts/Vault.sol";
 import {Voter} from "../contracts/Voter.sol";
+import {WeightManager} from "../contracts/WeightManager.sol";
 import {IVoter} from "../contracts/interfaces/IVoter.sol";
 import {IRewardGauge} from "../contracts/interfaces/IRewardGauge.sol";
 import {IVault} from "../contracts/interfaces/IVault.sol";

@@ -120,21 +120,21 @@ contract TestIncentive is Test {
 
     // 2. deposit lp into gauge and callback to incentives
     deviceGauge.deposit(1);
-    assertEq(1 ether, dinti.balanceOf(address(this)));
-    assertEq(1 ether, dinti.totalSupply());
+    assertEq(1, dinti.balanceOf(address(this)));
+    assertEq(1, dinti.totalSupply());
 
     // 3. again deposit to check increase
     deviceGauge.deposit(2);
-    assertEq(3 ether, dinti.balanceOf(address(this)));
-    assertEq(3 ether, dinti.totalSupply());
+    assertEq(2, dinti.balanceOf(address(this)));
+    assertEq(2, dinti.totalSupply());
 
     // 4. rewardRate should be zero due to not notifyReward.
     assertEq(0, dinti.rewardRate(rewardTokens[0]));
 
     // 5. withdraw
     deviceGauge.withdraw(1);
-    assertEq(2 ether, dinti.balanceOf(address(this)));
-    assertEq(2 ether, dinti.totalSupply());
+    assertEq(1, dinti.balanceOf(address(this)));
+    assertEq(1, dinti.totalSupply());
   }
 
   function test_notifyReward_Claim() external {
