@@ -6,6 +6,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IAdhocVoter} from "./interfaces/IAdhocVoter.sol";
+import {IIncentive} from "./interfaces/IIncentive.sol";
 import {IGauge} from "./interfaces/IGauge.sol";
 import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
@@ -32,6 +33,10 @@ contract AdhocVoter is IAdhocVoter, Initializable {
   ) public initializer {
     governor = msg.sender;
     weekly = 100_000 * 1e18;
+  }
+
+  function isAlive(address) external override pure returns (bool) {
+    return true;
   }
 
   function setGovernor(address _governor) public {
@@ -72,13 +77,14 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     emit WeeklyChanged(_weekly);
   }
 
-  function addGauge(address _gauge, uint256 _weight) external {
+  function addGauge(address _gauge, address _incentive, uint256 _weight) external {
     require(_weight >= 10 && _weight <= 100, "invalid weight");
     require(msg.sender == governor, "Not Governor");
     require(!gauges.contains(_gauge), "gauge already exist");
 
     weights[_gauge] = _weight;
     totalWeight += _weight;
+    IIncentive(_incentive).setGauge(_gauge);
     emit WeightChanged(_gauge, _weight);
   }
 

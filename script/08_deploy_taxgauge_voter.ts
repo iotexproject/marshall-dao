@@ -1,15 +1,11 @@
-import {ethers, upgrades} from 'hardhat';
-import fs from "fs";
+import { ethers, upgrades } from 'hardhat';
+import fs from 'fs';
 require('dotenv').config();
 
 // npx hardhat run script/08_deploy_taxgauge_voter.ts --network  testnet
 async function main() {
   if (!process.env.FORWARDER) {
-    console.log(`Please provide VOTER address`);
-    return;
-  }
-  if (!process.env.DeviceNFT) {
-    console.log(`Please provide EMPTY_FACTORY address`);
+    console.log(`Please provide FORWARDER address`);
     return;
   }
 
@@ -20,19 +16,31 @@ async function main() {
   await adhocVoter.waitForDeployment();
   console.log(`AdhocVoter deployed to ${adhocVoter.target}`);
 
-  const incentive = await ethers.deployContract('Incentives', [
-    process.env.FORWARDER, adhocVoter.target, []]);
+  const incentive = await ethers.deployContract('Incentives', [process.env.FORWARDER, adhocVoter.target, []]);
   await incentive.waitForDeployment();
   console.log(`Incentive deployed to ${incentive.target}`);
 
-  const deviceNFTToken = await ethers.deployContract('TestDeviceNFT', ["DeviceNFT", "TestNFT"])
-  await deviceNFTToken.waitForDeployment();
-  console.log(`TestToken deployed to ${deviceNFTToken.target}`);
+  let deviceNFT = process.env.DEVICE_NFT;
+
+  if (!deviceNFT) {
+    const deviceNFTToken = await ethers.deployContract('TestDeviceNFT', ['DeviceNFT', 'TestNFT']);
+    await deviceNFTToken.waitForDeployment();
+    // @ts-ignore
+    deviceNFT = deviceNFTToken.target;
+    console.log(`TestToken deployed to ${deviceNFTToken.target}`);
+  }
 
   const taxDeviceGauge = await ethers.deployContract('TaxDeviceGauge', [
-      process.env.FORWARDER, deviceNFTToken.target, adhocVoter.target, incentive.target]);
+    process.env.FORWARDER,
+    deviceNFT,
+    adhocVoter.target,
+    incentive.target,
+  ]);
   await taxDeviceGauge.waitForDeployment();
   console.log(`taxDeviceGauge deployed to ${taxDeviceGauge.target}`);
+
+  const tx = await adhocVoter.addGauge(taxDeviceGauge.target, incentive.target, 100);
+  await tx.wait();
 }
 
 main().catch(err => {

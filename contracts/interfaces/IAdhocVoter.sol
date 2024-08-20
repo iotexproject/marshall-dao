@@ -27,6 +27,9 @@ interface IAdhocVoter {
   /// @notice Number of epochs in which updatePeriod was called
   function epochCount() external view returns (uint256);
 
+  /// @dev Gauge => Liveness status
+  function isAlive(address gauge) external view returns (bool);
+
   /// @notice Processes emissions and rebases. Callable once per epoch (1 week).
   /// @return _period Start of current epoch.
   function emitReward() external returns (uint256 _period);
@@ -47,8 +50,9 @@ interface IAdhocVoter {
 
   /// @notice Add new gauge;
   /// @param _gauge .
+  /// @param _incentive .
   /// @param _weight for _gauge
-  function addGauge(address _gauge, uint256 _weight) external;
+  function addGauge(address _gauge, address _incentive, uint256 _weight) external;
 
   /// @notice change weight of the gauge
   /// @param _gauge .
