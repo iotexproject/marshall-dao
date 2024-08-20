@@ -5,7 +5,6 @@ import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Hol
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import {IVoter} from "../interfaces/IVoter.sol";
-import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
 import {RewardGauge} from "./RewardGauge.sol";
 import {IIncentive} from "../interfaces/IIncentive.sol";
 import "../interfaces/ITaxGauge.sol";
@@ -15,21 +14,17 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
   event WithdrawDevice(address indexed from, uint256 amount, uint256 tokenId);
 
   mapping(uint256 => address) public tokenStaker;
-  mapping(uint256 => uint256) public tokenWeight;
 
-  address public immutable weightedNFT;
   address public taxer;
   uint256 public taxRatio;
   mapping(address => uint256) public taxAmount ;
 
   constructor(
     address _forwarder,
-    address _weightedNFT,
+    address _nft,
     address _voter,
     address _incentives
-  ) RewardGauge(_forwarder, IWeightedNFT(_weightedNFT).nft(), _voter, _incentives) {
-    weightedNFT = _weightedNFT;
-  }
+  ) RewardGauge(_forwarder, _nft, _voter, _incentives) {}
 
   function _depositFor(uint256 _tokenId, address _recipient) internal override nonReentrant {
     if (_tokenId == 0) revert ZeroAmount();
@@ -39,11 +34,10 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
     _updateRewards(_recipient);
 
     IERC721(stakingToken).safeTransferFrom(sender, address(this), _tokenId);
-    uint256 _amount = IWeightedNFT(weightedNFT).weight(_tokenId);
+    uint256 _amount = 1;
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
     tokenStaker[_tokenId] = _recipient;
-    tokenWeight[_tokenId] = _amount;
     updateWeightBalance(_recipient);
     IIncentive(incentive).deposit(_amount, _recipient);
 
@@ -56,12 +50,11 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
 
     _updateRewards(sender);
 
-    uint256 _amount = tokenWeight[_tokenId];
+    uint256 _amount = 1;
     totalSupply -= _amount;
     balanceOf[sender] -= _amount;
     IERC721(stakingToken).safeTransferFrom(address(this), sender, _tokenId);
     delete tokenStaker[_tokenId];
-    delete tokenWeight[_tokenId];
     updateWeightBalance(sender);
     IIncentive(incentive).withdraw(_amount, sender);
     if (balanceOf[sender] == 0){
