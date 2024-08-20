@@ -33,6 +33,7 @@ contract AdhocVoter is IAdhocVoter, Initializable {
   ) public initializer {
     governor = msg.sender;
     weekly = 100_000 * 1e18;
+    activePeriod = ((block.timestamp) / WEEK) * WEEK;
   }
 
   function isAlive(address) external override pure returns (bool) {
