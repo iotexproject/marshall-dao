@@ -29,8 +29,7 @@ contract AdhocVoter is IAdhocVoter, Initializable {
   mapping(address => uint256) public weights;
   uint256 public totalWeight;
 
-  function initialize(
-  ) public initializer {
+  function initialize() public initializer {
     governor = msg.sender;
     weekly = 100_000 * 1e18;
     activePeriod = ((block.timestamp) / WEEK) * WEEK;
@@ -60,7 +59,7 @@ contract AdhocVoter is IAdhocVoter, Initializable {
       uint256 _balanceOf = address(this).balance;
       require(_balanceOf >= _emission, "InsufficientFund");
 
-      uint256 perWeightReward = _balanceOf / totalWeight;
+      uint256 perWeightReward = _emission / totalWeight;
       address[] memory _gauges = gauges.values();
       for (uint256 i = 0; i < _gauges.length; i++) {
         address _gauge = _gauges[i];
@@ -85,6 +84,7 @@ contract AdhocVoter is IAdhocVoter, Initializable {
 
     weights[_gauge] = _weight;
     totalWeight += _weight;
+    gauges.add(_gauge);
     IIncentive(_incentive).setGauge(_gauge);
     emit WeightChanged(_gauge, _weight);
   }

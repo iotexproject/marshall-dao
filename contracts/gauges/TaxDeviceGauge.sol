@@ -12,6 +12,8 @@ import "../interfaces/ITaxGauge.sol";
 contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
   event DepositDevice(address indexed from, address indexed to, uint256 amount, uint256 tokenId);
   event WithdrawDevice(address indexed from, uint256 amount, uint256 tokenId);
+  event SetTaxer(address indexed taxer);
+  event SetTaxRatio(address indexed taxer, uint256 ratio);
 
   mapping(uint256 => address) public tokenStaker;
 
@@ -34,7 +36,7 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
     _updateRewards(_recipient);
 
     IERC721(stakingToken).safeTransferFrom(sender, address(this), _tokenId);
-    uint256 _amount = 1;
+    uint256 _amount = 100;
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
     tokenStaker[_tokenId] = _recipient;
@@ -90,13 +92,16 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
     if (msg.sender != voter) revert NotVoter();
 
     taxer = _taxer;
+    emit SetTaxer(_taxer);
   }
 
   function changeTaxRatio(uint256 _ratio) external {
     require(_ratio != taxRatio, "same taxRatio for taxer");
+    require(_ratio <= 50, "two large tax ratio");
     if (msg.sender != voter) revert NotVoter();
 
     taxRatio = _ratio;
+    emit SetTaxRatio(taxer, _ratio);
   }
 
   function changeVoter(address _voter) external {
