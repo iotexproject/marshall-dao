@@ -15,11 +15,13 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
   event SetTaxer(address indexed taxer);
   event SetTaxRatio(address indexed taxer, uint256 ratio);
 
+  uint256 constant public DEFAULT_WEIGHT = 100;
+
   mapping(uint256 => address) public tokenStaker;
 
   address public taxer;
   uint256 public taxRatio;
-  mapping(address => uint256) public taxAmount ;
+  mapping(address => uint256) public taxAmount;
 
   constructor(
     address _forwarder,
@@ -36,14 +38,13 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
     _updateRewards(_recipient);
 
     IERC721(stakingToken).safeTransferFrom(sender, address(this), _tokenId);
-    uint256 _amount = 100;
-    totalSupply += _amount;
-    balanceOf[_recipient] += _amount;
+    totalSupply += DEFAULT_WEIGHT;
+    balanceOf[_recipient] += DEFAULT_WEIGHT;
     tokenStaker[_tokenId] = _recipient;
     updateWeightBalance(_recipient);
-    IIncentive(incentive).deposit(_amount, _recipient);
+    IIncentive(incentive).deposit(DEFAULT_WEIGHT, _recipient);
 
-    emit DepositDevice(sender, _recipient, _amount, _tokenId);
+    emit DepositDevice(sender, _recipient, DEFAULT_WEIGHT, _tokenId);
   }
 
   function withdraw(uint256 _tokenId) external override nonReentrant {
@@ -52,18 +53,17 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
 
     _updateRewards(sender);
 
-    uint256 _amount = 1;
-    totalSupply -= _amount;
-    balanceOf[sender] -= _amount;
+    totalSupply -= DEFAULT_WEIGHT;
+    balanceOf[sender] -= DEFAULT_WEIGHT;
     IERC721(stakingToken).safeTransferFrom(address(this), sender, _tokenId);
     delete tokenStaker[_tokenId];
     updateWeightBalance(sender);
-    IIncentive(incentive).withdraw(_amount, sender);
+    IIncentive(incentive).withdraw(DEFAULT_WEIGHT, sender);
     if (balanceOf[sender] == 0){
       depositUserNum--;
     }
 
-    emit WithdrawDevice(sender, _amount, _tokenId);
+    emit WithdrawDevice(sender, DEFAULT_WEIGHT, _tokenId);
   }
 
   function notifyRewardAmount() external override payable nonReentrant {
