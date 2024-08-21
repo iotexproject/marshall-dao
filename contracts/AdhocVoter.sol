@@ -7,7 +7,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {IAdhocVoter} from "./interfaces/IAdhocVoter.sol";
 import {IIncentive} from "./interfaces/IIncentive.sol";
-import {IGauge} from "./interfaces/IGauge.sol";
+import {IGauge, IRewardGauge} from "./interfaces/IRewardGauge.sol";
 import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {ITaxGauge} from "./interfaces/ITaxGauge.sol";
@@ -87,6 +87,14 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     gauges.add(_gauge);
     IIncentive(_incentive).setGauge(_gauge);
     emit WeightChanged(_gauge, _weight);
+  }
+
+  function claimRewards(address[] memory _gauges) external {
+    address _msgSender = msg.sender;
+    uint256 _length = _gauges.length;
+    for (uint256 i = 0; i < _length; i++) {
+      IRewardGauge(_gauges[i]).claimReward(_msgSender);
+    }
   }
 
   function changeWeight(address _gauge, uint256 _weight) external {
