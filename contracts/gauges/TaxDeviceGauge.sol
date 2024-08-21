@@ -14,6 +14,7 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
   event WithdrawDevice(address indexed from, uint256 amount, uint256 tokenId);
   event SetTaxer(address indexed taxer);
   event SetTaxRatio(address indexed taxer, uint256 ratio);
+  event WithdrawTax(address indexed taxer, uint256 amount);
 
   uint256 constant public DEFAULT_WEIGHT = 100;
 
@@ -83,8 +84,10 @@ contract TaxDeviceGauge is RewardGauge, ERC721Holder, ITaxGauge {
     uint256 _taxAmount = taxAmount[_taxer];
     require(_taxAmount > 0, "non Amount for taxer");
 
+    taxAmount[_taxer] = 0;
     (bool success, ) = payable(_taxer).call{value: _taxAmount}("");
     require(success, "withdraw tax failed.");
+    emit WithdrawTax(_taxer, _taxAmount);
   }
 
   function changeTaxer(address _taxer) external {
