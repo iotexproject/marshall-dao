@@ -4,13 +4,13 @@ pragma solidity ^0.8.0;
 import {IVoter} from "./IVoter.sol";
 
 interface IAdhocVoter {
-
   event Emission(address indexed sender, uint256 weekly);
   event WeeklyChanged(uint256 weekly);
   event WeightChanged(address gauge, uint256 weight);
   event GovernorChanged(address indexed governor);
   event Donation(address indexed donor, address indexed token, uint256 amount);
   event Withdraw(address indexed operator, address indexed token, address indexed recipcient, uint256 amount);
+  event WhitelistToken(address indexed whitelister, address indexed token, bool indexed _bool);
 
   /// @notice Standard OZ IGovernor using ve for vote weights.
   function governor() external view returns (address);

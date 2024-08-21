@@ -29,6 +29,8 @@ contract AdhocVoter is IAdhocVoter, Initializable {
   mapping(address => uint256) public weights;
   uint256 public totalWeight;
 
+  mapping(address => bool) public isWhitelistedToken;
+
   function initialize() public initializer {
     governor = msg.sender;
     weekly = 100_000 * 1e18;
@@ -95,6 +97,16 @@ contract AdhocVoter is IAdhocVoter, Initializable {
     for (uint256 i = 0; i < _length; i++) {
       IRewardGauge(_gauges[i]).claimReward(_msgSender);
     }
+  }
+
+  function whitelistToken(address _token, bool _bool) external {
+    require(msg.sender == governor, "Not Governor");
+    _whitelistToken(_token, _bool);
+  }
+
+  function _whitelistToken(address _token, bool _bool) internal {
+    isWhitelistedToken[_token] = _bool;
+    emit WhitelistToken(msg.sender, _token, _bool);
   }
 
   function changeWeight(address _gauge, uint256 _weight) external {
