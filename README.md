@@ -36,15 +36,9 @@ RewardsDistributor deployed to 0xCDBcBF82fE1534b54A2B55FA45Df0CD0C940fd8a
 Vault deployed to 0xC79Ceda1244Fc91472800E9e245C9c8014E95284
 ```
 
-#### Mainnet
+#### Mainnet adhoc
 
 ```
-Forwarder deployed to 
-EmptyPoolFactory deployed to 
-VotingRewardsFactory deployed to 
-GaugeFactory deployed to 
-FactoryRegistry deployed to 
-Voter deployed to 
-RewardsDistributor deployed to 
-Vault deployed to 
+Forwarder deployed to 0xf8d4F77b680aFc6b52b80628c7c1530d8Fbb98f6
+AdhocVoter deployed to 0xeB67ec1DC5095a83971d6E4119F62c3710c7079A
 ```

@@ -1,6 +1,5 @@
 import { ethers, upgrades } from 'hardhat';
 import fs from 'fs';
-import { AdhocVoter } from '../src/types';
 require('dotenv').config();
 
 // npx hardhat run script/08_deploy_taxgauge_voter.ts --network  testnet
@@ -9,14 +8,15 @@ async function main() {
     console.log(`Please provide FORWARDER address`);
     return;
   }
-  if (!process.env.VOTER) {
-    console.log(`Please provide VOTER address`);
-    return;
-  }
 
-  const voterFactory = await ethers.getContractFactory('AdhocVoter');
-  const adhocVoter = voterFactory.attach(process.env.VOTER) as AdhocVoter;
+  const AdhocVoter = await ethers.getContractFactory('AdhocVoter');
+  const adhocVoter = await upgrades.deployProxy(AdhocVoter, [], {
+    initializer: 'initialize',
+  });
+  await adhocVoter.waitForDeployment();
+  console.log(`AdhocVoter deployed to ${adhocVoter.target}`);
 
+  /*
   const incentive = await ethers.deployContract('Incentives', [process.env.FORWARDER, adhocVoter.target, []]);
   await incentive.waitForDeployment();
   console.log(`Incentive deployed to ${incentive.target}`);
@@ -31,17 +31,18 @@ async function main() {
     console.log(`TestToken deployed to ${deviceNFTToken.target}`);
   }
 
-  const deviceGauge = await ethers.deployContract('TaxDeviceGauge', [
+  const taxDeviceGauge = await ethers.deployContract('TaxDeviceGauge', [
     process.env.FORWARDER,
     deviceNFT,
-    process.env.VOTER,
+    adhocVoter.target,
     incentive.target,
   ]);
-  await deviceGauge.waitForDeployment();
-  console.log(`DeviceGauge deployed to ${deviceGauge.target}`);
+  await taxDeviceGauge.waitForDeployment();
+  console.log(`taxDeviceGauge deployed to ${taxDeviceGauge.target}`);
 
-  const tx = await adhocVoter.addGauge(deviceGauge.target, incentive.target, 100);
+  const tx = await adhocVoter.addGauge(taxDeviceGauge.target, incentive.target, 100);
   await tx.wait();
+  */
 }
 
 main().catch(err => {

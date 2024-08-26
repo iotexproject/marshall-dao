@@ -15,7 +15,7 @@ abstract contract RewardGauge is IRewardGauge, ERC2771Context, ReentrancyGuard {
   /// @inheritdoc IRewardGauge
   address public immutable stakingToken;
   /// @inheritdoc IRewardGauge
-  address public  voter;
+  address public voter;
 
   uint256 internal constant PRECISION = 10 ** 18;
   uint256 public constant TOKENLESS_PRODUCTION = 40;
