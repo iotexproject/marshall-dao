@@ -5,28 +5,26 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 
 contract BatchClaimVault is OwnableUpgradeable {
   event Donation(address indexed donor, uint256 amount);
-  event Initialize(uint256 startBlock, uint256 batchSize, uint256 rewardPerBlock);
+  event Withdraw(address indexed owner, address recipcient, uint256 amount);
+  event Initialize(uint256 batchSize, uint256 rewardPerBlock);
   event AddProject(uint256 projectId, address operator, uint256 startBlock);
   event Claim(uint256 projectId, address operator, uint256 startBlock, uint256 blocks, uint256 rewards);
   event ChangeBatchSize(uint256 batchSize);
   event ChangeRewardPerBlock(uint256 rewardPerBlock);
 
-  uint256 public startBlock;
   uint256 public batchSize;
   uint256 public rewardPerBlock;
   uint256 public projectNum;
   mapping(uint256 => address) public projectOperator;
   mapping(uint256 => uint256) public lastClaimedBlock;
 
-  function initialize(uint256 _startBlock, uint256 _rewardPerBlock) public initializer {
-    require(_startBlock > block.number, "invalid start block");
+  function initialize(uint256 _rewardPerBlock) public initializer {
     require(_rewardPerBlock > 0, "invalid reward per block");
 
-    startBlock = _startBlock;
     batchSize = 17280;
     rewardPerBlock = _rewardPerBlock;
 
-    emit Initialize(startBlock, 17280, rewardPerBlock);
+    emit Initialize(17280, rewardPerBlock);
   }
 
   function addProject(uint256 _projectId, address _operator, uint256 _startBlock) external onlyOwner {
@@ -78,5 +76,11 @@ contract BatchClaimVault is OwnableUpgradeable {
 
   function donate() external payable {
     emit Donation(msg.sender, msg.value);
+  }
+
+  function withdraw(address payable _recipcient, uint256 _amount) external onlyOwner {
+    (bool success, ) = payable(_recipcient).call{value: _amount}("");
+    require(success, "withdraw token failed.");
+    emit Withdraw(msg.sender, _recipcient, _amount);
   }
 }
