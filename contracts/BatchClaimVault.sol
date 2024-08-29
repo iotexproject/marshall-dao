@@ -23,6 +23,8 @@ contract BatchClaimVault is OwnableUpgradeable {
   function initialize(uint256 _rewardPerBlock) public initializer {
     require(_rewardPerBlock > 0, "invalid reward per block");
 
+    __Ownable_init_unchained();
+
     batchSize = 17280;
     rewardPerBlock = _rewardPerBlock;
 
@@ -49,7 +51,7 @@ contract BatchClaimVault is OwnableUpgradeable {
 
   function claim(uint256 _projectId) external returns (uint256) {
     address _operator = projectOperator[_projectId];
-    require(msg.sender != _operator, "invalid operator");
+    require(msg.sender == _operator, "invalid operator");
     uint256 _lastClaimedBlock = lastClaimedBlock[_projectId];
     require(_lastClaimedBlock + batchSize <= block.number, "claim too short");
 
