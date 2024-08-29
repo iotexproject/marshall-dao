@@ -34,6 +34,7 @@ FactoryRegistry deployed to 0x37adcCFc183030cFA8AC696c04711cC4a1401de1
 Voter deployed to 0x34c18bccE72C7FD891F6aBB54874F1a5067C86cc
 RewardsDistributor deployed to 0xCDBcBF82fE1534b54A2B55FA45Df0CD0C940fd8a
 Vault deployed to 0xC79Ceda1244Fc91472800E9e245C9c8014E95284
+BatchClaimVault deployed to 0x49bA62521Ce247dFd48B9953f2Cfb1797bECb9C8
 ```
 
 #### Mainnet adhoc

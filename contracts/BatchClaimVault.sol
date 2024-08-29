@@ -8,9 +8,11 @@ contract BatchClaimVault is OwnableUpgradeable {
   event Withdraw(address indexed owner, address recipcient, uint256 amount);
   event Initialize(uint256 batchSize, uint256 rewardPerBlock);
   event AddProject(uint256 projectId, address operator, uint256 startBlock);
+  event RemoveProject(uint256 projectId);
   event Claim(uint256 projectId, address operator, uint256 startBlock, uint256 blocks, uint256 rewards);
   event ChangeBatchSize(uint256 batchSize);
   event ChangeRewardPerBlock(uint256 rewardPerBlock);
+  event ChangeOperator(address indexed admin, uint256 projectId, address operator);
 
   uint256 public batchSize;
   uint256 public rewardPerBlock;
@@ -35,6 +37,14 @@ contract BatchClaimVault is OwnableUpgradeable {
     projectOperator[_projectId] = _operator;
     lastClaimedBlock[_projectId] = _startBlock;
     emit AddProject(_projectId, _operator, _startBlock);
+  }
+
+  function removeProject(uint256 _projectId) external onlyOwner {
+    require(projectOperator[_projectId] != address(0), "invalid project");
+
+    delete projectOperator[_projectId];
+    delete lastClaimedBlock[_projectId];
+    emit RemoveProject(_projectId);
   }
 
   function claim(uint256 _projectId) external returns (uint256) {
@@ -68,6 +78,14 @@ contract BatchClaimVault is OwnableUpgradeable {
     rewardPerBlock = _rewardPerBlock;
 
     emit ChangeRewardPerBlock(_rewardPerBlock);
+  }
+
+  function changeOperator(uint256 _projectId, address _operator) external {
+    require(_operator != address(0), "zero address");
+    require(msg.sender == owner() || msg.sender == projectOperator[_projectId], "invalid operator");
+
+    projectOperator[_projectId] = _operator;
+    emit ChangeOperator(msg.sender, _projectId, _operator);
   }
 
   receive() external payable {
