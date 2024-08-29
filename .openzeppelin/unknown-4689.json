@@ -10,6 +10,16 @@
       "address": "0x6382366Dd7A612e98663AF1e6826b272C815c8D9",
       "txHash": "0x0cc81f79844356437a55b947e88999264febb57a08c06ca6e1099241c76f010a",
       "kind": "transparent"
+    },
+    {
+      "address": "0xBFda8658B14ed76089dE24A6B161eF1dC8CcF573",
+      "txHash": "0x623ac4e930d8f1caac82d9bf33e81b1c56cdf9cbd69603f4f04946a6b5d86bad",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xeB67ec1DC5095a83971d6E4119F62c3710c7079A",
+      "txHash": "0x06b4286a15086b5655ed0f1a71d1afe680694deaa6939046ef8c074dc8e9f344",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -696,6 +706,165 @@
           "t_contract(IVotingEscrow)31393": {
             "label": "contract IVotingEscrow",
             "numberOfBytes": "20"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "968678389e4c1e3fd3c3b671ecbd6b51630e9c6a25206d054555984b8dcc37f4": {
+      "address": "0x8299d3bd351d38807a5e61B1942693225616E79b",
+      "txHash": "0xcb56b5fb56adc47be611af86fa1082e67c7a88f2fe7b3c86f5c8d0e71660cb16",
+      "layout": {
+        "solcVersion": "0.8.19",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "governor",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:21"
+          },
+          {
+            "label": "weekly",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:24"
+          },
+          {
+            "label": "activePeriod",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_uint256",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:25"
+          },
+          {
+            "label": "epochCount",
+            "offset": 0,
+            "slot": "3",
+            "type": "t_uint256",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:26"
+          },
+          {
+            "label": "gauges",
+            "offset": 0,
+            "slot": "4",
+            "type": "t_struct(AddressSet)2907_storage",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:28"
+          },
+          {
+            "label": "weights",
+            "offset": 0,
+            "slot": "6",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:29"
+          },
+          {
+            "label": "totalWeight",
+            "offset": 0,
+            "slot": "7",
+            "type": "t_uint256",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:30"
+          },
+          {
+            "label": "isWhitelistedToken",
+            "offset": 0,
+            "slot": "8",
+            "type": "t_mapping(t_address,t_bool)",
+            "contract": "AdhocVoter",
+            "src": "contracts/AdhocVoter.sol:32"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]",
+            "numberOfBytes": "32"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(AddressSet)2907_storage": {
+            "label": "struct EnumerableSet.AddressSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)2592_storage",
+                "offset": 0,
+                "slot": "0"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_struct(Set)2592_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
           },
           "t_uint256": {
             "label": "uint256",
