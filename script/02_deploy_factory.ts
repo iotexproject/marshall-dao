@@ -15,7 +15,11 @@ async function main() {
   await incentiveFactory.waitForDeployment();
   console.log(`VotingRewardsFactory deployed to ${incentiveFactory.target}`);
 
-  const factoryRegistry = await ethers.deployContract('FactoryRegistry', [poolFactory.target, incentiveFactory.target,gaugeFactory.target]);
+  const factoryRegistry = await ethers.deployContract('FactoryRegistry', [
+    poolFactory.target,
+    incentiveFactory.target,
+    gaugeFactory.target,
+  ]);
   await factoryRegistry.waitForDeployment();
   console.log(`FactoryRegistry deployed to ${factoryRegistry.target}`);
 

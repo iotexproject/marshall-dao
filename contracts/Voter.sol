@@ -276,7 +276,12 @@ contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   }
 
   /// @inheritdoc IVoter
-  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType, uint256 threshold) external nonReentrant returns (address) {
+  function createGauge(
+    address _poolFactory,
+    address _pool,
+    uint8 _gaugeType,
+    uint256 threshold
+  ) external nonReentrant returns (address) {
     if (gauges[_pool] != address(0)) revert GaugeExists();
     (address incentiveFactory, address gaugeFactory) = IFactoryRegistry(factoryRegistry).factoriesToPoolFactory(
       _poolFactory

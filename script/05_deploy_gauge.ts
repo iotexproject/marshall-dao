@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import fs from "fs";
+import fs from 'fs';
 require('dotenv').config();
 
 // npx hardhat run script/05_deploy_gauge.ts --network  testnet
@@ -35,7 +35,7 @@ async function main() {
 
     const deploy_gauge = await voter.gauges(process.env.LST_POOL1);
     console.log('deploy gauge: ', deploy_gauge);
-    fs.appendFileSync('.env', `LST_GAUGE=${deploy_gauge}\n`)
+    fs.appendFileSync('.env', `LST_GAUGE=${deploy_gauge}\n`);
     const lst_gauge = await ethers.getContractAt('IRewardGauge', deploy_gauge, deployer);
     const incentive = await lst_gauge.incentive();
     fs.appendFileSync('.env', `LST_Incentive=${incentive}\n`);
@@ -52,7 +52,7 @@ async function main() {
 
     const deploy_gauge = await voter.gauges(process.env.DeviceNFT);
     console.log('deploy DeviceNFTGauge: ', deploy_gauge);
-    fs.appendFileSync('.env', `DeviceNFT_GAUGE=${deploy_gauge}\n`)
+    fs.appendFileSync('.env', `DeviceNFT_GAUGE=${deploy_gauge}\n`);
     const device_gauge = await ethers.getContractAt('IRewardGauge', deploy_gauge, deployer);
     const incentive = await device_gauge.incentive();
     fs.appendFileSync('.env', `DeviceNFT_Incentive=${incentive}\n`);

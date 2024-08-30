@@ -184,7 +184,12 @@ interface IVoter {
   /// @param _pool .
   /// @param _gaugeType 0: ERC20Gauge, 1: DeviceNFTGauge, 2: WithdrawGauge
   /// @param threshold only >0 for deviceNFTGauge
-  function createGauge(address _poolFactory, address _pool, uint8 _gaugeType, uint256 threshold) external returns (address);
+  function createGauge(
+    address _poolFactory,
+    address _pool,
+    uint8 _gaugeType,
+    uint256 threshold
+  ) external returns (address);
 
   /// @notice Kills a gauge. The gauge will not receive any new emissions and cannot be deposited into.
   ///         Can still withdraw from gauge.

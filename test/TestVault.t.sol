@@ -28,7 +28,7 @@ contract TestVault is Test {
     gaugeFactory = new GaugeFactory();
     incentiveFactory = new IncentivesFactory();
     strategyManager = new TestStrategyManager();
-    strategyManager.setShare(address (this), 100);
+    strategyManager.setShare(address(this), 100);
     poolFactory = address(1);
     factoryRegistry = new FactoryRegistry(poolFactory, address(incentiveFactory), address(gaugeFactory));
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
@@ -71,7 +71,7 @@ contract TestVault is Test {
     skip(2 hours);
     payable(address(vault)).transfer(vault.weekly() - 1 ether);
     voter.initialize(new address[](0), address(vault));
-    address pool = address (111);
+    address pool = address(111);
     voter.createGauge(poolFactory, address(pool), 0, 0);
     address[] memory poolvote = new address[](1);
     uint256[] memory weights = new uint256[](1);

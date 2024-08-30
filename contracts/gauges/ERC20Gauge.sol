@@ -47,7 +47,7 @@ contract ERC20Gauge is RewardGauge {
     IERC20(stakingToken).safeTransfer(sender, _amount);
     updateWeightBalance(sender);
     IIncentive(incentive).withdraw(_amount, sender);
-    if (balanceOf[sender] == 0){
+    if (balanceOf[sender] == 0) {
       depositUserNum--;
     }
 

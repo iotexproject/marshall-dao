@@ -28,11 +28,15 @@ contract TestERC20Gauge is Test {
     forwarder = new DAOForwarder();
     // manager & _factoryRegistry not used in gauge
     strategyManager = new TestStrategyManager();
-    strategyManager.setShare(address (this), 100);
+    strategyManager.setShare(address(this), 100);
     GaugeFactory gaugeFactory = new GaugeFactory();
     IncentivesFactory incentiveFactory = new IncentivesFactory();
     address poolFactory = address(1);
-    FactoryRegistry factoryRegistry = new FactoryRegistry(poolFactory, address(incentiveFactory), address(gaugeFactory));
+    FactoryRegistry factoryRegistry = new FactoryRegistry(
+      poolFactory,
+      address(incentiveFactory),
+      address(gaugeFactory)
+    );
     voter = new Voter(address(forwarder), address(strategyManager), address(factoryRegistry));
     address _gauge = voter.createGauge(poolFactory, address(pool), 0, 0);
     gauge = ERC20Gauge(_gauge);
