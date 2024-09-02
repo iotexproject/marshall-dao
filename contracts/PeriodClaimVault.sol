@@ -16,7 +16,7 @@ contract PeriodClaimVault is OwnableUpgradeable {
   event RemoveProject(uint256 projectId);
   event Claim(uint256 projectId, address recipient, uint256 startTimestamp, uint256 endTimestamp, uint256 rewards);
   event ChangePeriod(uint256 batchSize);
-  event ChangeRewardPerDevice(uint256 rewardPerBlock);
+  event ChangeRewardPerDevice(uint256 rewardPerDevice);
   event ChangeRecipient(address indexed admin, uint256 projectId, address recipient);
   event SetInvalidDevice(uint256 projectId, uint256 amount);
 
@@ -44,7 +44,7 @@ contract PeriodClaimVault is OwnableUpgradeable {
 
   function addProject(uint256 _projectId, address _recipient, uint256 _startTimestamp) external onlyOwner {
     require(_recipient != address(0), "zero address");
-    require(_startTimestamp > block.number, "invalid start timestamp");
+    require(_startTimestamp > block.timestamp, "invalid start timestamp");
     require(ioIDStore.projectDeviceContract(_projectId) != address(0), "invalid project");
 
     projectNum++;
@@ -64,8 +64,8 @@ contract PeriodClaimVault is OwnableUpgradeable {
   function claim(uint256 _projectId) external returns (uint256) {
     uint256 _lastClaimedTimestamp = lastClaimedTimestamp[_projectId];
     require(_lastClaimedTimestamp != 0, "invalid project");
-    require(_lastClaimedTimestamp + period <= block.number, "claim too short");
-    uint256 _claimablePeriods = (block.number - _lastClaimedTimestamp) / period;
+    require(_lastClaimedTimestamp + period <= block.timestamp, "claim too short");
+    uint256 _claimablePeriods = (block.timestamp - _lastClaimedTimestamp) / period;
     uint256 _rewards = _claimablePeriods *
       rewardPerDevice *
       (ioIDStore.projectActivedAmount(_projectId) - projectInvalidDevice[_projectId]);
