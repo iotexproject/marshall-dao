@@ -47,4 +47,5 @@ FactoryRegistry deployed to
 Voter deployed to 
 RewardsDistributor deployed to 
 Vault deployed to 
+BatchClaimVault deployed to 0x26f0508DD630731DC0e7d75A856f984deB29cea3
 ```
