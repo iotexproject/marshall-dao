@@ -34,6 +34,7 @@ contract BatchClaimVault is OwnableUpgradeable {
   function addProject(uint256 _projectId, address _recipient, uint256 _startBlock) external onlyOwner {
     require(_recipient != address(0), "zero address");
     require(_startBlock > block.number, "invalid start block");
+    require(projectRecipient[_projectId] == address(0), "already added");
 
     projectNum++;
     projectRecipient[_projectId] = _recipient;
@@ -46,6 +47,7 @@ contract BatchClaimVault is OwnableUpgradeable {
 
     delete projectRecipient[_projectId];
     delete lastClaimedBlock[_projectId];
+    projectNum--;
     emit RemoveProject(_projectId);
   }
 

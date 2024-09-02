@@ -45,6 +45,7 @@ contract PeriodClaimVault is OwnableUpgradeable {
   function addProject(uint256 _projectId, address _recipient, uint256 _startTimestamp) external onlyOwner {
     require(_recipient != address(0), "zero address");
     require(_startTimestamp > block.timestamp, "invalid start timestamp");
+    require(projectRecipient[_projectId] == address(0), "already added");
     require(ioIDStore.projectDeviceContract(_projectId) != address(0), "invalid project");
 
     projectNum++;
@@ -58,6 +59,7 @@ contract PeriodClaimVault is OwnableUpgradeable {
 
     delete projectRecipient[_projectId];
     delete lastClaimedTimestamp[_projectId];
+    projectNum--;
     emit RemoveProject(_projectId);
   }
 
@@ -93,7 +95,6 @@ contract PeriodClaimVault is OwnableUpgradeable {
   }
 
   function setInvalidDevice(uint256 _projectId, uint256 _amount) external onlyOwner {
-    require(_amount > 0, "zero amount");
     require(ioIDStore.projectActivedAmount(_projectId) >= _amount, "invalid project");
 
     projectInvalidDevice[_projectId] = _amount;
