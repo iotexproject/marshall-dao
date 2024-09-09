@@ -8,12 +8,11 @@ describe('PeriodClaimVault tests', function () {
 
     const ioIDStore = await ethers.deployContract('TestIoIDStore');
     const vault = await ethers.deployContract('PeriodClaimVault');
-    await vault.connect(owner).initialize(ioIDStore.target, ethers.parseEther('0.1'));
+    await vault.connect(owner).initialize(ioIDStore.target);
 
     expect(await vault.period()).to.equal(86400);
-    expect(await vault.rewardPerDevice()).to.equal(ethers.parseEther('0.1'));
     await expect(vault.connect(fakeRecipient).changePeriod(10)).to.revertedWith('Ownable: caller is not the owner');
-    await expect(vault.connect(fakeRecipient).changeRewardPerDevice(10)).to.revertedWith(
+    await expect(vault.connect(fakeRecipient).changeRewardPerDevice(1, 10)).to.revertedWith(
       'Ownable: caller is not the owner',
     );
     await expect(vault.connect(fakeRecipient).changeRecipient(1, fakeRecipient.address)).to.revertedWith(
@@ -36,9 +35,13 @@ describe('PeriodClaimVault tests', function () {
 
     const projectId = 1;
     const projectRecipient = '0x0000000000000000000000000000000000000100';
-    await expect(vault.addProject(2, projectRecipient, startTimestamp)).to.revertedWith('invalid project');
-    await vault.addProject(projectId, projectRecipient, startTimestamp);
-    await expect(vault.addProject(projectId, projectRecipient, startTimestamp)).to.revertedWith('already added');
+    await expect(vault.addProject(2, ethers.parseEther('0.1'), projectRecipient, startTimestamp)).to.revertedWith(
+      'invalid project',
+    );
+    await vault.addProject(projectId, ethers.parseEther('0.1'), projectRecipient, startTimestamp);
+    await expect(
+      vault.addProject(projectId, ethers.parseEther('0.1'), projectRecipient, startTimestamp),
+    ).to.revertedWith('already added');
 
     expect(await vault.lastClaimedTimestamp(projectId)).to.be.equals(startTimestamp);
     await expect(vault.claim(projectId)).to.revertedWith('claim too short');
@@ -49,7 +52,7 @@ describe('PeriodClaimVault tests', function () {
     await vault.donate({ value: ethers.parseEther('100') });
     await vault.claim(projectId);
     expect(await ethers.provider.getBalance(projectRecipient)).to.be.equals(
-      (await ioIDStore.projectActivedAmount(projectId)) * (await vault.rewardPerDevice()),
+      (await ioIDStore.projectActivedAmount(projectId)) * (await vault.rewardPerDevice(projectId)),
     );
     await expect(vault.claim(projectId)).to.revertedWith('claim too short');
 
@@ -60,14 +63,14 @@ describe('PeriodClaimVault tests', function () {
     await vault.claim(projectId);
     expect((await ethers.provider.getBalance(projectRecipient)) - balanceRecipient).to.be.equals(
       ((await ioIDStore.projectActivedAmount(projectId)) - (await vault.projectInvalidDevice(projectId))) *
-        (await vault.rewardPerDevice()),
+        (await vault.rewardPerDevice(projectId)),
     );
 
     await time.increaseTo(startTimestamp + 86400 * 5 + 50000);
     await vault.connect(fakeRecipient).claim(projectId);
     expect((await ethers.provider.getBalance(projectRecipient)) - balanceRecipient).to.be.equals(
       ((await ioIDStore.projectActivedAmount(projectId)) - (await vault.projectInvalidDevice(projectId))) *
-        (await vault.rewardPerDevice()) *
+        (await vault.rewardPerDevice(projectId)) *
         BigInt(4),
     );
 

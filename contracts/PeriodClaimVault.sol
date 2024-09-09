@@ -11,47 +11,52 @@ interface IioIDStore {
 contract PeriodClaimVault is OwnableUpgradeable {
   event Donation(address indexed donor, uint256 amount);
   event Withdraw(address indexed owner, address recipcient, uint256 amount);
-  event Initialize(uint256 period, uint256 rewardPerDevice);
-  event AddProject(uint256 projectId, address recipient, uint256 startTimestamp);
+  event Initialize(uint256 period);
+  event AddProject(uint256 projectId, uint256 rewardPerDevice, address recipient, uint256 startTimestamp);
   event RemoveProject(uint256 projectId);
   event Claim(uint256 projectId, address recipient, uint256 startTimestamp, uint256 endTimestamp, uint256 rewards);
   event ChangePeriod(uint256 batchSize);
-  event ChangeRewardPerDevice(uint256 rewardPerDevice);
+  event ChangeRewardPerDevice(uint256 projectId, uint256 rewardPerDevice);
   event ChangeRecipient(address indexed admin, uint256 projectId, address recipient);
   event SetInvalidDevice(uint256 projectId, uint256 amount);
 
   IioIDStore public ioIDStore;
   uint256 public period;
-  uint256 public rewardPerDevice;
   uint256 public projectNum;
+  mapping(uint256 => uint256) public rewardPerDevice;
   mapping(uint256 => address) public projectRecipient;
   mapping(uint256 => uint256) public projectInvalidDevice;
   mapping(uint256 => uint256) public lastClaimedTimestamp;
 
-  function initialize(address _ioIDStore, uint256 _rewardPerDevice) public initializer {
+  function initialize(address _ioIDStore) public initializer {
     require(_ioIDStore != address(0), "zero address");
-    require(_rewardPerDevice > 0, "invalid reward per device");
 
     __Ownable_init_unchained();
 
     ioIDStore = IioIDStore(_ioIDStore);
     uint256 _period = 1 days;
     period = _period;
-    rewardPerDevice = _rewardPerDevice;
 
-    emit Initialize(_period, _rewardPerDevice);
+    emit Initialize(_period);
   }
 
-  function addProject(uint256 _projectId, address _recipient, uint256 _startTimestamp) external onlyOwner {
+  function addProject(
+    uint256 _projectId,
+    uint256 _rewardPerDevice,
+    address _recipient,
+    uint256 _startTimestamp
+  ) external onlyOwner {
     require(_recipient != address(0), "zero address");
+    require(_rewardPerDevice > 0, "invalid reward per device");
     require(_startTimestamp > block.timestamp, "invalid start timestamp");
     require(projectRecipient[_projectId] == address(0), "already added");
     require(ioIDStore.projectDeviceContract(_projectId) != address(0), "invalid project");
 
     projectNum++;
+    rewardPerDevice[_projectId] = _rewardPerDevice;
     projectRecipient[_projectId] = _recipient;
     lastClaimedTimestamp[_projectId] = _startTimestamp;
-    emit AddProject(_projectId, _recipient, _startTimestamp);
+    emit AddProject(_projectId, _rewardPerDevice, _recipient, _startTimestamp);
   }
 
   function removeProject(uint256 _projectId) external onlyOwner {
@@ -69,7 +74,7 @@ contract PeriodClaimVault is OwnableUpgradeable {
     require(_lastClaimedTimestamp + period <= block.timestamp, "claim too short");
     uint256 _claimablePeriods = (block.timestamp - _lastClaimedTimestamp) / period;
     uint256 _rewards = _claimablePeriods *
-      rewardPerDevice *
+      rewardPerDevice[_projectId] *
       (ioIDStore.projectActivedAmount(_projectId) - projectInvalidDevice[_projectId]);
     require(address(this).balance >= _rewards, "insufficient fund");
     lastClaimedTimestamp[_projectId] += (_claimablePeriods * period);
@@ -87,11 +92,13 @@ contract PeriodClaimVault is OwnableUpgradeable {
     emit ChangePeriod(_period);
   }
 
-  function changeRewardPerDevice(uint256 _rewardPerDevice) external onlyOwner {
+  function changeRewardPerDevice(uint256 _projectId, uint256 _rewardPerDevice) external onlyOwner {
     require(_rewardPerDevice > 0, "invalid reward per device");
-    rewardPerDevice = _rewardPerDevice;
+    require(projectRecipient[_projectId] != address(0), "invalid project");
 
-    emit ChangeRewardPerDevice(_rewardPerDevice);
+    rewardPerDevice[_projectId] = _rewardPerDevice;
+
+    emit ChangeRewardPerDevice(_projectId, _rewardPerDevice);
   }
 
   function setInvalidDevice(uint256 _projectId, uint256 _amount) external onlyOwner {
