@@ -10,6 +10,11 @@
       "address": "0x6382366Dd7A612e98663AF1e6826b272C815c8D9",
       "txHash": "0x0cc81f79844356437a55b947e88999264febb57a08c06ca6e1099241c76f010a",
       "kind": "transparent"
+    },
+    {
+      "address": "0xd4509B8a922c7060F0F6450318c251442B76a046",
+      "txHash": "0x915ad36db5da1426dabd860eb056df7cecd940cca19f171604316d682a3f4899",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -696,6 +701,151 @@
           "t_contract(IVotingEscrow)31393": {
             "label": "contract IVotingEscrow",
             "numberOfBytes": "20"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "7be264975c7af40cc6dbe1ee0755d613bfd3c6f55c94ef51272cd3b7dda95621": {
+      "address": "0x3A88A6F54A7B43BED34EB79E7f8194C6db4cBa81",
+      "txHash": "0xe9ea662e815721af07ea3117b123bf752275e7f30400e47bdbe9b7ea7b7f2a25",
+      "layout": {
+        "solcVersion": "0.8.19",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "ioIDStore",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_contract(IioIDStore)701",
+            "contract": "PeriodClaimVault",
+            "src": "contracts/PeriodClaimVault.sol:23"
+          },
+          {
+            "label": "period",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_uint256",
+            "contract": "PeriodClaimVault",
+            "src": "contracts/PeriodClaimVault.sol:24"
+          },
+          {
+            "label": "projectNum",
+            "offset": 0,
+            "slot": "103",
+            "type": "t_uint256",
+            "contract": "PeriodClaimVault",
+            "src": "contracts/PeriodClaimVault.sol:25"
+          },
+          {
+            "label": "rewardPerDevice",
+            "offset": 0,
+            "slot": "104",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "PeriodClaimVault",
+            "src": "contracts/PeriodClaimVault.sol:26"
+          },
+          {
+            "label": "projectRecipient",
+            "offset": 0,
+            "slot": "105",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "PeriodClaimVault",
+            "src": "contracts/PeriodClaimVault.sol:27"
+          },
+          {
+            "label": "projectInvalidDevice",
+            "offset": 0,
+            "slot": "106",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "PeriodClaimVault",
+            "src": "contracts/PeriodClaimVault.sol:28"
+          },
+          {
+            "label": "lastClaimedTimestamp",
+            "offset": 0,
+            "slot": "107",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "PeriodClaimVault",
+            "src": "contracts/PeriodClaimVault.sol:29"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IioIDStore)701": {
+            "label": "contract IioIDStore",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
           },
           "t_uint256": {
             "label": "uint256",
