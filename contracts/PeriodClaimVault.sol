@@ -19,6 +19,7 @@ contract PeriodClaimVault is OwnableUpgradeable {
   event ChangeRewardPerDevice(uint256 projectId, uint256 rewardPerDevice);
   event ChangeRecipient(address indexed admin, uint256 projectId, address recipient);
   event SetInvalidDevice(uint256 projectId, uint256 amount);
+  event SetProjectCap(uint256 projectId, uint256 cap);
 
   IioIDStore public ioIDStore;
   uint256 public period;
@@ -27,6 +28,7 @@ contract PeriodClaimVault is OwnableUpgradeable {
   mapping(uint256 => address) public projectRecipient;
   mapping(uint256 => uint256) public projectInvalidDevice;
   mapping(uint256 => uint256) public lastClaimedTimestamp;
+  mapping(uint256 => uint256) public projectCap;
 
   function initialize(address _ioIDStore) public initializer {
     require(_ioIDStore != address(0), "zero address");
@@ -73,9 +75,15 @@ contract PeriodClaimVault is OwnableUpgradeable {
     require(_lastClaimedTimestamp != 0, "invalid project");
     require(_lastClaimedTimestamp + period <= block.timestamp, "claim too short");
     uint256 _claimablePeriods = (block.timestamp - _lastClaimedTimestamp) / period;
-    uint256 _rewards = _claimablePeriods *
-      rewardPerDevice[_projectId] *
+
+    uint256 _periodRewards = rewardPerDevice[_projectId] *
       (ioIDStore.projectActivedAmount(_projectId) - projectInvalidDevice[_projectId]);
+    uint256 _cap = projectCap[_projectId];
+    if (_cap != 0 && _periodRewards > _cap) {
+      _periodRewards = _cap;
+    }
+
+    uint256 _rewards = _claimablePeriods * _periodRewards;
     require(address(this).balance >= _rewards, "insufficient fund");
     lastClaimedTimestamp[_projectId] += (_claimablePeriods * period);
     address _recipient = projectRecipient[_projectId];
@@ -99,6 +107,32 @@ contract PeriodClaimVault is OwnableUpgradeable {
     rewardPerDevice[_projectId] = _rewardPerDevice;
 
     emit ChangeRewardPerDevice(_projectId, _rewardPerDevice);
+  }
+
+  function setProjectCap(uint256 _projectId, uint256 _cap) external onlyOwner {
+    require(_cap > 0, "invalid cap");
+    require(projectRecipient[_projectId] != address(0), "invalid project");
+
+    projectCap[_projectId] = _cap;
+    emit SetProjectCap(_projectId, _cap);
+  }
+
+  function claimableRewards(uint256 _projectId) external view returns (uint256) {
+    uint256 _lastClaimedTimestamp = lastClaimedTimestamp[_projectId];
+    require(_lastClaimedTimestamp != 0, "invalid project");
+    uint256 _claimablePeriods = (block.timestamp - _lastClaimedTimestamp) / period;
+    if (_claimablePeriods == 0) {
+      return 0;
+    }
+
+    uint256 _periodRewards = rewardPerDevice[_projectId] *
+      (ioIDStore.projectActivedAmount(_projectId) - projectInvalidDevice[_projectId]);
+    uint256 _cap = projectCap[_projectId];
+    if (_cap != 0 && _periodRewards > _cap) {
+      _periodRewards = _cap;
+    }
+
+    return _claimablePeriods * _periodRewards;
   }
 
   function setInvalidDevice(uint256 _projectId, uint256 _amount) external onlyOwner {
