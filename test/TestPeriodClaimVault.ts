@@ -67,12 +67,20 @@ describe('PeriodClaimVault tests', function () {
     );
 
     await time.increaseTo(startTimestamp + 86400 * 5 + 50000);
+    expect(await vault.claimableRewards(projectId)).to.be.equals(ethers.parseEther('0.9'));
     await vault.connect(fakeRecipient).claim(projectId);
     expect((await ethers.provider.getBalance(projectRecipient)) - balanceRecipient).to.be.equals(
       ((await ioIDStore.projectActivedAmount(projectId)) - (await vault.projectInvalidDevice(projectId))) *
         (await vault.rewardPerDevice(projectId)) *
         BigInt(4),
     );
+
+    await vault.setProjectCap(projectId, ethers.parseEther('0.2'));
+    await expect(vault.setProjectCap(projectId, ethers.parseEther('0'))).to.revertedWith('invalid cap');
+    await expect(vault.setProjectCap(2, ethers.parseEther('10'))).to.revertedWith('invalid project');
+
+    await time.increaseTo(startTimestamp + 86400 * 8 + 50000);
+    expect(await vault.claimableRewards(projectId)).to.be.equals(ethers.parseEther('0.6'));
 
     await vault.removeProject(projectId);
     await expect(vault.claim(projectId)).to.revertedWith('invalid project');
