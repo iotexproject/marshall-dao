@@ -5,7 +5,7 @@ import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Hol
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 import {IVoter} from "../interfaces/IVoter.sol";
-import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
+import {IWeightManager} from "../interfaces/IWeightManager.sol";
 import {RewardGauge} from "./RewardGauge.sol";
 import {IIncentive} from "../interfaces/IIncentive.sol";
 
@@ -16,15 +16,18 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
   mapping(uint256 => address) public tokenStaker;
   mapping(uint256 => uint256) public tokenWeight;
 
-  address public immutable weightedNFT;
+  address public weightManager;
 
   constructor(
     address _forwarder,
-    address _weightedNFT,
+    address _nft,
     address _voter,
     address _incentives
-  ) RewardGauge(_forwarder, IWeightedNFT(_weightedNFT).nft(), _voter, _incentives) {
-    weightedNFT = _weightedNFT;
+  ) RewardGauge(_forwarder, _nft, _voter, _incentives) {}
+
+  function setWeightManager(address _weightManager) external {
+    if (msg.sender != IVoter(voter).team()) revert NotTeam();
+    weightManager = _weightManager;
   }
 
   function _depositFor(uint256 _tokenId, address _recipient) internal override nonReentrant {
@@ -35,7 +38,10 @@ contract DeviceGauge is RewardGauge, ERC721Holder {
     _updateRewards(_recipient);
 
     IERC721(stakingToken).safeTransferFrom(sender, address(this), _tokenId);
-    uint256 _amount = IWeightedNFT(weightedNFT).weight(_tokenId);
+    uint256 _amount = 1;
+    if (weightManager != address(0)) {
+      _amount = IWeightManager(weightManager).weight(stakingToken, _tokenId);
+    }
     totalSupply += _amount;
     balanceOf[_recipient] += _amount;
     tokenStaker[_tokenId] = _recipient;
