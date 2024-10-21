@@ -2,15 +2,18 @@
 pragma solidity ^0.8.0;
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
 
-contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable {
-  event Deposit(address indexed user, uint256 tokenId, uint256 weight);
-  event Withdraw(address indexed user, uint256 tokenId, uint256 weight);
+contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721Holder {
+  event Deposit(address indexed user, uint256 tokenId, uint256 rewards, uint256 weight);
+  event Withdraw(address indexed user, uint256 tokenId, uint256 rewards, uint256 weight);
   event EmergencyWithdraw(address indexed user, uint256 tokenId, uint256 weight);
+  event Poke(address indexed user, uint256 tokenId, uint256 rewards, uint256 originalWeight, uint256 newWeight);
+  event ClaimRewards(address indexed user, uint256 rewards);
 
   struct UserInfo {
     uint256 amount; // How many staked tokens the user has provided
@@ -53,10 +56,11 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     UserInfo storage user = userInfo[msg.sender];
     _updatePool();
 
+    uint256 _pending = 0;
     if (user.amount > 0) {
-      uint256 pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
-      if (pending > 0) {
-        (bool success, ) = msg.sender.call{value: pending}("");
+      _pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
+      if (_pending > 0) {
+        (bool success, ) = msg.sender.call{value: _pending}("");
         require(success, "Failed to send reward");
       }
     }
@@ -72,7 +76,7 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
 
-    emit Deposit(msg.sender, _tokenId, _amount);
+    emit Deposit(msg.sender, _tokenId, _pending, _amount);
   }
 
   function withdraw(uint256 _tokenId) external nonReentrant {
@@ -81,7 +85,7 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable {
 
     _updatePool();
 
-    uint256 pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
+    uint256 _pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
 
     uint256 _amount = tokenWeight[_tokenId];
     user.amount = user.amount - _amount;
@@ -90,14 +94,14 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     tokenWeight[_tokenId] = 0;
     totalStakedWeight = totalStakedWeight - _amount;
 
-    if (pending > 0) {
-      (bool success, ) = msg.sender.call{value: pending}("");
+    if (_pending > 0) {
+      (bool success, ) = msg.sender.call{value: _pending}("");
       require(success, "Failed to send reward");
     }
 
     user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
 
-    emit Withdraw(msg.sender, _tokenId, _amount);
+    emit Withdraw(msg.sender, _tokenId, _pending, _amount);
   }
 
   function emergencyWithdraw(uint256 _tokenId) external nonReentrant {
@@ -113,6 +117,48 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     totalStakedWeight = totalStakedWeight - _amount;
 
     emit EmergencyWithdraw(msg.sender, _tokenId, user.amount);
+  }
+
+  function poke(uint256 _tokenId) external nonReentrant {
+    address _staker = tokenStaker[_tokenId];
+    require(_staker == address(0), "Invalid token");
+
+    UserInfo storage user = userInfo[_staker];
+
+    _updatePool();
+
+    uint256 _pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
+    if (_pending > 0) {
+      (bool success, ) = _staker.call{value: _pending}("");
+      require(success, "Failed to send reward");
+    }
+
+    uint256 _originalWeight = tokenWeight[_tokenId];
+    uint256 _newWeight = weightNFT.weight(_tokenId);
+    if (_originalWeight != _newWeight) {
+      user.amount = user.amount - _originalWeight + _newWeight;
+      tokenWeight[_tokenId] = _newWeight;
+      totalStakedWeight = totalStakedWeight - _originalWeight + _newWeight;
+    }
+
+    user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
+
+    emit Poke(_staker, _tokenId, _pending, _originalWeight, _newWeight);
+  }
+
+  function claimRewards(address _user) external nonReentrant {
+    UserInfo storage user = userInfo[_user];
+
+    _updatePool();
+
+    uint256 _pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
+    if (_pending > 0) {
+      (bool success, ) = _user.call{value: _pending}("");
+      require(success, "Failed to send reward");
+    }
+
+    user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
+    emit ClaimRewards(_user, _pending);
   }
 
   function pendingReward(address _user) external view returns (uint256) {
@@ -138,7 +184,7 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable {
     }
 
     uint256 rewards = (block.number - lastRewardBlock) * rewardPerBlock;
-    accTokenPerShare = accTokenPerShare + ((rewards * PRECISION_FACTOR) / totalStakedWeight);
+    accTokenPerShare = accTokenPerShare + (rewards * PRECISION_FACTOR) / totalStakedWeight;
     lastRewardBlock = block.number;
   }
 
