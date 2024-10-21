@@ -121,7 +121,7 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
 
   function poke(uint256 _tokenId) external nonReentrant {
     address _staker = tokenStaker[_tokenId];
-    require(_staker == address(0), "Invalid token");
+    require(_staker != address(0), "Invalid token");
 
     UserInfo storage user = userInfo[_staker];
 
