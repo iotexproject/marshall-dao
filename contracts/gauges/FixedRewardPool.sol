@@ -21,7 +21,7 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
   }
 
   // The precision factor
-  uint256 immutable PRECISION_FACTOR = 1e12;
+  uint256 constant PRECISION_FACTOR = 1e12;
 
   // The weighted NFT contract
   IWeightedNFT public weightNFT;
