@@ -52,15 +52,15 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
     rewardPerBlock = _rewardPerBlock;
   }
 
-  function deposit(uint256 _tokenId) external nonReentrant {
-    UserInfo storage user = userInfo[msg.sender];
+  function deposit(uint256 _tokenId, address _recipient) public nonReentrant {
+    UserInfo storage user = userInfo[_recipient];
     _updatePool();
 
     uint256 _pending = 0;
     if (user.amount > 0) {
       _pending = (user.amount * accTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
       if (_pending > 0) {
-        (bool success, ) = msg.sender.call{value: _pending}("");
+        (bool success, ) = _recipient.call{value: _pending}("");
         require(success, "Failed to send reward");
       }
     }
@@ -69,14 +69,18 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
     if (_amount > 0) {
       user.amount = user.amount + _amount;
       IERC721(weightNFT.nft()).safeTransferFrom(msg.sender, address(this), _tokenId);
-      tokenStaker[_tokenId] = msg.sender;
+      tokenStaker[_tokenId] = _recipient;
       tokenWeight[_tokenId] = _amount;
       totalStakedWeight = totalStakedWeight + _amount;
     }
 
     user.rewardDebt = (user.amount * accTokenPerShare) / PRECISION_FACTOR;
 
-    emit Deposit(msg.sender, _tokenId, _pending, _amount);
+    emit Deposit(_recipient, _tokenId, _pending, _amount);
+  }
+
+  function deposit(uint256 _tokenId) external {
+    deposit(_tokenId, msg.sender);
   }
 
   function withdraw(uint256 _tokenId) external nonReentrant {
