@@ -188,5 +188,9 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
     lastRewardBlock = block.number;
   }
 
+  function stakingToken() external view returns (address) {
+    return weightNFT.nft();
+  }
+
   receive() external payable {}
 }
