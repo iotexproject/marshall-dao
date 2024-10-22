@@ -12,6 +12,7 @@ contract VestingMaster is ReentrancyGuard, Ownable {
     uint256 locked;
     uint256 timestamp;
   }
+
   event Lock(address indexed user, uint256 amount);
   event Claim(address indexed user, uint256 amount);
   event LockerAdded(address indexed locker);

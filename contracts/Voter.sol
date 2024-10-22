@@ -23,6 +23,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 contract Voter is IVoter, ERC2771Context, ReentrancyGuard {
   using SafeERC20 for IERC20;
   /// @inheritdoc IVoter
+
   address public immutable forwarder;
   /// @inheritdoc IVoter
   address public strategyManager;

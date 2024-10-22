@@ -7,7 +7,6 @@ pragma solidity 0.8.19;
  * @notice An implementation of Perlin Noise that uses 16 bit fixed point arithmetic.
  * @notice Updated solidity version from 0.5.0 to 0.8.12.
  */
-
 library PerlinNoise {
   /**
    * @notice Computes the noise value for a 2D point.
@@ -22,7 +21,7 @@ library PerlinNoise {
   function noise2d(int256 x, int256 y) public pure returns (int256) {
     int256 temp = ptable((x >> 16) & 0xff /* Unit square X */);
 
-    int256 a = ptable((temp >> 8) + ((y >> 16) & 0xff /* Unit square Y */));
+    int256 a = ptable((temp >> 8) + ((y >> 16) & 0xff) /* Unit square Y */);
     int256 b = ptable((temp & 0xff) + ((y >> 16) & 0xff));
 
     x &= 0xffff; // Square relative X
