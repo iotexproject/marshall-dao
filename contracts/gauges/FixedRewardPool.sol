@@ -9,6 +9,9 @@ import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/se
 import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
 
 contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721Holder {
+  string public constant GAUGE_TYPE = "gauge_fixed_reward_pool";
+  string public constant GAUGE_VERSION = "0.1.0";
+
   event Deposit(address indexed user, uint256 tokenId, uint256 rewards, uint256 weight);
   event Withdraw(address indexed user, uint256 tokenId, uint256 rewards, uint256 weight);
   event EmergencyWithdraw(address indexed user, uint256 tokenId, uint256 weight);
