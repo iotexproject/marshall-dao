@@ -110,13 +110,16 @@ contract TestFixedRewardPool is Test {
     fixedRewardPool.withdraw(1);
     assertEq(bob.balance, 0.225 ether);
     assertEq(testNFT.ownerOf(1), bob);
-    fixedRewardPool.claimRewards(alice);
-    assertEq(alice.balance, 0.075 ether);
+    assertEq(alice.balance, 0.05 ether);
     assertEq(fixedRewardPool.totalStakedWeight(), 100);
     assertEq(fixedRewardPool.tokenWeight(1), 0);
 
     vm.roll(15);
     assertEq(fixedRewardPool.pendingReward(bob), 0);
+    fixedRewardPool.claimRewards(alice);
+    assertEq(alice.balance, 0.075 ether);
+
+    vm.roll(20);
     vm.prank(alice);
     fixedRewardPool.withdraw(3);
     assertEq(alice.balance, 0.075 ether);
