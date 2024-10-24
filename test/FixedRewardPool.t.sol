@@ -26,7 +26,7 @@ contract TestFixedRewardPool is Test {
     testNFT = new TestNFT();
     ownedWeightedNFT = new OwnedWeightedNFT(address(testNFT), alice);
     fixedRewardPool = new FixedRewardPool();
-    fixedRewardPool.initialize(address(ownedWeightedNFT), 10, 0.1 ether);
+    fixedRewardPool.initialize(address(ownedWeightedNFT), 10, 0.1 ether, 3);
   }
 
   function testOwnership() public {
@@ -114,5 +114,11 @@ contract TestFixedRewardPool is Test {
     assertEq(alice.balance, 0.075 ether);
     assertEq(fixedRewardPool.totalStakedWeight(), 100);
     assertEq(fixedRewardPool.tokenWeight(1), 0);
+
+    vm.roll(15);
+    assertEq(fixedRewardPool.pendingReward(bob), 0);
+    vm.prank(alice);
+    fixedRewardPool.withdraw(3);
+    assertEq(alice.balance, 0.075 ether);
   }
 }

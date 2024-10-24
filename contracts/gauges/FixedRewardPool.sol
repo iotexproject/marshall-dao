@@ -32,7 +32,9 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
   uint256 public accTokenPerShare;
   // The block number of the last pool update
   uint256 public lastRewardBlock;
-  // Reward tokens created per block.
+  // The block number when mining ends
+  uint256 public bonusEndBlock;
+  // Reward tokens created per block
   uint256 public rewardPerBlock;
   // Total staked weight
   uint256 public totalStakedWeight;
@@ -44,7 +46,12 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
   // Mapping from tokenId to weight
   mapping(uint256 => uint256) public tokenWeight;
 
-  function initialize(address _nft, uint256 _startBlock, uint256 _rewardPerBlock) external initializer {
+  function initialize(
+    address _nft,
+    uint256 _startBlock,
+    uint256 _rewardPerBlock,
+    uint256 _totalBlocks
+  ) external initializer {
     require(_startBlock >= block.number, "invalid start block");
     require(_rewardPerBlock > 0, "invalid reward per block");
 
@@ -53,6 +60,7 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
     weightNFT = IWeightedNFT(_nft);
     lastRewardBlock = _startBlock;
     rewardPerBlock = _rewardPerBlock;
+    bonusEndBlock = _startBlock + _totalBlocks;
   }
 
   function deposit(uint256 _tokenId, address _recipient) public nonReentrant {
@@ -172,7 +180,8 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
     UserInfo storage user = userInfo[_user];
     uint256 _totalStakedWeight = totalStakedWeight;
     if (block.number > lastRewardBlock && _totalStakedWeight != 0) {
-      uint256 rewards = (block.number - lastRewardBlock) * rewardPerBlock;
+      uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
+      uint256 rewards = multiplier * rewardPerBlock;
       uint256 adjustedTokenPerShare = accTokenPerShare + (rewards * PRECISION_FACTOR) / _totalStakedWeight;
       return (user.amount * adjustedTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
     } else {
@@ -190,9 +199,20 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
       return;
     }
 
-    uint256 rewards = (block.number - lastRewardBlock) * rewardPerBlock;
+    uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
+    uint256 rewards = multiplier * rewardPerBlock;
     accTokenPerShare = accTokenPerShare + (rewards * PRECISION_FACTOR) / totalStakedWeight;
     lastRewardBlock = block.number;
+  }
+
+  function _getMultiplier(uint256 _from, uint256 _to) internal view returns (uint256) {
+    if (_to <= bonusEndBlock) {
+      return _to - _from;
+    } else if (_from >= bonusEndBlock) {
+      return 0;
+    } else {
+      return bonusEndBlock - _from;
+    }
   }
 
   function stakingToken() external view returns (address) {
