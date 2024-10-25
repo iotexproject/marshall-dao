@@ -10,6 +10,10 @@ async function main() {
     console.log(`Please provide START_BLOCK`);
     return;
   }
+  if (!process.env.TOTAL_BLOCKS) {
+    console.log(`Please provide TOTAL_BLOCKS`);
+    return;
+  }
   if (!process.env.REWARD_PER_BLOCK) {
     console.log(`Please provide REWARD_PER_BLOCK (unit: IOTX)`);
     return;
@@ -25,7 +29,12 @@ async function main() {
 
   const pool = await upgrades.deployProxy(
     await ethers.getContractFactory('FixedRewardPool'),
-    [ownedWeightedNFT.target, process.env.START_BLOCK, ethers.parseEther(process.env.REWARD_PER_BLOCK)],
+    [
+      ownedWeightedNFT.target,
+      process.env.START_BLOCK,
+      ethers.parseEther(process.env.REWARD_PER_BLOCK),
+      process.env.TOTAL_BLOCKS,
+    ],
     {
       initializer: 'initialize',
     },
