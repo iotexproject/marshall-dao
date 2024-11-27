@@ -21,8 +21,6 @@ contract TestERC20Gauge is Test {
   Voter public voter;
   TestStrategyManager public strategyManager;
 
-  fallback() external payable {}
-
   function setUp() public {
     pool = new TestToken("lp_pool", "pool");
     forwarder = new DAOForwarder();

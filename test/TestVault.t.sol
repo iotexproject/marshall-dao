@@ -84,6 +84,4 @@ contract TestVault is Test {
     assertEq(address(strategyManager).balance, vault.weekly() / 10);
     assertEq(address(voter).balance, (90 * vault.weekly()) / 100);
   }
-
-  fallback() external payable {}
 }
