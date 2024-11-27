@@ -76,7 +76,7 @@ contract FixedRewardPool is OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC7
       }
     }
 
-    uint _amount = weightNFT.weight(_tokenId);
+    uint256 _amount = weightNFT.weight(_tokenId);
     if (_amount > 0) {
       user.amount = user.amount + _amount;
       IERC721(weightNFT.nft()).safeTransferFrom(msg.sender, address(this), _tokenId);
