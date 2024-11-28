@@ -151,4 +151,6 @@ contract TestERC20Gauge is Test {
     uint256 left = gauge.left();
     console.log("left+thirdEarned: ", thirdEarned + left, ", totalReward: ", 2.1 ether);
   }
+
+  receive() external payable {}
 }
