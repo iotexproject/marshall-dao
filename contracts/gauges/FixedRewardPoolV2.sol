@@ -3,13 +3,13 @@ pragma solidity ^0.8.0;
 
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
+import {MulticallUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import {Multicall} from "../utils/Multicall.sol";
 import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
 
-contract FixedRewardPoolV2 is Multicall, OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721Holder {
+contract FixedRewardPoolV2 is MulticallUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721Holder {
   string public constant GAUGE_TYPE = "gauge_fixed_reward_pool";
   string public constant GAUGE_VERSION = "0.2.0";
 

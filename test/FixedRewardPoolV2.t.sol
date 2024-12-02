@@ -124,4 +124,58 @@ contract TestFixedRewardPoolV2 is Test {
     fixedRewardPool.withdraw(3);
     assertEq(alice.balance, 0.075 ether);
   }
+
+  function testCycle() public {
+    testNFT.mint(bob, 1);
+    testNFT.mint(bob, 2);
+    testNFT.mint(bob, 3);
+    testNFT.mint(bob, 4);
+
+    vm.startPrank(bob);
+    vm.roll(15);
+    testNFT.approve(address(fixedRewardPool), 1);
+    fixedRewardPool.deposit(1);
+
+    vm.roll(20);
+    assertEq(bob.balance, 0);
+    fixedRewardPool.withdraw(1);
+    assertEq(bob.balance, 0);
+    testNFT.approve(address(fixedRewardPool), 1);
+    fixedRewardPool.deposit(1);
+    vm.stopPrank();
+
+    bytes[] memory _calldata = new bytes[](2);
+    _calldata[0] = abi.encodeCall(FixedRewardPoolV2.updateRewardPerBlock, (0.2 ether));
+    _calldata[1] = abi.encodeCall(FixedRewardPoolV2.updateBonusEndBlock, (30));
+    fixedRewardPool.multicall(_calldata);
+
+    assertEq(fixedRewardPool.rewardPerBlock(), 0.2 ether);
+    assertEq(fixedRewardPool.lastRewardBlock(), 20);
+    assertEq(fixedRewardPool.bonusEndBlock(), 30);
+
+    payable(address(fixedRewardPool)).transfer(2 ether);
+
+    vm.roll(21);
+    assertEq(bob.balance, 0);
+    assertEq(fixedRewardPool.pendingReward(bob), 0.2 ether);
+    fixedRewardPool.claimRewards(bob);
+    assertEq(bob.balance, 0.2 ether);
+
+    fixedRewardPool.updateRewardPerBlock(0.1 ether);
+    assertEq(fixedRewardPool.pendingReward(bob), 0);
+    fixedRewardPool.claimRewards(bob);
+    assertEq(bob.balance, 0.2 ether);
+
+    vm.roll(25);
+    assertEq(fixedRewardPool.pendingReward(bob), 0.4 ether);
+    fixedRewardPool.claimRewards(bob);
+    assertEq(bob.balance, 0.6 ether);
+
+    fixedRewardPool.updateRewardPerBlock(0.2 ether);
+
+    vm.roll(30);
+    vm.prank(bob);
+    fixedRewardPool.withdraw(1);
+    assertEq(bob.balance, 1.6 ether);
+  }
 }

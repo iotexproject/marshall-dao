@@ -30,11 +30,29 @@ contract TestIncentive is Test {
   Incentives public dinti;
 
   function onERC721Received(
-    address /**operator**/,
-    address /**from**/,
-    uint256 /**tokenId**/,
-    bytes calldata /**data**/
-  ) external pure returns (bytes4) {
+    address,
+    /**
+     * operator*
+     */
+    address,
+    /**
+     * from*
+     */
+    uint256,
+    /**
+     * tokenId*
+     */
+    bytes calldata
+  )
+    external
+    pure
+    returns (
+      /**
+       * data*
+       */
+      bytes4
+    )
+  {
     return bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"));
   }
 
