@@ -7,7 +7,7 @@ abstract contract Multicall {
   function multicall(bytes[] calldata data) public payable returns (bytes[] memory results) {
     results = new bytes[](data.length);
     for (uint256 i = 0; i < data.length; i++) {
-      (bool success, bytes memory result) = address(this).delegatecall(data[i]);
+      (bool success, bytes memory result) = address(this).call(data[i]);
 
       if (!success) {
         // Next 5 lines from https://ethereum.stackexchange.com/a/83577

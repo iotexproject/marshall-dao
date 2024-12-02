@@ -15,6 +15,16 @@
       "address": "0x462C66e43e0Ad4B10791Aa666d8c68Cc8e82F65C",
       "txHash": "0xb3d3a7681247ff9171e99d10ebbbc96aab59f0f093df33ae5e0f335da80abc3b",
       "kind": "transparent"
+    },
+    {
+      "address": "0x41E3dc8416b18DF805b05f0f703E55Dd3eD9ECAe",
+      "txHash": "0x6121794350f83e10706c35cf1d4f76821a7d560619bd98375705e71aae0ffabc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x65a5487b51C4773dc0D77EAA2704DA6F5763F03b",
+      "txHash": "0x0ee8f252b9ac4b252e9f4de3d6a1e5b1a2c1b5e91ca1c1728ca97f1313502fcb",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -189,6 +199,205 @@
           },
           "t_struct(UserInfo)19121_storage": {
             "label": "struct FixedRewardPool.UserInfo",
+            "members": [
+              {
+                "label": "amount",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "rewardDebt",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        },
+        "namespaces": {}
+      }
+    },
+    "f178378247420c5dcd3843ddc3c3d1db4e6f15f7854be8271f3e34ef2b1a8b8a": {
+      "address": "0x5DC67f920ba79521388387317eC573B301F6e878",
+      "txHash": "0x6394362c7a11ca75ee77d621ad445650c49464db1b753d90b8633442e9794714",
+      "layout": {
+        "solcVersion": "0.8.19",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:40"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:88"
+          },
+          {
+            "label": "weightNFT",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IWeightedNFT)1936",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:34"
+          },
+          {
+            "label": "accTokenPerShare",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_uint256",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:36"
+          },
+          {
+            "label": "lastRewardBlock",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_uint256",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:38"
+          },
+          {
+            "label": "bonusEndBlock",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_uint256",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:40"
+          },
+          {
+            "label": "rewardPerBlock",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_uint256",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:42"
+          },
+          {
+            "label": "totalStakedWeight",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_uint256",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:44"
+          },
+          {
+            "label": "userInfo",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_mapping(t_address,t_struct(UserInfo)1031_storage)",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:46"
+          },
+          {
+            "label": "tokenStaker",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_uint256,t_address)",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:49"
+          },
+          {
+            "label": "tokenWeight",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "contract": "FixedRewardPoolV2",
+            "src": "contracts/gauges/FixedRewardPoolV2.sol:51"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IWeightedNFT)1936": {
+            "label": "contract IWeightedNFT",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_struct(UserInfo)1031_storage)": {
+            "label": "mapping(address => struct FixedRewardPoolV2.UserInfo)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_address)": {
+            "label": "mapping(uint256 => address)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_struct(UserInfo)1031_storage": {
+            "label": "struct FixedRewardPoolV2.UserInfo",
             "members": [
               {
                 "label": "amount",

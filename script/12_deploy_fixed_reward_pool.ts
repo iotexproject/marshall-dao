@@ -28,7 +28,7 @@ async function main() {
   await ownedWeightedNFT.waitForDeployment();
 
   const pool = await upgrades.deployProxy(
-    await ethers.getContractFactory('FixedRewardPool'),
+    await ethers.getContractFactory('FixedRewardPoolV2'),
     [
       ownedWeightedNFT.target,
       process.env.START_BLOCK,
@@ -41,6 +41,7 @@ async function main() {
   );
   await pool.waitForDeployment();
 
+  console.log(`OwnedWeightedNFT for ${process.env.DEVICE_NFT} deployed to ${ownedWeightedNFT.target}`);
   console.log(`FixedRewardPool for ${process.env.DEVICE_NFT} deployed to ${pool.target}`);
 }
 
