@@ -28,7 +28,9 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
   event ChangeRewardPerPeriod(uint256 rewardPerPeriod);
   event ChangeDApp(address indexed dApp);
 
+  /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
   IioIDRegistry public immutable ioIDRegistry;
+  /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
   uint256 public immutable MIN_INTERNAL;
 
   uint256 public rewardPeriod;
@@ -42,9 +44,10 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
   mapping(address => uint256) public lastTickTimestamp;
   mapping(address => uint256) public pendingRewards;
 
-  constructor(address _ioIDRegistry) {
+  /// @custom:oz-upgrades-unsafe-allow constructor
+  constructor(address _ioIDRegistry, uint256 _internal) {
     ioIDRegistry = IioIDRegistry(_ioIDRegistry);
-    MIN_INTERNAL = 1 minutes;
+    MIN_INTERNAL = _internal;
   }
 
   function initialize(
@@ -56,6 +59,9 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
   ) external initializer {
     require(_rewardPeriod > 0 && _activePeriodLimit > 0 && _projectId > 0, "zero value");
     require(_dApp != address(0), "zero address");
+
+    __Multicall_init();
+    __Ownable_init();
 
     rewardPeriod = _rewardPeriod;
     activePeriodLimit = _activePeriodLimit;
