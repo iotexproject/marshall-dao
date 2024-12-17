@@ -83,7 +83,7 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
       lastTickTimestamp[_device] = block.timestamp;
 
       if (
-        rewardPerPeriod > 0 && validCount[_device][_period] >= activePeriodLimit && !receivedPeriod[_device][_period]
+        rewardPerPeriod > 0 && !receivedPeriod[_device][_period] && validCount[_device][_period] >= activePeriodLimit
       ) {
         address _owner = ioID.ownerOf(ioIDRegistry.deviceTokenId(_device));
         uint256 _rewardPerPeriod = rewardPerPeriod;
