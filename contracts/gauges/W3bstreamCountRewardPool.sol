@@ -87,10 +87,19 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
       ) {
         address _owner = ioID.ownerOf(ioIDRegistry.deviceTokenId(_device));
         uint256 _rewardPerPeriod = rewardPerPeriod;
-        pendingRewards[_owner] += _rewardPerPeriod;
+        uint256 _pendingRewards = pendingRewards[_owner] + _rewardPerPeriod;
         receivedPeriod[_device][_period] = true;
-
         emit ReceiveRewards(_owner, _device, _rewardPerPeriod);
+
+        if (_pendingRewards > 0 && address(this).balance >= _pendingRewards) {
+          pendingRewards[_owner] = 0;
+          (bool success, ) = _owner.call{value: _pendingRewards}("");
+          require(success, "fail claim");
+
+          emit ClaimRewards(_owner, _pendingRewards);
+        } else {
+          pendingRewards[_owner] = _pendingRewards;
+        }
       }
     }
 
