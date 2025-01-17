@@ -6,6 +6,10 @@ async function main() {
     console.log(`Please provide IOID_REGISTRY address`);
     return;
   }
+  if (!process.env.CAP) {
+    console.log(`Please provide CAP (unit: IOTX)`);
+    return;
+  }
   if (!process.env.REWARD_PERIOD) {
     console.log(`Please provide REWARD_PERIOD (unit: second)`);
     return;
@@ -34,6 +38,7 @@ async function main() {
   const pool = await upgrades.deployProxy(
     await ethers.getContractFactory('W3bstreamCountRewardPool'),
     [
+      ethers.parseEther(process.env.CAP),
       process.env.REWARD_PERIOD,
       process.env.ACTIVE_PERIOD_LIMIT,
       ethers.parseEther(process.env.REWARD_PER_PERIOD),

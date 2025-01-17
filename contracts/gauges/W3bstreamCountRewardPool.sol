@@ -27,12 +27,14 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
   event ChangeActivePeriodLimit(uint256 activePeriodLimit);
   event ChangeRewardPerPeriod(uint256 rewardPerPeriod);
   event ChangeDApp(address indexed dApp);
+  event IncreaseRewards(uint256 rewards);
 
   /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
   IioIDRegistry public immutable ioIDRegistry;
   /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
   uint256 public immutable MIN_INTERNAL;
 
+  uint256 public remainingRewards;
   uint256 public rewardPeriod;
   uint256 public activePeriodLimit;
   uint256 public rewardPerPeriod;
@@ -51,6 +53,7 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
   }
 
   function initialize(
+    uint256 _cap,
     uint256 _rewardPeriod,
     uint256 _activePeriodLimit,
     uint256 _rewardPerPeriod,
@@ -63,6 +66,7 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
     __Multicall_init();
     __Ownable_init();
 
+    remainingRewards = _cap;
     rewardPeriod = _rewardPeriod;
     activePeriodLimit = _activePeriodLimit;
     rewardPerPeriod = _rewardPerPeriod;
@@ -83,10 +87,18 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
       lastTickTimestamp[_device] = block.timestamp;
 
       if (
-        rewardPerPeriod > 0 && !receivedPeriod[_device][_period] && validCount[_device][_period] >= activePeriodLimit
+        rewardPerPeriod > 0 &&
+        remainingRewards > 0 &&
+        !receivedPeriod[_device][_period] &&
+        validCount[_device][_period] >= activePeriodLimit
       ) {
         address _owner = ioID.ownerOf(ioIDRegistry.deviceTokenId(_device));
         uint256 _rewardPerPeriod = rewardPerPeriod;
+        if (_rewardPerPeriod > remainingRewards) {
+          _rewardPerPeriod = remainingRewards;
+        }
+        remainingRewards -= _rewardPerPeriod;
+
         uint256 _pendingRewards = pendingRewards[_owner] + _rewardPerPeriod;
         receivedPeriod[_device][_period] = true;
         emit ReceiveRewards(_owner, _device, _rewardPerPeriod);
@@ -156,6 +168,13 @@ contract W3bstreamCountRewardPool is MulticallUpgradeable, OwnableUpgradeable {
     dApp = _dApp;
 
     emit ChangeDApp(_dApp);
+  }
+
+  function increaseRewards(uint256 _rewards) external onlyOwner {
+    require(_rewards > 0, "zero reward");
+
+    remainingRewards += _rewards;
+    emit IncreaseRewards(_rewards);
   }
 
   receive() external payable {}
