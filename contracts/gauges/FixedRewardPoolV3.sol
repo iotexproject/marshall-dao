@@ -9,18 +9,18 @@ import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/se
 
 import {IWeightedNFT} from "../interfaces/IWeightedNFT.sol";
 
-contract FixedRewardPoolV2 is MulticallUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721Holder {
+contract FixedRewardPoolV3 is MulticallUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, ERC721Holder {
   string public constant GAUGE_TYPE = "gauge_fixed_reward_pool";
-  string public constant GAUGE_VERSION = "0.2.0";
+  string public constant GAUGE_VERSION = "0.3.0";
 
   event Deposit(address indexed user, uint256 tokenId, uint256 rewards, uint256 weight);
   event Withdraw(address indexed user, uint256 tokenId, uint256 rewards, uint256 weight);
   event EmergencyWithdraw(address indexed user, uint256 tokenId, uint256 weight);
   event Poke(address indexed user, uint256 tokenId, uint256 rewards, uint256 originalWeight, uint256 newWeight);
   event ClaimRewards(address indexed user, uint256 rewards);
-  event StopRewards(uint256 stopHeight);
-  event NewRewardPerBlock(uint256 rewardPerBlock);
-  event NewBonusEndBlock(uint256 bonusEndBlock);
+  event StopRewards(uint256 stopTimestamp);
+  event NewRewardPerSecond(uint256 rewardPerSecond);
+  event NewBonusEndTimestamp(uint256 bonusEndTimestamp);
 
   struct UserInfo {
     uint256 amount; // How many staked tokens the user has provided
@@ -34,12 +34,12 @@ contract FixedRewardPoolV2 is MulticallUpgradeable, OwnableUpgradeable, Reentran
   IWeightedNFT public weightNFT;
   // Accrued token per share
   uint256 public accTokenPerShare;
-  // The block number of the last pool update
-  uint256 public lastRewardBlock;
-  // The block number when mining ends
-  uint256 public bonusEndBlock;
-  // Reward tokens created per block
-  uint256 public rewardPerBlock;
+  // The timestamp of the last pool update
+  uint256 public lastRewardTimestamp;
+  // The timestamp when mining ends
+  uint256 public bonusEndTimestamp;
+  // Reward tokens created per second
+  uint256 public rewardPerSecond;
   // Total staked weight
   uint256 public totalStakedWeight;
   // Info of each user that stakes tokens (stakedToken)
@@ -52,40 +52,41 @@ contract FixedRewardPoolV2 is MulticallUpgradeable, OwnableUpgradeable, Reentran
 
   function initialize(
     address _nft,
-    uint256 _startBlock,
-    uint256 _rewardPerBlock,
-    uint256 _totalBlocks
+    uint256 _startTime,
+    uint256 _rewardPerSecond,
+    uint256 _totalSeconds
   ) external initializer {
-    require(_startBlock >= block.number, "invalid start block");
-    require(_rewardPerBlock > 0, "invalid reward per block");
+    require(_startTime >= block.timestamp, "invalid startTime");
+    require(_rewardPerSecond > 0, "invalid reward per second");
 
     __Ownable_init();
     __ReentrancyGuard_init();
     weightNFT = IWeightedNFT(_nft);
-    lastRewardBlock = _startBlock;
-    rewardPerBlock = _rewardPerBlock;
-    bonusEndBlock = _startBlock + _totalBlocks;
+    lastRewardTimestamp = _startTime;
+    rewardPerSecond = _rewardPerSecond;
+    bonusEndTimestamp = _startTime + _totalSeconds;
   }
 
-  function updateRewardPerBlock(uint256 _rewardPerBlock) external onlyOwner {
+  function updateRewardPerSecond(uint256 _rewardPerSecond) external onlyOwner {
     _updatePool();
-    rewardPerBlock = _rewardPerBlock;
-    emit NewRewardPerBlock(_rewardPerBlock);
+    rewardPerSecond = _rewardPerSecond;
+    emit NewRewardPerSecond(_rewardPerSecond);
   }
 
-  function updateBonusEndBlock(uint256 _bonusEndBlock) external onlyOwner {
-    require(_bonusEndBlock > block.number, "Invalid end block");
+  function updateBonusEndTimestamp(uint256 _bonusEndTimestamp) external onlyOwner {
+    require(_bonusEndTimestamp > block.timestamp, "Invalid end timestamp");
 
     _updatePool();
-    bonusEndBlock = _bonusEndBlock;
-    emit NewBonusEndBlock(_bonusEndBlock);
+    bonusEndTimestamp = _bonusEndTimestamp;
+    emit NewBonusEndTimestamp(_bonusEndTimestamp);
   }
 
   function stopReward() external onlyOwner {
-    require(bonusEndBlock > block.number, "Cannot stop ended cycle");
-    bonusEndBlock = block.number;
+    uint256 _now = block.timestamp;
+    require(bonusEndTimestamp > _now, "Cannot stop ended cycle");
+    bonusEndTimestamp = _now;
 
-    emit StopRewards(block.number);
+    emit StopRewards(_now);
   }
 
   function deposit(uint256 _tokenId, address _recipient) public nonReentrant {
@@ -204,9 +205,9 @@ contract FixedRewardPoolV2 is MulticallUpgradeable, OwnableUpgradeable, Reentran
   function pendingReward(address _user) external view returns (uint256) {
     UserInfo storage user = userInfo[_user];
     uint256 _totalStakedWeight = totalStakedWeight;
-    if (block.number > lastRewardBlock && _totalStakedWeight != 0) {
-      uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
-      uint256 rewards = multiplier * rewardPerBlock;
+    if (block.timestamp > lastRewardTimestamp && _totalStakedWeight != 0) {
+      uint256 multiplier = _getMultiplier(lastRewardTimestamp, block.timestamp);
+      uint256 rewards = multiplier * rewardPerSecond;
       uint256 adjustedTokenPerShare = accTokenPerShare + (rewards * PRECISION_FACTOR) / _totalStakedWeight;
       return (user.amount * adjustedTokenPerShare) / PRECISION_FACTOR - user.rewardDebt;
     } else {
@@ -215,28 +216,29 @@ contract FixedRewardPoolV2 is MulticallUpgradeable, OwnableUpgradeable, Reentran
   }
 
   function _updatePool() internal {
-    if (block.number <= lastRewardBlock) {
+    uint256 _now = block.timestamp;
+    if (_now <= lastRewardTimestamp) {
       return;
     }
 
     if (totalStakedWeight == 0) {
-      lastRewardBlock = block.number;
+      lastRewardTimestamp = _now;
       return;
     }
 
-    uint256 multiplier = _getMultiplier(lastRewardBlock, block.number);
-    uint256 rewards = multiplier * rewardPerBlock;
+    uint256 multiplier = _getMultiplier(lastRewardTimestamp, _now);
+    uint256 rewards = multiplier * rewardPerSecond;
     accTokenPerShare = accTokenPerShare + (rewards * PRECISION_FACTOR) / totalStakedWeight;
-    lastRewardBlock = block.number;
+    lastRewardTimestamp = _now;
   }
 
   function _getMultiplier(uint256 _from, uint256 _to) internal view returns (uint256) {
-    if (_to <= bonusEndBlock) {
+    if (_to <= bonusEndTimestamp) {
       return _to - _from;
-    } else if (_from >= bonusEndBlock) {
+    } else if (_from >= bonusEndTimestamp) {
       return 0;
     } else {
-      return bonusEndBlock - _from;
+      return bonusEndTimestamp - _from;
     }
   }
 
