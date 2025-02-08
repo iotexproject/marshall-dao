@@ -120,6 +120,7 @@ contract FixedRewardPoolV3WithStaking is
   function deposit(uint256 _bucketId, uint256 _tokenId, address _recipient) public nonReentrant {
     require(systemStaking.ownerOf(_bucketId) == _recipient, "invalid bucket owner");
     Bucket memory bucket = systemStaking.bucketOf(_bucketId);
+    require(bucket.duration > minDuration, "invalid bucket duration");
     require(bucketInLocking(bucket.unlockedAt), "not locking bucket");
 
     uint256 _bucketDeviceCount = bucketDeviceCount[_bucketId];
